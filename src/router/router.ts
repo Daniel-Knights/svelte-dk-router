@@ -11,6 +11,15 @@ const loadState = () => {
             routes.filter(singleRoute => {
                 const state = window.history.state;
                 const path = window.location.pathname;
+                const query = new URLSearchParams(window.location.search);
+
+                if (query) {
+                    for (const pair of query.entries()) {
+                        if (!singleRoute.query) singleRoute['query'] = {};
+
+                        singleRoute.query[pair[0]] = pair[1];
+                    }
+                }
 
                 singleRoute.path.split('/').forEach((param, i) => {
                     if (param.includes(':')) {
@@ -36,7 +45,7 @@ const loadState = () => {
 
 export let route: Route = null;
 export const writableRoute = writable(null);
-writableRoute.subscribe(value => (route = value));
+writableRoute.subscribe(newRoute => (route = newRoute));
 
 export const setRoutes = (userRoutes: Route[]): void => {
     userRoutes.forEach(userRoute => {
@@ -78,6 +87,24 @@ export const changeRoute = (
         if (routeData.title) newTitle = routeData.title;
     });
 
+    if (query) {
+        writableRoute.update(routeValue => {
+            routeValue['query'] = query;
+
+            return routeValue;
+        });
+
+        const formattedQuery = Object.entries(query)
+            .map(([key, value], i, arr) => {
+                if (i !== arr.length - 1) {
+                    return key + '=' + value + '&';
+                } else return key + '=' + value;
+            })
+            .join('');
+
+        newPath += '?' + formattedQuery;
+    }
+
     if (params) {
         Object.keys(params).forEach(passedParam => {
             if (newPath.includes(':' + passedParam)) {
@@ -103,18 +130,6 @@ export const changeRoute = (
                 console.error('Svelte-Router [Error]: Missing required param: "' + param + '"');
             }
         });
-    }
-
-    if (query) {
-        const formattedQuery = Object.entries(query)
-            .map(([key, value], i, arr) => {
-                if (i !== arr.length - 1) {
-                    return key + '=' + value + '&';
-                } else return key + '=' + value;
-            })
-            .join('');
-
-        newPath += '?' + formattedQuery;
     }
 
     if (newTitle) document.title = newTitle;
