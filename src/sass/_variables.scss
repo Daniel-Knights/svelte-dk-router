@@ -1,0 +1,14 @@
+@function hexToRGB($hex) {
+    @return red($hex), green($hex), blue($hex);
+}
+
+:root {
+    --white: #fff;
+    --white-rgb: #{hexToRGB(#fff)};
+    --black: #000;
+    --black-rgb: #{hexToRGB(#000)};
+    --primary: #ff3e00;
+    --primary-rgb: #{hexToRGB(#ff3e00)};
+    --secondary: #676778;
+    --secondary-rgb: #{hexToRGB(#676778)};
+}

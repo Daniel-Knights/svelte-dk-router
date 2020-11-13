@@ -1,0 +1,4 @@
+configure reactive route object
+    beforeEach/afterEach/push/replace methods
+    params property - split path by ':'
+    meta property
