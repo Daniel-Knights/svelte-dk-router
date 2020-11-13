@@ -2,6 +2,7 @@
     import Link from '../router/Link.svelte';
 
     let query: Record<string, string> = { id: '1', name: 'dan' };
+    let params: Record<string, string> = { id: '1', name: 'dan' };
 </script>
 
 <style type="text/scss">
@@ -12,6 +13,6 @@
     <nav>
         <Link name={'Home'} {query}>Home</Link>
         <Link name={'About'}>About</Link>
-        <Link path={'/blog/2'}>Blog</Link>
+        <Link name={'Blog'} {params}>Blog</Link>
     </nav>
 </header>

@@ -34,7 +34,7 @@ export const setRoutes = (userRoutes: Route[]): void => {
     userRoutes.forEach(userRoute => {
         if (!userRoute.name || !userRoute.path || !userRoute.component) {
             return console.error(
-                'svelte-router [error]: name, path and component are required properties'
+                'Svelte-Router [Error]: name, path and component are required properties'
             );
         }
     });
@@ -47,10 +47,11 @@ export const setRoutes = (userRoutes: Route[]): void => {
 export const changeRoute = (
     name: string | void,
     path: string | void,
-    query: Record<string, string> | void
+    query: Record<string, string> | void,
+    params: Record<string, string> | void
 ): void => {
     if (!name && !path) {
-        return console.error('svelte-router [error]: name or path required');
+        return console.error('Svelte-Router [Error]: name or path required');
     }
 
     let newPath, newTitle, newRoute;
@@ -60,7 +61,7 @@ export const changeRoute = (
             writableRoute.set(routeData);
             newPath = routeData.path;
             newRoute = routeData;
-        } else if (path && routeData.path === path) {
+        } else if (path && routeData.path.split('/:')[0] === path) {
             writableRoute.set(routes[routes.indexOf(routeData)]);
             newPath = routeData.path;
             newRoute = routeData;
@@ -68,6 +69,33 @@ export const changeRoute = (
 
         if (routeData.title) newTitle = routeData.title;
     });
+
+    if (params) {
+        Object.keys(params).forEach(passedParam => {
+            if (newPath.includes(':' + passedParam)) {
+                writableRoute.update(routeValue => {
+                    if (!routeValue.params) {
+                        routeValue['params'] = {};
+                    }
+
+                    routeValue.params[passedParam] = params[passedParam];
+
+                    return routeValue;
+                });
+            } else {
+                console.warn('Svelte-Router [Warn]: Invalid param: "' + passedParam + '"');
+            }
+
+            newPath = newPath.replace(':' + passedParam, params[passedParam]);
+        });
+
+        newPath.split('/:').forEach((param, i) => {
+            if (i === 0) return;
+            if (!params[param]) {
+                console.error('Svelte-Router [Error]: Missing required param: "' + param + '"');
+            }
+        });
+    }
 
     if (query) {
         const formattedQuery = Object.entries(query)
@@ -80,6 +108,7 @@ export const changeRoute = (
 
         newPath += '?' + formattedQuery;
     }
+
     if (newTitle) document.title = newTitle;
     window.history.pushState({ name: newRoute.name }, '', newPath);
 };
