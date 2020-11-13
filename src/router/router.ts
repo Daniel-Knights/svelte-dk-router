@@ -8,16 +8,24 @@ const loadState = () => {
     if (!routes) return;
     else
         currentRoute =
-            routes.filter(writableRoute => {
+            routes.filter(singleRoute => {
                 const state = window.history.state;
                 const path = window.location.pathname;
 
-                if (state && writableRoute.name === state.name) {
-                    return writableRoute;
+                singleRoute.path.split('/').forEach((param, i) => {
+                    if (param.includes(':')) {
+                        if (!singleRoute.params) singleRoute.params = {};
+
+                        singleRoute.params[param.split(':')[1]] = path.split('/')[i];
+                    }
+                });
+
+                if (state && singleRoute.name === state.name) {
+                    return singleRoute;
                 }
 
-                if (path && writableRoute.path === path) {
-                    return writableRoute;
+                if (path && singleRoute.path.split('/:')[0] === '/' + path.split('/')[1]) {
+                    return singleRoute;
                 }
             }) || routes;
 

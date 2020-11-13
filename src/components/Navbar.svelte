@@ -13,6 +13,6 @@
     <nav>
         <Link name={'Home'} {query}>Home</Link>
         <Link name={'About'}>About</Link>
-        <Link name={'Blog'} {params}>Blog</Link>
+        <Link path={'/blog'} {params}>Blog</Link>
     </nav>
 </header>
