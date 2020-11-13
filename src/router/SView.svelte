@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { writableRoute } from './router';
+    import { writableRoute } from './state';
 
-    let component;
+    let component: any;
 
     writableRoute.subscribe(newRoute => (component = newRoute ? newRoute.component : null));
 </script>

@@ -1,9 +1,10 @@
-<script lang='ts'>
-	import Navbar from './components/Navbar.svelte';
-	import View from './router/View.svelte';
+<script lang="ts">
+    import Navbar from './components/Navbar.svelte';
+    import { SView } from './router';
 </script>
 
-<Navbar />
-<View />
+<style type="text/scss">
+</style>
 
-<style type='text/scss'></style>
+<Navbar />
+<SView />

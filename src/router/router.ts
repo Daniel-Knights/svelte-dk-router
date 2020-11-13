@@ -1,65 +1,12 @@
-import { writable } from 'svelte/store';
 import type { Route } from './types';
-
-let routes: Route[];
-let currentRoute: Route[] = [];
-
-const loadState = () => {
-    if (!routes) return;
-    else
-        currentRoute =
-            routes.filter(singleRoute => {
-                const state = window.history.state;
-                const path = window.location.pathname;
-                const query = new URLSearchParams(window.location.search);
-
-                if (query) {
-                    for (const pair of query.entries()) {
-                        if (!singleRoute.query) singleRoute['query'] = {};
-
-                        singleRoute.query[pair[0]] = pair[1];
-                    }
-                }
-
-                singleRoute.path.split('/').forEach((param, i) => {
-                    if (param.includes(':')) {
-                        if (!singleRoute.params) singleRoute.params = {};
-
-                        singleRoute.params[param.split(':')[1]] = path.split('/')[i];
-                    }
-                });
-
-                if (state && singleRoute.name === state.name) {
-                    return singleRoute;
-                }
-
-                if (path && singleRoute.path.split('/:')[0] === '/' + path.split('/')[1]) {
-                    return singleRoute;
-                }
-            }) || routes;
-
-    if (routes && currentRoute[0] && currentRoute[0].title) {
-        document.title = currentRoute[0].title;
-    }
-};
+import { routes, writableRoute } from './state';
+import { beforeCallback, afterCallback } from './methods';
 
 export let route: Route = null;
-export const writableRoute = writable(null);
-writableRoute.subscribe(newRoute => (route = newRoute));
-
-export const setRoutes = (userRoutes: Route[]): void => {
-    userRoutes.forEach(userRoute => {
-        if (!userRoute.name || !userRoute.path || !userRoute.component) {
-            return console.error(
-                'Svelte-Router [Error]: name, path and component are required properties'
-            );
-        }
-    });
-
-    routes = userRoutes;
-    loadState();
-    writableRoute.set(currentRoute[0]);
-};
+export let fromRoute: Route = null;
+writableRoute.subscribe(newRoute => {
+    route = newRoute;
+});
 
 export const changeRoute = (
     name: string | void,
@@ -67,6 +14,8 @@ export const changeRoute = (
     query: Record<string, string> | void,
     params: Record<string, string> | void
 ): void => {
+    fromRoute = route;
+
     if (!name && !path) {
         return console.error('Svelte-Router [Error]: name or path required');
     }
@@ -133,5 +82,8 @@ export const changeRoute = (
     }
 
     if (newTitle) document.title = newTitle;
+
+    if (beforeCallback) beforeCallback(route, fromRoute);
     window.history.pushState({ name: newRoute.name }, '', newPath);
+    if (afterCallback) afterCallback(route, fromRoute);
 };

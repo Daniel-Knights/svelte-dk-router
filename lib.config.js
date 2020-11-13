@@ -5,10 +5,8 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 
-const production = !process.env.ROLLUP_WATCH;
-
 module.exports = {
-    input: 'src/router/router.ts',
+    input: 'src/router/index.ts',
     output: {
         sourcemap: true,
         format: 'iife',
@@ -17,8 +15,6 @@ module.exports = {
     },
     plugins: [
         svelte({
-            // enable run-time checks when not in production
-            dev: !production,
             preprocess: sveltePreprocess(),
         }),
 
@@ -27,12 +23,8 @@ module.exports = {
             dedupe: ['svelte'],
         }),
         commonjs(),
-        typescript({
-            sourceMap: !production,
-            inlineSources: !production,
-        }),
-
-        production && terser(),
+        typescript(),
+        terser(),
     ],
     watch: {
         clearScreen: false,

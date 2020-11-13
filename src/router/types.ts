@@ -7,3 +7,7 @@ export interface Route {
     params?: Record<string, string>;
     meta?: Record<string, string>;
 }
+
+export interface Callback {
+    (to: Route, from: Route): void;
+}

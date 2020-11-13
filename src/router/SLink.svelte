@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { writableRoute, changeRoute } from './router';
+    import { writableRoute } from './state';
+    import { changeRoute } from './router';
 
     export let name: string = undefined,
         path: string = undefined,
         query: Record<string, string> = undefined,
         params: Record<string, string> = undefined;
 
-    let routerActive;
+    let routerActive: boolean;
 
     writableRoute.subscribe(newRoute => {
         if (newRoute.path.split('/:')[0] === path || newRoute.name === name) {

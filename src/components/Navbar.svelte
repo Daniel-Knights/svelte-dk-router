@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Link from '../router/Link.svelte';
+    import { SLink } from '../router';
 
     let query: Record<string, string> = { id: '1', name: 'dan' };
     let params: Record<string, string> = { id: '1', name: 'dan' };
@@ -11,8 +11,8 @@
 <header>
     <h1>Svelte Blog</h1>
     <nav>
-        <Link name={'Home'} {query}>Home</Link>
-        <Link name={'About'}>About</Link>
-        <Link path={'/blog'} {params}>Blog</Link>
+        <SLink name={'Home'} {query}>Home</SLink>
+        <SLink name={'About'}>About</SLink>
+        <SLink path={'/blog'} {params}>Blog</SLink>
     </nav>
 </header>

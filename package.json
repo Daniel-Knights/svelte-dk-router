@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "build": "rollup -c",
-        "lib": "rollup -c lib.config.js && cp src/router/View.svelte dist/View.svelte && cp src/router/Link.svelte dist/Link.svelte",
+        "lib": "rollup -c lib.config.js",
         "dev": "rollup -c -w",
         "start": "sirv public -s",
         "validate": "svelte-check"
