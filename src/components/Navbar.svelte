@@ -12,6 +12,6 @@
     <nav>
         <Link name={'Home'} {query}>Home</Link>
         <Link name={'About'}>About</Link>
-        <Link path={'/blog'}>Blog</Link>
+        <Link path={'/blog/2'}>Blog</Link>
     </nav>
 </header>

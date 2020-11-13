@@ -1,6 +1,9 @@
 export interface Route {
     name: string;
+    title?: string;
     path: string;
     component;
-    title?: string;
+    query?: string;
+    params?: Record<string, string>;
+    meta?: Record<string, string>;
 }

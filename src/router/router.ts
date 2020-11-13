@@ -26,9 +26,19 @@ const loadState = () => {
     }
 };
 
+export let route: Route = null;
 export const writableRoute = writable(null);
+writableRoute.subscribe(value => (route = value));
 
 export const setRoutes = (userRoutes: Route[]): void => {
+    userRoutes.forEach(userRoute => {
+        if (!userRoute.name || !userRoute.path || !userRoute.component) {
+            return console.error(
+                'svelte-router [error]: name, path and component are required properties'
+            );
+        }
+    });
+
     routes = userRoutes;
     loadState();
     writableRoute.set(currentRoute[0]);
@@ -40,7 +50,7 @@ export const changeRoute = (
     query: Record<string, string> | void
 ): void => {
     if (!name && !path) {
-        return console.error('Router [error]: Name or path required');
+        return console.error('svelte-router [error]: name or path required');
     }
 
     let newPath, newTitle, newRoute;
@@ -70,7 +80,6 @@ export const changeRoute = (
 
         newPath += '?' + formattedQuery;
     }
-
     if (newTitle) document.title = newTitle;
     window.history.pushState({ name: newRoute.name }, '', newPath);
 };

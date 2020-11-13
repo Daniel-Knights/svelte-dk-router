@@ -8,6 +8,9 @@ const routes = [
         title: 'Home',
         path: '/home',
         component: home,
+        meta: {
+            name: 'hello',
+        },
     },
     {
         name: 'About',
@@ -18,7 +21,7 @@ const routes = [
     {
         name: 'Blog',
         title: 'Blog',
-        path: '/blog',
+        path: '/blog/:id',
         component: blog,
     },
 ];
