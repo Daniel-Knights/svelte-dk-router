@@ -1,11 +1,12 @@
-import { routes } from './state';
+import type { PassedRoute, RouteWithRegex } from '../static';
+import { error, validateParams } from '../static';
 import { changeRoute } from './router';
-import type { Guard, PassedRoute, RouteWithRegex } from './types';
-import { error, validateParams } from './utils';
+import { routes } from './state';
 
-let filteredRoute: RouteWithRegex, beforeCallback: Guard, afterCallback: Guard;
+let filteredRoute: RouteWithRegex;
 
 const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWithRegex => {
+    // Filter route using identifier
     filteredRoute = routes.filter(route => {
         const { name, regex } = route;
 
@@ -27,6 +28,12 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
         return false;
     }
 
+    if (window.location.pathname.match(filteredRoute.regex)) {
+        error('Duplicate route navigation not permitted');
+        return false;
+    }
+
+    // Set route object properties
     if (typeof identifier === 'object') {
         if (identifier.query) {
             filteredRoute['query'] = identifier.query;
@@ -44,26 +51,18 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
     return filteredRoute;
 };
 
+// Push to the current history entry
 const push = (identifier: string | PassedRoute): void => {
     if (!processIdentifier(identifier)) return;
 
     changeRoute(filteredRoute);
 };
 
+// Replace the current history entry
 const replace = (identifier: string | PassedRoute): void => {
     if (!processIdentifier(identifier)) return;
 
     changeRoute(filteredRoute, true);
 };
 
-// Set function to run before each route change
-const beforeEach = (cb: Guard): void => {
-    beforeCallback = cb;
-};
-
-// Set function to run after each route change
-const afterEach = (cb: Guard): void => {
-    afterCallback = cb;
-};
-
-export { beforeCallback, afterCallback, push, replace, beforeEach, afterEach };
+export { push, replace };

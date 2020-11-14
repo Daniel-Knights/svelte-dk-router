@@ -1,7 +1,7 @@
-import type { Route, PassedRoute } from './types';
+import type { Route, PassedRoute, RouteWithRegex } from '../static';
+import { error, warn, validateParams } from '../static';
 import { routes, writableRoute } from './state';
-import { beforeCallback, afterCallback } from './methods';
-import { error, warn, validateParams } from './utils';
+import { beforeCallback, afterCallback } from './guard';
 
 // Current route data
 let route: Route = null;
@@ -23,7 +23,7 @@ const changeRoute = (passedRoute: PassedRoute, replace?: boolean): void => {
 
     let newPath: string,
         newTitle: string,
-        newRoute: Route,
+        newRoute: RouteWithRegex,
         routeExists = false;
 
     const setNewRouteData = routeData => {
@@ -47,6 +47,9 @@ const changeRoute = (passedRoute: PassedRoute, replace?: boolean): void => {
     if (!routeExists) {
         return error('unknown route');
     }
+
+    // Prevent duplicate route navigation
+    if (window.location.pathname.match(newRoute.regex)) return;
 
     if (!validateParams(newPath, params)) return;
 
@@ -82,14 +85,13 @@ const changeRoute = (passedRoute: PassedRoute, replace?: boolean): void => {
 
     // Named-params handling
     if (params) {
-        // Loop through passed-params and compare against
-        // the matched routes' params
+        // Compare passed params with matched routes' params,
+        // format and set to the route object
         Object.keys(params).forEach(passedParam => {
             if (newPath.includes(':' + passedParam)) {
                 writableRoute.update(routeValue => {
-                    if (!routeValue.params) {
-                        routeValue['params'] = {};
-                    }
+                    if (!routeValue.params) routeValue['params'] = {};
+
                     routeValue.params[passedParam] = params[passedParam];
 
                     return routeValue;

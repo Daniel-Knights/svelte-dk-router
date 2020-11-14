@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { writableRoute } from './state';
-    import { changeRoute } from './router';
+    import { writableRoute, changeRoute } from '../internal';
 
     export let name: string = undefined,
         path: string = undefined,

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    import { route } from '../router/router';
+    import { route } from '../router';
 
     import Post from '../components/Post.svelte';
 

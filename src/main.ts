@@ -14,7 +14,7 @@ afterEach((to, from) => {
 });
 
 setTimeout(() => {
-    replace('/home');
+    replace('/blog');
 }, 3000);
 
 setRoutes(routes);

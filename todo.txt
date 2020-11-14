@@ -1,3 +1,2 @@
-prevent navigating to the same route
 fallback routes
 nested routes

@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
-import type { Route, RouteWithRegex } from './types';
-import { error } from './utils';
+import type { Route, RouteWithRegex } from '../static';
+import { error } from '../static';
 
 // Provided routes
 let routes: RouteWithRegex[];

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writableRoute } from './state';
+    import { writableRoute } from '../internal';
 
     let component: any;
 
