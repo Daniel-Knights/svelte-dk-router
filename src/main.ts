@@ -9,13 +9,7 @@ beforeEach((to, from) => {
 afterEach((to, from) => {
     console.log(to, ' - after to');
     console.log(from, ' - after from');
-
-    if (to.name === 'Home') push('/about');
 });
-
-setTimeout(() => {
-    replace('/blog');
-}, 3000);
 
 setRoutes(routes);
 
