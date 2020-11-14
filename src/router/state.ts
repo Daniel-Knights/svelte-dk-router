@@ -1,12 +1,42 @@
 import { writable } from 'svelte/store';
-import type { Route } from './types';
+import type { Route, RouteWithRegex } from './types';
+import { error } from './utils';
 
-export let routes: Route[];
-export let currentRoute: Route[] = [];
+// Provided routes
+let routes: RouteWithRegex[];
+let currentRoute: RouteWithRegex[] = [];
 
-export const writableRoute = writable(null);
+// Reactive route data
+const writableRoute = writable(null);
 
-export const loadState = (): void => {
+// Set query params to route object on page-load
+const queryState = (query, route) => {
+    if (query) {
+        for (const pair of query.entries()) {
+            if (!route.query) route['query'] = {};
+
+            route.query[pair[0]] = pair[1];
+        }
+    }
+};
+
+// Set named params to route object on page-load
+const paramState = (path, route) => {
+    route.path.split('/').forEach((param, i) => {
+        if (param.includes(':')) {
+            // Validate
+            if (!path.split('/')[i])
+                return error('Missing required param: "' + param.slice(1) + '"');
+
+            if (!route.params) route.params = {};
+
+            route.params[param.split(':')[1]] = path.split('/')[i];
+        }
+    });
+};
+
+// Determine the current route and update route data
+const loadState = (): void => {
     if (!routes) return;
     else
         currentRoute =
@@ -15,46 +45,58 @@ export const loadState = (): void => {
                 const path = window.location.pathname;
                 const query = new URLSearchParams(window.location.search);
 
-                if (query) {
-                    for (const pair of query.entries()) {
-                        if (!singleRoute.query) singleRoute['query'] = {};
-
-                        singleRoute.query[pair[0]] = pair[1];
-                    }
-                }
-
-                singleRoute.path.split('/').forEach((param, i) => {
-                    if (param.includes(':')) {
-                        if (!singleRoute.params) singleRoute.params = {};
-
-                        singleRoute.params[param.split(':')[1]] = path.split('/')[i];
-                    }
-                });
-
+                // Compare route name against state name
                 if (state && singleRoute.name === state.name) {
+                    queryState(query, singleRoute);
+                    paramState(path, singleRoute);
                     return singleRoute;
                 }
 
+                // Compare route path against URL path
                 if (path && singleRoute.path.split('/:')[0] === '/' + path.split('/')[1]) {
+                    queryState(query, singleRoute);
+                    paramState(path, singleRoute);
                     return singleRoute;
                 }
             }) || routes;
 
-    if (routes && currentRoute[0] && currentRoute[0].title) {
+    writableRoute.set(currentRoute[0]);
+
+    // Update title
+    if (currentRoute[0] && currentRoute[0].title) {
         document.title = currentRoute[0].title;
     }
 };
 
-export const setRoutes = (userRoutes: Route[]): void => {
+// Set provided routes
+const setRoutes = (userRoutes: Route[]): void => {
+    // Validate
     userRoutes.forEach(userRoute => {
         if (!userRoute.name || !userRoute.path || !userRoute.component) {
             return console.error(
                 'Svelte-Router [Error]: name, path and component are required properties'
             );
         }
+
+        // Generate dynamic regex for each route
+        const routeRegex = userRoute.path
+            .split('/')
+            .map((section, i, arr) => {
+                if (section.includes(':')) {
+                    if (!arr[i - 1].includes(':')) return '.*';
+                    else return '';
+                } else if (i !== 0) return '/' + section;
+            })
+            .join('')
+            .slice(1);
+
+        userRoute['regex'] = new RegExp(routeRegex, 'g');
     });
 
-    routes = userRoutes;
+    routes = userRoutes as RouteWithRegex[];
     loadState();
-    writableRoute.set(currentRoute[0]);
 };
+
+window.addEventListener('popstate', loadState);
+
+export { routes, currentRoute, writableRoute, loadState, setRoutes };

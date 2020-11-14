@@ -1,15 +1,21 @@
 import App from './App.svelte';
 import routes from './routes';
-import { setRoutes, beforeEach, afterEach } from './router';
+import { setRoutes, beforeEach, afterEach, replace, push } from './router';
 
 beforeEach((to, from) => {
-    console.log('before to: ', to);
-    console.log('before from: ', from);
+    console.log(to, ' - before to');
+    console.log(from, ' - before from');
 });
 afterEach((to, from) => {
-    console.log('after to: ', to);
-    console.log('after from: ', from);
+    console.log(to, ' - after to');
+    console.log(from, ' - after from');
+
+    if (to.name === 'Home') push('/about');
 });
+
+setTimeout(() => {
+    replace('/home');
+}, 3000);
 
 setRoutes(routes);
 

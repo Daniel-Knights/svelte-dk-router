@@ -1,2 +1,3 @@
-beforeEach/afterEach/push/replace methods
+prevent navigating to the same route
+fallback routes
 nested routes
