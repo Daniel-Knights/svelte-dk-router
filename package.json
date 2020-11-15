@@ -1,7 +1,7 @@
 {
     "name": "svelte-dk-router",
     "version": "0.1.10",
-    "main": "./dist/router.js",
+    "main": "./dist/router.umd.min.js",
     "scripts": {
         "build": "rollup -c",
         "lib": "rollup -c lib.config.js",
@@ -35,8 +35,7 @@
         "svelte": "^3.0.0"
     },
     "files": [
-        "dist/router.js",
-        "dist/router.js.map"
+        "dist/router.umd.min.js"
     ],
     "keywords": [
         "svelte",
