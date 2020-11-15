@@ -3,7 +3,7 @@
     "version": "0.1.16",
     "main": "dist/router.js",
     "module": "dist/router.mjs",
-    "svelte": "src/router/index.ts",
+    "svelte": "dist/router.js",
     "scripts": {
         "build": "rollup -c",
         "lib": "rollup -c lib.config.js",
