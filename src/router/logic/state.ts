@@ -4,19 +4,18 @@ import { error } from '../static';
 
 // Provided routes
 let routes: RouteWithRegex[];
-let currentRoute: RouteWithRegex[] = [];
+let currentRoute: RouteWithRegex;
 
 // Reactive route data
 const writableRoute = writable(null);
 
 // Set query params to route object on page-load
 const queryState = (query, route) => {
-    if (query) {
-        for (const pair of query.entries()) {
-            if (!route.query) route['query'] = {};
+    if (!query) return;
+    for (const pair of query.entries()) {
+        if (!route.query) route['query'] = {};
 
-            route.query[pair[0]] = pair[1];
-        }
+        route.query[pair[0]] = pair[1];
     }
 };
 
@@ -53,18 +52,18 @@ const loadState = (): void => {
                 }
 
                 // Compare route path against URL path
-                if (path && singleRoute.path.split('/:')[0] === '/' + path.split('/')[1]) {
+                if (path && path.match(singleRoute.regex)) {
                     queryState(query, singleRoute);
                     paramState(path, singleRoute);
                     return singleRoute;
                 }
-            }) || routes;
+            })[0] || routes[0];
 
-    writableRoute.set(currentRoute[0]);
+    writableRoute.set(currentRoute);
 
     // Update title
-    if (currentRoute[0] && currentRoute[0].title) {
-        document.title = currentRoute[0].title;
+    if (currentRoute && currentRoute.title) {
+        document.title = currentRoute.title;
     }
 };
 
@@ -99,4 +98,4 @@ const setRoutes = (userRoutes: Route[]): void => {
 
 window.addEventListener('popstate', loadState);
 
-export { routes, currentRoute, writableRoute, loadState, setRoutes };
+export { routes, writableRoute, loadState, setRoutes };

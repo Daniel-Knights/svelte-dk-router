@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writableRoute, changeRoute } from '../internal';
+    import { writableRoute, changeRoute } from '../logic';
 
     export let name: string = undefined,
         path: string = undefined,
@@ -9,11 +9,9 @@
     let routerActive: boolean;
 
     writableRoute.subscribe(newRoute => {
-        if (newRoute.path.split('/:')[0] === path || newRoute.name === name) {
-            routerActive = true;
-        } else {
-            routerActive = false;
-        }
+        if (newRoute.path === '*') return;
+        const matches = (path && path.match(newRoute.regex)) || newRoute.name === name;
+        routerActive = matches ? true : false;
     });
 </script>
 

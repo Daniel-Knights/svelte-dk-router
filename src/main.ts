@@ -1,6 +1,6 @@
 import App from './App.svelte';
 import routes from './routes';
-import { setRoutes, beforeEach, afterEach, replace, push } from './router';
+import { setRoutes, beforeEach, afterEach } from './router';
 
 beforeEach((to, from) => {
     console.log(to, ' - before to');

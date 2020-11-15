@@ -1,4 +1,2 @@
-export { route } from './internal';
-export { setRoutes } from './internal';
-export { push, replace, beforeEach, afterEach } from './internal';
+export { route, setRoutes, push, replace, beforeEach, afterEach } from './logic';
 export { SLink, SView } from './components';
