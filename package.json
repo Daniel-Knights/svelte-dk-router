@@ -1,6 +1,6 @@
 {
     "name": "svelte-dk-router",
-    "version": "0.1.21",
+    "version": "0.1.22",
     "main": "dist/router.umd.min.js",
     "module": "dist/router.mjs",
     "svelte": "src/router/components/index.js",
