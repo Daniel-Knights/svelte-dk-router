@@ -9,7 +9,6 @@ module.exports = {
     input: 'src/router/index.ts',
     output: {
         format: 'umd',
-        globals: 'svelte-dk-router',
         name: 'SvelteDKRouter',
         file: 'dist/router.js',
         sourcemap: true,
