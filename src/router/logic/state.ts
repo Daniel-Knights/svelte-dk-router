@@ -89,7 +89,7 @@ const setRoutes = (userRoutes: Route[]): void => {
             .join('')
             .slice(1);
 
-        userRoute['regex'] = new RegExp('\\/' + routeRegex, 'g');
+        userRoute['regex'] = new RegExp('\\/' + routeRegex + '$', 'g');
     });
 
     routes = userRoutes as RouteWithRegex[];
