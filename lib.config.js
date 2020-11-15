@@ -9,7 +9,7 @@ module.exports = {
     input: 'src/router/index.ts',
     output: {
         sourcemap: true,
-        format: 'iife',
+        format: 'umd',
         name: 'app',
         file: 'dist/router.js',
     },

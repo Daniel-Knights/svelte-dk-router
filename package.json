@@ -1,6 +1,7 @@
 {
-    "name": "svelte-app",
-    "version": "1.0.0",
+    "name": "svelte-dk-router",
+    "version": "0.1.0",
+    "main": "./dist/router.js",
     "scripts": {
         "build": "rollup -c",
         "lib": "rollup -c lib.config.js",
@@ -27,9 +28,19 @@
         "svelte-check": "^1.0.0",
         "svelte-preprocess": "^4.5.2",
         "tslib": "^2.0.0",
+        "sirv-cli": "^1.0.0",
         "typescript": "^3.9.3"
     },
-    "dependencies": {
-        "sirv-cli": "^1.0.0"
-    }
+    "peerDependencies": {
+        "svelte": "^3.0.0"
+    },
+    "files": [
+        "dist/router.js"
+    ],
+    "keywords": [
+        "svelte",
+        "router",
+        "typescript",
+        "javascript"
+    ]
 }
