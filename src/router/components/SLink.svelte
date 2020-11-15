@@ -1,5 +1,5 @@
 <script>
-    import { writableRoute, changeRoute } from '../logic';
+    import { writableRoute, changeRoute } from '../logic/internal';
 
     export let name, path, query, params;
 
