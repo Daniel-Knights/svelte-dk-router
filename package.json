@@ -40,7 +40,7 @@
         "src/router/components/index.js",
         "src/router/components/SLink.svelte",
         "src/router/components/SView.svelte",
-        "src/router/index.js"
+        "src/router/logic/internal.js"
     ],
     "keywords": [
         "svelte",
