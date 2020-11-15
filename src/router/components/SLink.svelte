@@ -1,12 +1,12 @@
-<script lang="ts">
+<script>
     import { writableRoute, changeRoute } from '../logic';
 
-    export let name: string = undefined,
-        path: string = undefined,
-        query: Record<string, string> = undefined,
-        params: Record<string, string> = undefined;
+    export let name = undefined,
+        path = undefined,
+        query = undefined,
+        params = undefined;
 
-    let routerActive: boolean;
+    let routerActive;
 
     writableRoute.subscribe(newRoute => {
         if (newRoute.path === '*') return;
