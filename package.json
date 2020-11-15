@@ -37,9 +37,8 @@
         "svelte": "^3.0.0"
     },
     "files": [
-        "dist/router.umd.min.js",
-        "dist/SLink.svelte",
-        "dist/SView.svelte"
+        "dist/router.js",
+        "dist/router.mjs"
     ],
     "keywords": [
         "svelte",
