@@ -1,7 +1,7 @@
-<script lang="ts">
+<script>
     import { writableRoute } from '../logic';
 
-    let component: any;
+    let component;
 
     writableRoute.subscribe(newRoute => (component = newRoute ? newRoute.component : null));
 </script>
