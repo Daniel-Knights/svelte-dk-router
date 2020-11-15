@@ -8,16 +8,15 @@ import typescript from '@rollup/plugin-typescript';
 module.exports = {
     input: 'src/router/index.ts',
     output: {
-        sourcemap: true,
-        format: 'umd',
-        name: 'app',
+        format: 'es',
+        name: 'SvelteDKRouter',
         file: 'dist/router.js',
+        sourcemap: true,
     },
     plugins: [
         svelte({
             preprocess: sveltePreprocess(),
         }),
-
         resolve({
             browser: true,
             dedupe: ['svelte'],
@@ -26,7 +25,4 @@ module.exports = {
         typescript(),
         terser(),
     ],
-    watch: {
-        clearScreen: false,
-    },
 };
