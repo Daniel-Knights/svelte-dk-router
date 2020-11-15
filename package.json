@@ -39,7 +39,8 @@
         "dist/router.umd.min.js",
         "src/router/components/index.js",
         "src/router/components/SLink.svelte",
-        "src/router/components/SView.svelte"
+        "src/router/components/SView.svelte",
+        "src/router/logic/index.js"
     ],
     "keywords": [
         "svelte",
