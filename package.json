@@ -1,7 +1,7 @@
 {
     "name": "svelte-dk-router",
     "version": "0.1.3",
-    "main": "./router/index.ts",
+    "main": "./dist/router.js",
     "scripts": {
         "build": "rollup -c",
         "lib": "rollup -c lib.config.js",
