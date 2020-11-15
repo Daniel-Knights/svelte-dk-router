@@ -6,7 +6,7 @@ import typescript from '@rollup/plugin-typescript';
 import pkg from './package.json';
 
 module.exports = {
-    input: 'src/router/index.ts',
+    input: 'src/router/index.js',
     output: {
         file: pkg.main,
         format: 'umd',
