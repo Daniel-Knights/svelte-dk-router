@@ -2,10 +2,10 @@
     "name": "svelte-dk-router",
     "version": "0.1.42",
     "main": "dist/index.js",
-    "svelte": "dist/components/index.js",
+    "svelte": "dist/index.js",
     "scripts": {
         "build": "rollup -c",
-        "lib": "rollup -c lib.config.js",
+        "lib": "tsc && cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
         "dev": "rollup -c -w",
         "start": "sirv public -s",
         "validate": "svelte-check"
