@@ -1,7 +1,10 @@
 <script>
     import { writableRoute, changeRoute } from '../logic';
 
-    export let name, path, query, params;
+    export let name = undefined,
+        path = undefined,
+        query = undefined,
+        params = undefined;
 
     let routerActive;
 
