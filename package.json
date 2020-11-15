@@ -1,7 +1,7 @@
 {
     "name": "svelte-dk-router",
     "version": "0.1.2",
-    "main": "./dist/router.js",
+    "main": "./router/index.ts",
     "scripts": {
         "build": "rollup -c",
         "lib": "rollup -c lib.config.js",
@@ -34,9 +34,6 @@
     "peerDependencies": {
         "svelte": "^3.0.0"
     },
-    "files": [
-        "dist/router.js"
-    ],
     "keywords": [
         "svelte",
         "router",

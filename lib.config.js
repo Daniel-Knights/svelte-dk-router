@@ -8,7 +8,7 @@ import typescript from '@rollup/plugin-typescript';
 module.exports = {
     input: 'src/router/index.ts',
     output: {
-        format: 'es',
+        format: 'umd',
         name: 'SvelteDKRouter',
         file: 'dist/router.js',
         sourcemap: true,
