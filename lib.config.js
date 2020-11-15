@@ -22,7 +22,7 @@ module.exports = {
     ],
     plugins: [
         svelte({
-            format: 'esm',
+            format: 'umd',
             preprocess: sveltePreprocess(),
         }),
         resolve(),

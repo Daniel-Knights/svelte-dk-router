@@ -1,4 +1,2 @@
-import SLink from './SLink.svelte';
-import SView from './SView.svelte';
-
-export { SLink, SView };
+export { default as SLink } from './SLink.svelte';
+export { default as SView } from './SView.svelte';
