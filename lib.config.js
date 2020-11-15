@@ -7,19 +7,12 @@ import pkg from './package.json';
 
 module.exports = {
     input: 'src/router/index.ts',
-    output: [
-        {
-            file: pkg.module,
-            format: 'es',
-            sourcemap: true,
-        },
-        {
-            file: pkg.main,
-            format: 'umd',
-            name: 'Router',
-            sourcemap: true,
-        },
-    ],
+    output: {
+        file: pkg.main,
+        format: 'umd',
+        name: 'Router',
+        sourcemap: true,
+    },
     plugins: [
         svelte({
             format: 'umd',
