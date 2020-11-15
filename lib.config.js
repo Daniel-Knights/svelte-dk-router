@@ -3,17 +3,26 @@ import resolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
+import pkg from './package.json';
 
 module.exports = {
     input: 'src/router/index.ts',
-    output: {
-        format: 'umd',
-        name: 'SvelteDKRouter',
-        file: 'dist/router.umd.min.js',
-        sourcemap: true,
-    },
+    output: [
+        {
+            file: pkg.module,
+            format: 'es',
+            sourcemap: true,
+        },
+        {
+            file: pkg.main,
+            format: 'umd',
+            name: 'Router',
+            sourcemap: true,
+        },
+    ],
     plugins: [
         svelte({
+            format: 'esm',
             preprocess: sveltePreprocess(),
         }),
         resolve(),
