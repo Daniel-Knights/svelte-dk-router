@@ -1,8 +1,9 @@
 {
     "extends": "@tsconfig/svelte/tsconfig.json",
-    "include": ["src/**/*"],
+    "include": ["src/router/*"],
     "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
     "compilerOptions": {
-        "module": "es2020"
+        "module": "es2020",
+        "outDir": "dist"
     }
 }
