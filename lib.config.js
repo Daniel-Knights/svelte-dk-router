@@ -10,7 +10,7 @@ module.exports = {
     output: {
         format: 'umd',
         name: 'SvelteDKRouter',
-        file: 'dist/router.js',
+        file: 'dist/router.umd.min.js',
         sourcemap: true,
     },
     plugins: [
