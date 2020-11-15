@@ -1,5 +1,5 @@
 <script>
-    import { writableRoute } from '../logic/internal';
+    import { writableRoute } from '../logic';
 
     let component;
 
