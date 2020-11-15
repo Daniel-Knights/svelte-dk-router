@@ -3,7 +3,7 @@
     "version": "0.1.21",
     "main": "dist/router.umd.min.js",
     "module": "dist/router.mjs",
-    "svelte": "src/router/components/index.ts",
+    "svelte": "src/router/components/index.js",
     "scripts": {
         "build": "rollup -c",
         "lib": "rollup -c lib.config.js",
