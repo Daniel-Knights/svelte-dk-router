@@ -17,10 +17,7 @@ module.exports = {
         svelte({
             preprocess: sveltePreprocess(),
         }),
-        resolve({
-            browser: true,
-            dedupe: ['svelte'],
-        }),
+        resolve(),
         commonjs(),
         typescript(),
         terser(),
