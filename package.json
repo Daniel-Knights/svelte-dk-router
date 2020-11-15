@@ -38,7 +38,8 @@
     },
     "files": [
         "dist/router.umd.min.js",
-        "dist/router.mjs"
+        "dist/router.mjs",
+        "src/router/components/index.js"
     ],
     "keywords": [
         "svelte",
