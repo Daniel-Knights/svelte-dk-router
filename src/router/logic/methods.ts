@@ -1,5 +1,5 @@
 import type { PassedRoute, RouteWithRegex } from '../static';
-import { error, validatePassedParams } from '../static';
+import { error } from '../static';
 import { changeRoute } from './change';
 import { routes } from './state';
 
@@ -45,8 +45,6 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
             filteredRoute['meta'] = identifier.meta;
         }
     }
-
-    if (!validatePassedParams(filteredRoute.path, filteredRoute.params)) return false;
 
     return filteredRoute;
 };

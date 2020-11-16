@@ -1,5 +1,6 @@
 <script>
-    import { writableRoute, changeRoute } from '../logic';
+    import { writableRoute, changeRoute, routes } from '../logic';
+    import { formatPathFromParams, compareRoutes } from '../static';
 
     export let name = undefined,
         path = undefined,
@@ -7,19 +8,25 @@
         params = undefined,
         replace = undefined;
 
-    console.log(replace);
+    let routerActive, href;
 
-    let routerActive;
+    href = compareRoutes(routes, { name, path }).path;
+
+    if (href.includes(':') && params) {
+        href = formatPathFromParams(href, params);
+    }
 
     writableRoute.subscribe(newRoute => {
-        if (newRoute.path === '*') return;
+        if (!newRoute || newRoute.path === '*') return;
+
         const matches = (path && path.match(newRoute.regex)) || newRoute.name === name;
+
         routerActive = matches ? true : false;
     });
 </script>
 
 <a
-    href="void"
+    {href}
     on:click|preventDefault={() => changeRoute({ name, path, query, params }, replace)}
     class={routerActive ? 'router-active' : ''}>
     <slot />

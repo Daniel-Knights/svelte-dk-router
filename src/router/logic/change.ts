@@ -1,16 +1,51 @@
 import type { Route, PassedRoute, RouteWithRegex } from '../static';
-import { error, warn, validatePassedParams } from '../static';
+import { error, validatePassedParams } from '../static';
 import { routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
+import { formatPathFromParams } from '../static/utils';
 
 // Current route data
 let route: Route = null;
 // Previous route data
 let fromRoute: Route = null;
+// New route data
+let newPath: string, newTitle: string, newRoute: RouteWithRegex;
+
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => {
     route = newRoute;
 });
+
+const formatQuery = query => {
+    // Set query params to route object
+    writableRoute.update(routeValue => {
+        routeValue['query'] = query;
+
+        return routeValue;
+    });
+
+    // Format and append to newPath
+    const formattedQuery = Object.entries(query)
+        .map(([key, value], i, arr) => {
+            if (i !== arr.length - 1) {
+                return key + '=' + value + '&';
+            } else return key + '=' + value;
+        })
+        .join('');
+
+    newPath += '?' + formattedQuery;
+};
+
+const formatParams = params => {
+    writableRoute.update(routeValue => {
+        routeValue['params'] = params;
+
+        return routeValue;
+    });
+
+    // Replace named params with passed values
+    newPath = formatPathFromParams(newPath, params);
+};
 
 const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
     const { name, path, query, params } = passedRoute;
@@ -21,10 +56,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         return error('name or path required');
     }
 
-    let newPath: string,
-        newTitle: string,
-        newRoute: RouteWithRegex,
-        routeExists = false;
+    let routeExists = false;
 
     const setNewRouteData = routeData => {
         routeExists = true;
@@ -45,14 +77,12 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         }
     });
 
-    if (!routeExists) {
-        return error('unknown route');
-    }
+    if (!routeExists) return error('unknown route');
 
     // Prevent duplicate route navigation
     if (window.location.pathname.match(newRoute.regex)) return;
 
-    if (!validatePassedParams(newPath, params)) return;
+    if (!validatePassedParams(newRoute.path, params)) return;
 
     // Before route change navigation guard
     if (beforeCallback) {
@@ -64,47 +94,10 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     writableRoute.set(newRoute);
 
     // Query handling
-    if (query) {
-        // Set query params to route object
-        writableRoute.update(routeValue => {
-            routeValue['query'] = query;
-
-            return routeValue;
-        });
-
-        // Format and append to newPath
-        const formattedQuery = Object.entries(query)
-            .map(([key, value], i, arr) => {
-                if (i !== arr.length - 1) {
-                    return key + '=' + value + '&';
-                } else return key + '=' + value;
-            })
-            .join('');
-
-        newPath += '?' + formattedQuery;
-    }
+    if (query) formatQuery(query);
 
     // Named-params handling
-    if (params) {
-        // Compare passed params with matched routes' params,
-        // format and set to the route object
-        Object.keys(params).forEach(passedParam => {
-            if (newPath.includes(':' + passedParam)) {
-                writableRoute.update(routeValue => {
-                    if (!routeValue.params) routeValue['params'] = {};
-
-                    routeValue.params[passedParam] = params[passedParam];
-
-                    return routeValue;
-                });
-            } else {
-                warn('Invalid param: "' + passedParam + '"');
-            }
-
-            // Replace named params with passed values
-            newPath = newPath.replace(':' + passedParam, params[passedParam]);
-        });
-    }
+    if (params) formatParams(params);
 
     // Update page title
     if (newTitle) {

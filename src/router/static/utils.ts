@@ -20,7 +20,26 @@ const validatePassedParams = (path: string, params: Record<string, string>): boo
         }
     });
 
+    if (params) {
+        // Compare passed params with path params
+        Object.keys(params).forEach(passedParam => {
+            if (!path.includes(':' + passedParam)) {
+                warn('Invalid param: "' + passedParam + '"');
+            }
+        });
+    }
+
     return valid;
+};
+
+const formatPathFromParams = (path: string, params: Record<string, string>): string => {
+    let formattedParams = path;
+
+    Object.entries(params).forEach(([key, value]) => {
+        formattedParams = formattedParams.replace(':' + key, value);
+    });
+
+    return formattedParams;
 };
 
 const compareRoutes = (
@@ -32,26 +51,30 @@ const compareRoutes = (
     let matchedRoute;
 
     routes.forEach((compare, compareIndex) => {
-        const sameRoute = routeIndex === compareIndex;
+        let sameRoute;
+
+        if (routeIndex) {
+            sameRoute = routeIndex === compareIndex;
+        }
 
         if (name === compare.name) {
             matchedRoute = compare;
 
-            if (!sameRoute)
+            if (sameRoute === false)
                 error('The "name" property must be unique, duplicates detected: "' + name + '"');
         }
 
         if (path === compare.path) {
             matchedRoute = compare;
 
-            if (!sameRoute)
+            if (sameRoute === false)
                 error('The "path" property must be unique, duplicates detected: "' + path + '"');
         }
 
-        if (path.match((compare as RouteWithRegex).regex)) matchedRoute = compare;
+        if (path && path.match((compare as RouteWithRegex).regex)) matchedRoute = compare;
     });
 
     return matchedRoute;
 };
 
-export { error, warn, validatePassedParams, compareRoutes };
+export { error, warn, validatePassedParams, formatPathFromParams, compareRoutes };

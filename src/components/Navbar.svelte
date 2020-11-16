@@ -15,6 +15,12 @@
         <SLink name={'About'}>About</SLink>
         <SLink path={'/blog'} {params}>Blog</SLink>
         <div on:click={() => push('/')}>Push</div>
-        <div on:click={() => replace('/about')}>Replace</div>
+        <div
+            on:click={() => replace({
+                    path: '/blog',
+                    params: { id: 'hello', name: 'knsckjsndc' },
+                })}>
+            Replace
+        </div>
     </nav>
 </header>
