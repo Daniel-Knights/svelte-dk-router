@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Route, RouteWithRegex } from '../static';
-import { error } from '../static';
+import { error, compareRoutes } from '../static';
 
 // Provided routes
 let routes: RouteWithRegex[];
@@ -34,42 +34,20 @@ const paramState = (path, route) => {
     });
 };
 
-// Route validation
-const validateDuplicateRoutes = (routes, route, routeIndex) => {
-    routes.forEach((compare, compareIndex) => {
-        if (routeIndex === compareIndex) return;
-
-        if (route.name === compare.name) {
-            error('The "name" property must be unique, duplicates detected: "' + route.name + '"');
-        }
-
-        if (route.path === compare.path) {
-            error('The "path" property must be unique, duplicates detected: "' + route.path + '"');
-        }
-    });
-};
-
 // Determine the current route and update route data
 const loadState = (): void => {
     if (!routes) return;
     else
         currentRoute =
             routes.filter(singleRoute => {
-                const state = window.history.state;
                 const path = window.location.pathname;
                 const query = new URLSearchParams(window.location.search);
-
-                // Compare route name against state name
-                if (state && singleRoute.name === state.name) {
-                    queryState(query, singleRoute);
-                    paramState(path, singleRoute);
-                    return singleRoute;
-                }
 
                 // Compare route path against URL path
                 if (path && path.match(singleRoute.regex)) {
                     queryState(query, singleRoute);
                     paramState(path, singleRoute);
+
                     return singleRoute;
                 }
             })[0] || routes[0];
@@ -78,7 +56,7 @@ const loadState = (): void => {
 
     // Update title
     if (currentRoute && currentRoute.title) {
-        document.title = currentRoute.title;
+        document.getElementsByTagName('title')[0].innerHTML = currentRoute.title;
     }
 };
 
@@ -92,7 +70,7 @@ const setRoutes = (userRoutes: Route[]): void => {
             );
         }
 
-        validateDuplicateRoutes(userRoutes, userRoute, i);
+        compareRoutes(userRoutes, userRoute, i);
 
         // Generate dynamic regex for each route
         const routeRegex = userRoute.path
@@ -100,7 +78,6 @@ const setRoutes = (userRoutes: Route[]): void => {
             .map((section, i, arr) => {
                 if (section.includes(':')) {
                     if (!arr[i - 1].includes(':')) return '.*';
-                    else return '';
                 } else if (i !== 0) return '/' + section;
             })
             .join('')
