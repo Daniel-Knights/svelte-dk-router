@@ -1,6 +1,6 @@
 import type { PassedRoute, RouteWithRegex } from '../static';
-import { error, validateParams } from '../static';
-import { changeRoute } from './router';
+import { error, validatePassedParams } from '../static';
+import { changeRoute } from './change';
 import { routes } from './state';
 
 let filteredRoute: RouteWithRegex;
@@ -16,9 +16,9 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
             }
 
             if (name === identifier) return route;
-        } else if (identifier.name && identifier.name === name) {
+        } else if (identifier.name === name) {
             return route;
-        } else if (identifier.path && identifier.path.match(regex)) {
+        } else if (identifier.path.match(regex)) {
             return route;
         }
     })[0];
@@ -29,7 +29,7 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
     }
 
     if (window.location.pathname.match(filteredRoute.regex)) {
-        error('Duplicate route navigation not permitted');
+        error('Duplicate route navigation is not permitted');
         return false;
     }
 
@@ -46,7 +46,7 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
         }
     }
 
-    if (!validateParams(filteredRoute.path, filteredRoute.params)) return false;
+    if (!validatePassedParams(filteredRoute.path, filteredRoute.params)) return false;
 
     return filteredRoute;
 };

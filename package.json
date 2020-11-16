@@ -6,9 +6,10 @@
     "scripts": {
         "build": "rollup -c",
         "lib": "tsc -b src/router && cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
+        "pub": "npm run lib && npm version patch && npm publish",
         "dev": "rollup -c -w",
         "start": "sirv public -s",
-        "validate": "svelte-check"
+        "check": "svelte-check"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^14.0.0",
