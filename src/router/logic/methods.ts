@@ -1,7 +1,8 @@
 import type { PassedRoute, RouteWithRegex } from '../static';
 import { error } from '../static';
+import { currentPath } from '../static/utils';
 import { changeRoute } from './change';
-import { routes } from './state';
+import { hashHistory, routes } from './state';
 
 let filteredRoute: RouteWithRegex;
 
@@ -28,10 +29,13 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
         return false;
     }
 
-    if (window.location.pathname.match(filteredRoute.regex)) {
+    if (currentPath(hashHistory).match(filteredRoute.regex)) {
         error('Duplicate route navigation is not permitted');
         return false;
     }
+
+    //  Cleanup query if not passed
+    if (!identifier.query) delete filteredRoute.query;
 
     // Set route object properties
     if (typeof identifier === 'object') {

@@ -3,9 +3,8 @@ import routes from './routes';
 import { setRoutes, beforeEach, afterEach, replace, push } from './router';
 
 beforeEach((to, from) => {
-    console.log(to, ' - before to');
-    console.log(from, ' - before from');
-
+    // console.log(to, ' - before to');
+    // console.log(from, ' - before from');
     // if (to.path === '/about') {
     //     if (from.name !== 'Blog') {
     //         push({
@@ -13,16 +12,14 @@ beforeEach((to, from) => {
     //             params: { id: 'name', name: 'id' },
     //         });
     //     }
-
     //     return false;
     // }
 });
-afterEach((to, from) => {
-    console.log(to, ' - after to');
-    console.log(from, ' - after from');
-
+afterEach(async (to, from) => {
+    // console.log(to, ' - after to');
     // if (to.path === '/about') push({ path: '/blog', params: { id: 'name', name: 'id' } });
-    // if (to.path === '/') replace('/about');
+    // if (to.path === '/') await replace('/about');
+    // console.log(from, ' - after from');
 });
 
 setRoutes(routes);

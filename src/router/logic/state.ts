@@ -1,13 +1,13 @@
 import { writable } from 'svelte/store';
 import type { Route, RouteWithRegex } from '../static';
-import { error, compareRoutes } from '../static';
-
-// Provided routes
-let routes: RouteWithRegex[];
-let currentRoute: RouteWithRegex;
+import { error, currentPath, compareRoutes } from '../static';
 
 // Reactive route data
 const writableRoute = writable(null);
+
+// Provided routes
+let routes: RouteWithRegex[];
+let currentRoute: RouteWithRegex, hashHistory;
 
 // Set query params to route object on page-load
 const queryState = (query, route) => {
@@ -23,6 +23,8 @@ const queryState = (query, route) => {
 const paramState = (path, route) => {
     route.path.split('/').forEach((param, i) => {
         if (param.includes(':')) {
+            if (hashHistory) i -= 1;
+
             // Validate
             if (!path.split('/')[i])
                 return error('Missing required param: "' + param.slice(1) + '"');
@@ -40,7 +42,7 @@ const loadState = (): void => {
     else
         currentRoute =
             routes.filter(singleRoute => {
-                const path = window.location.pathname;
+                const path = currentPath(hashHistory);
                 const query = new URLSearchParams(window.location.search);
 
                 // Compare route path against URL path
@@ -61,16 +63,20 @@ const loadState = (): void => {
 };
 
 // Set provided routes
-const setRoutes = (userRoutes: Route[]): void => {
+const setRoutes = (userRoutes: Route[], hashMode: boolean): void => {
+    if (hashMode) hashHistory = true;
+
     // Validate
     userRoutes.forEach((userRoute, i) => {
         const { name, path, component } = userRoute;
+
         if (!path || !component) {
             return console.error(
                 'Svelte-Router [Error]: "path" and "component" are required properties'
             );
         }
 
+        // Set formatted path as route name if no name supplied
         if (!name) {
             userRoute['name'] = path === '/' ? 'home' : path.split('/')[1];
         }
@@ -90,6 +96,8 @@ const setRoutes = (userRoutes: Route[]): void => {
             .slice(1);
 
         userRoute['regex'] = new RegExp('\\/' + routeRegex + '$');
+
+        if (hashMode) userRoute.path = '/#' + path;
     });
 
     routes = userRoutes as RouteWithRegex[];
@@ -98,4 +106,4 @@ const setRoutes = (userRoutes: Route[]): void => {
 
 window.addEventListener('popstate', loadState);
 
-export { routes, writableRoute, loadState, setRoutes };
+export { routes, writableRoute, hashHistory, loadState, setRoutes };

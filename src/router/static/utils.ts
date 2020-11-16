@@ -7,6 +7,10 @@ const warn = (msg: string): void => {
     return console.warn('Svelte-Router [Warn]: ' + msg);
 };
 
+const currentPath = (hash: boolean): string => {
+    return hash ? window.location.hash.split('?')[0] : window.location.pathname;
+};
+
 const validatePassedParams = (path: string, params: Record<string, string>): boolean => {
     let valid = true;
 
@@ -51,9 +55,9 @@ const compareRoutes = (
     let matchedRoute;
 
     routes.forEach((compare, compareIndex) => {
-        let sameRoute;
+        const { regex } = compare as RouteWithRegex;
 
-        matchedRoute = compare;
+        let sameRoute;
 
         if (routeIndex) {
             sameRoute = routeIndex === compareIndex;
@@ -66,17 +70,19 @@ const compareRoutes = (
                 error('The "name" property must be unique, duplicates detected: "' + name + '"');
         }
 
-        if (path === compare.path) {
+        if (path === compare.path || '/#' + path === compare.path) {
             matchedRoute = compare;
 
             if (sameRoute === false)
                 error('The "path" property must be unique, duplicates detected: "' + path + '"');
         }
 
-        if (path && path.match((compare as RouteWithRegex).regex)) matchedRoute = compare;
+        if (path && path.match(regex)) {
+            matchedRoute = compare;
+        }
     });
 
     return matchedRoute;
 };
 
-export { error, warn, validatePassedParams, formatPathFromParams, compareRoutes };
+export { error, warn, currentPath, validatePassedParams, formatPathFromParams, compareRoutes };

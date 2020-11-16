@@ -1,2 +1,4 @@
 nested routes
-hash routing
+failed/aborted navigation
+query method for appending query params
+silence errors?

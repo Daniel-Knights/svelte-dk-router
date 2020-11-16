@@ -3,8 +3,5 @@
     import { SView } from './router';
 </script>
 
-<style type="text/scss">
-</style>
-
 <Navbar />
 <SView />

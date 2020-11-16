@@ -1,8 +1,8 @@
 import type { Route, PassedRoute, RouteWithRegex } from '../static';
 import { error, validatePassedParams } from '../static';
-import { routes, writableRoute } from './state';
+import { hashHistory, routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
-import { formatPathFromParams } from '../static/utils';
+import { formatPathFromParams, currentPath } from '../static/utils';
 
 // Current route data
 let route: Route = null;
@@ -12,17 +12,18 @@ let fromRoute: Route = null;
 let newPath: string, newTitle: string, newRoute: RouteWithRegex;
 
 // Update route each time writableRoute is updated
-writableRoute.subscribe(newRoute => {
-    route = newRoute;
-});
+writableRoute.subscribe(newRoute => (route = newRoute));
 
 const formatQuery = query => {
     // Set query params to route object
     writableRoute.update(routeValue => {
-        routeValue['query'] = query;
+        if (query) routeValue['query'] = query;
+        else delete routeValue.query;
 
         return routeValue;
     });
+
+    if (!query) return;
 
     // Format and append to newPath
     const formattedQuery = Object.entries(query)
@@ -49,6 +50,7 @@ const formatParams = params => {
 
 const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
     const { name, path, query, params } = passedRoute;
+
     // Set fromRoute before route is updated
     fromRoute = route;
 
@@ -80,7 +82,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     if (!routeExists) return error('unknown route');
 
     // Prevent duplicate route navigation
-    if (window.location.pathname.match(newRoute.regex)) return;
+    if (currentPath(hashHistory).match(newRoute.regex)) return;
 
     if (!validatePassedParams(newRoute.path, params)) return;
 
@@ -94,7 +96,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     writableRoute.set(newRoute);
 
     // Query handling
-    if (query) formatQuery(query);
+    formatQuery(query);
 
     // Named-params handling
     if (params) formatParams(params);
