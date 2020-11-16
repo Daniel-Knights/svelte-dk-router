@@ -4,7 +4,10 @@
     export let name = undefined,
         path = undefined,
         query = undefined,
-        params = undefined;
+        params = undefined,
+        replace = undefined;
+
+    console.log(replace);
 
     let routerActive;
 
@@ -17,7 +20,7 @@
 
 <a
     href="void"
-    on:click|preventDefault={() => changeRoute({ name, path, query, params })}
+    on:click|preventDefault={() => changeRoute({ name, path, query, params }, replace)}
     class={routerActive ? 'router-active' : ''}>
     <slot />
 </a>

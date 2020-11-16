@@ -11,7 +11,7 @@
 <header>
     <h1>Svelte Blog</h1>
     <nav>
-        <SLink name={'Home'} {query}>Home</SLink>
+        <SLink name={'Home'} {query} replace={true}>Home</SLink>
         <SLink name={'About'}>About</SLink>
         <SLink path={'/blog'} {params}>Blog</SLink>
         <div on:click={() => push('/')}>Push</div>
