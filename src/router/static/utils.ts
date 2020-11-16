@@ -53,6 +53,8 @@ const compareRoutes = (
     routes.forEach((compare, compareIndex) => {
         let sameRoute;
 
+        matchedRoute = compare;
+
         if (routeIndex) {
             sameRoute = routeIndex === compareIndex;
         }

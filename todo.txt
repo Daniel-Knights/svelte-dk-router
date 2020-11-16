@@ -1,3 +1,2 @@
 nested routes
 hash routing
-async component imports

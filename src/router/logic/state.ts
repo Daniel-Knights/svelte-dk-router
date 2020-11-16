@@ -64,18 +64,24 @@ const loadState = (): void => {
 const setRoutes = (userRoutes: Route[]): void => {
     // Validate
     userRoutes.forEach((userRoute, i) => {
-        if (!userRoute.name || !userRoute.path || !userRoute.component) {
+        const { name, path, component } = userRoute;
+        if (!path || !component) {
             return console.error(
-                'Svelte-Router [Error]: "name", "path" and "component" are required properties'
+                'Svelte-Router [Error]: "path" and "component" are required properties'
             );
+        }
+
+        if (!name) {
+            userRoute['name'] = path === '/' ? 'home' : path.split('/')[1];
         }
 
         compareRoutes(userRoutes, userRoute, i);
 
         // Generate dynamic regex for each route
-        const routeRegex = userRoute.path
+        const routeRegex = path
             .split('/')
             .map((section, i, arr) => {
+                if (section === '*') return '.*';
                 if (section.includes(':')) {
                     if (!arr[i - 1].includes(':')) return '.*';
                 } else if (i !== 0) return '/' + section;
