@@ -1,1 +1,5 @@
+use a tags 
 nested routes
+hash routing
+async component imports
+matchRoute utility function

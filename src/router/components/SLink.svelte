@@ -15,8 +15,9 @@
     });
 </script>
 
-<div
-    on:click={() => changeRoute({ name, path, query, params })}
+<a
+    href="void"
+    on:click|preventDefault={() => changeRoute({ name, path, query, params })}
     class={routerActive ? 'router-active' : ''}>
     <slot />
-</div>
+</a>

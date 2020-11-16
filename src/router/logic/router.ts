@@ -33,19 +33,15 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         if (routeData.title) newTitle = routeData.title;
     };
 
-    let matchFound = false;
-
     // Set new route data
     routes.forEach(routeData => {
-        if (matchFound) return;
+        if (routeExists) return;
         if (name && routeData.name === name) {
             // If route changed by name
             setNewRouteData(routeData);
-            matchFound = true;
         } else if (path && path.match(routeData.regex)) {
             // If route changed by path
             setNewRouteData(routeData);
-            matchFound = true;
         }
     });
 

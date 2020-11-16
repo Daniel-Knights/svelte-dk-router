@@ -14,7 +14,7 @@
         <SLink name={'Home'} {query}>Home</SLink>
         <SLink name={'About'}>About</SLink>
         <SLink path={'/blog'} {params}>Blog</SLink>
-        <div on:click={() => push('/home')}>Push</div>
+        <div on:click={() => push('/')}>Push</div>
         <div on:click={() => replace('/about')}>Replace</div>
     </nav>
 </header>

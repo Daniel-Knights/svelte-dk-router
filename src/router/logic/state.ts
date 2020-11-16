@@ -34,6 +34,21 @@ const paramState = (path, route) => {
     });
 };
 
+// Route validation
+const validateDuplicateRoutes = (routes, route, routeIndex) => {
+    routes.forEach((compare, compareIndex) => {
+        if (routeIndex === compareIndex) return;
+
+        if (route.name === compare.name) {
+            error('The "name" property must be unique, duplicates detected: "' + route.name + '"');
+        }
+
+        if (route.path === compare.path) {
+            error('The "path" property must be unique, duplicates detected: "' + route.path + '"');
+        }
+    });
+};
+
 // Determine the current route and update route data
 const loadState = (): void => {
     if (!routes) return;
@@ -70,12 +85,14 @@ const loadState = (): void => {
 // Set provided routes
 const setRoutes = (userRoutes: Route[]): void => {
     // Validate
-    userRoutes.forEach(userRoute => {
+    userRoutes.forEach((userRoute, i) => {
         if (!userRoute.name || !userRoute.path || !userRoute.component) {
             return console.error(
-                'Svelte-Router [Error]: name, path and component are required properties'
+                'Svelte-Router [Error]: "name", "path" and "component" are required properties'
             );
         }
+
+        validateDuplicateRoutes(userRoutes, userRoute, i);
 
         // Generate dynamic regex for each route
         const routeRegex = userRoute.path
@@ -89,7 +106,7 @@ const setRoutes = (userRoutes: Route[]): void => {
             .join('')
             .slice(1);
 
-        userRoute['regex'] = new RegExp('\\/' + routeRegex + '$', 'g');
+        userRoute['regex'] = new RegExp('\\/' + routeRegex + '$');
     });
 
     routes = userRoutes as RouteWithRegex[];
