@@ -1,8 +1,7 @@
 import type { Route, PassedRoute, RouteWithRegex } from '../static';
-import { error, validatePassedParams } from '../static';
-import { hashHistory, routes, writableRoute } from './state';
+import { error, formatQuery, validatePassedParams, formatPathFromParams } from '../static';
+import { routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
-import { formatPathFromParams, currentPath } from '../static/utils';
 
 // Current route data
 let route: Route = null;
@@ -13,40 +12,6 @@ let newPath: string, newTitle: string, newRoute: RouteWithRegex;
 
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => (route = newRoute));
-
-const formatQuery = query => {
-    // Set query params to route object
-    writableRoute.update(routeValue => {
-        if (query) routeValue['query'] = query;
-        else delete routeValue.query;
-
-        return routeValue;
-    });
-
-    if (!query) return;
-
-    // Format and append to newPath
-    const formattedQuery = Object.entries(query)
-        .map(([key, value], i, arr) => {
-            if (i !== arr.length - 1) {
-                return key + '=' + value + '&';
-            } else return key + '=' + value;
-        })
-        .join('');
-
-    newPath += '?' + formattedQuery;
-};
-
-const formatParams = params => {
-    writableRoute.update(routeValue => {
-        routeValue['params'] = params;
-
-        return routeValue;
-    });
-
-    // Replace named params with passed values
-    newPath = formatPathFromParams(newPath, params);
-};
 
 const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
     const { name, path, query, params } = passedRoute;
@@ -81,12 +46,19 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
 
     if (!routeExists) return error('unknown route');
 
-    // Prevent duplicate route navigation
-    if (currentPath(hashHistory).match(newRoute.regex)) {
-        return error('Duplicate route navigation is not permitted');
+    if (!validatePassedParams(newRoute.path, params)) return;
+
+    // Query handling
+    if (query) {
+        newRoute['query'] = query;
+        newPath += '?' + formatQuery(query);
     }
 
-    if (!validatePassedParams(newRoute.path, params)) return;
+    // Named-params handling
+    if (params) {
+        newRoute['params'] = params;
+        newPath = formatPathFromParams(newPath, params);
+    }
 
     // Before route change navigation guard
     if (beforeCallback) {
@@ -96,12 +68,6 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     }
 
     writableRoute.set(newRoute);
-
-    // Query handling
-    formatQuery(query);
-
-    // Named-params handling
-    if (params) formatParams(params);
 
     // Update page title
     if (newTitle) {

@@ -1,5 +1,5 @@
 import type { PassedRoute, RouteWithRegex } from '../static';
-import { error } from '../static';
+import { error, formatQuery } from '../static';
 import { currentPath } from '../static/utils';
 import { changeRoute } from './change';
 import { hashHistory, routes } from './state';
@@ -24,11 +24,6 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
 
     if (!filteredRoute) {
         error('Invalid route');
-        return false;
-    }
-
-    if (currentPath(hashHistory).match(filteredRoute.regex)) {
-        error('Duplicate route navigation is not permitted');
         return false;
     }
 
@@ -65,4 +60,19 @@ const replace = (identifier: string | PassedRoute): void => {
     changeRoute(filteredRoute, true);
 };
 
-export { push, replace };
+// Set or update query params
+const setQuery = (query: Record<string, string> | string, update = false, replace = true): void => {
+    if (typeof query !== 'string') query = formatQuery(query);
+    if (update) query = window.location.search + '&' + query;
+    else query = '?' + query;
+
+    const path = currentPath(hashHistory) + query;
+
+    if (replace) {
+        window.history.replaceState(null, '', path);
+    } else {
+        window.history.pushState(null, '', path);
+    }
+};
+
+export { push, replace, setQuery };

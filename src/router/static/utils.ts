@@ -7,8 +7,21 @@ const warn = (msg: string): void => {
     return console.warn('Svelte-Router [Warn]: ' + msg);
 };
 
+// Hash path or history path
 const currentPath = (hash: boolean): string => {
     return hash ? window.location.hash.split('?')[0] : window.location.pathname;
+};
+
+const formatQuery = (query: Record<string, string>): string => {
+    const formattedQuery = Object.entries(query)
+        .map(([key, value], i, arr) => {
+            if (i !== arr.length - 1) {
+                return key + '=' + value + '&';
+            } else return key + '=' + value;
+        })
+        .join('');
+
+    return formattedQuery;
 };
 
 const validatePassedParams = (path: string, params: Record<string, string>): boolean => {
@@ -55,6 +68,8 @@ const compareRoutes = (
     let matchedRoute;
 
     routes.forEach((compare, compareIndex) => {
+        if (matchedRoute) return;
+
         const { regex } = compare as RouteWithRegex;
 
         let sameRoute;
@@ -85,4 +100,12 @@ const compareRoutes = (
     return matchedRoute;
 };
 
-export { error, warn, currentPath, validatePassedParams, formatPathFromParams, compareRoutes };
+export {
+    error,
+    warn,
+    currentPath,
+    formatQuery,
+    validatePassedParams,
+    formatPathFromParams,
+    compareRoutes,
+};
