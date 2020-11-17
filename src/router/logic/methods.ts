@@ -17,9 +17,7 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
             }
 
             if (name === identifier) return route;
-        } else if (identifier.name === name) {
-            return route;
-        } else if (identifier.path.match(regex)) {
+        } else if (identifier.name === name || identifier.path.match(regex)) {
             return route;
         }
     })[0];

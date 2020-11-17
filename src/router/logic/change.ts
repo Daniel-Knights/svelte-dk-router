@@ -82,7 +82,9 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     if (!routeExists) return error('unknown route');
 
     // Prevent duplicate route navigation
-    if (currentPath(hashHistory).match(newRoute.regex)) return;
+    if (currentPath(hashHistory).match(newRoute.regex)) {
+        return error('Duplicate route navigation is not permitted');
+    }
 
     if (!validatePassedParams(newRoute.path, params)) return;
 

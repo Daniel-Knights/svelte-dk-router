@@ -5,7 +5,6 @@ import fallback from './views/fallback.svelte';
 
 const routes = [
     {
-        name: 'Home',
         title: 'Home',
         path: '/',
         component: home,

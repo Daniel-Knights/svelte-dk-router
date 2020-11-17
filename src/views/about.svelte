@@ -8,7 +8,6 @@
     });
 </script>
 
-<style type="text/scss">
-</style>
-
-<h1>About</h1>
+<main id="about">
+    <h1>About</h1>
+</main>

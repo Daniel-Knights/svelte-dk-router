@@ -66,7 +66,7 @@ const loadState = (): void => {
 const setRoutes = (userRoutes: Route[], hashMode: boolean): void => {
     if (hashMode) hashHistory = true;
 
-    // Validate
+    // Validate and format
     userRoutes.forEach((userRoute, i) => {
         const { name, path, component } = userRoute;
 
@@ -90,12 +90,11 @@ const setRoutes = (userRoutes: Route[], hashMode: boolean): void => {
                 if (section === '*') return '.*';
                 if (section.includes(':')) {
                     if (!arr[i - 1].includes(':')) return '.*';
-                } else if (i !== 0) return '/' + section;
+                } else if (i !== 0) return '\\/' + section;
             })
-            .join('')
-            .slice(1);
+            .join('');
 
-        userRoute['regex'] = new RegExp('\\/' + routeRegex + '$');
+        userRoute['regex'] = new RegExp(routeRegex + '$');
 
         if (hashMode) userRoute.path = '/#' + path;
     });

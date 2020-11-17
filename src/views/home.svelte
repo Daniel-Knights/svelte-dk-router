@@ -2,13 +2,12 @@
     import { onMount } from 'svelte';
 
     import { route } from '../router';
+    import { SView } from '../router';
 
-    onMount(() => {
-        console.log(route);
-    });
+    onMount(() => console.log(route));
 </script>
 
-<style type="text/scss">
-</style>
-
-<h1>Home</h1>
+<main id="home">
+    <h1>Home</h1>
+    <!-- <SView /> -->
+</main>

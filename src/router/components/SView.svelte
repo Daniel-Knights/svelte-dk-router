@@ -3,7 +3,7 @@
 
     let component;
 
-    writableRoute.subscribe(newRoute => (component = newRoute ? newRoute.component : null));
+    writableRoute.subscribe(newRoute => (component = newRoute.component));
 </script>
 
 <svelte:component this={component} />
