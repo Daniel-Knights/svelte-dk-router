@@ -56,7 +56,11 @@ const replace = (identifier: string | PassedRoute): void => {
 };
 
 // Set or update query params
-const setQuery = (query: Record<string, string> | string, update = false, replace = true): void => {
+const setQuery = (
+    query: Record<string, string>,
+    update = false,
+    replace = true
+): RouteWithRegex => {
     if (!query) return error('A query argument is required');
     if (typeof query !== 'object') {
         return error('Query argument must be an object');
@@ -77,10 +81,12 @@ const setQuery = (query: Record<string, string> | string, update = false, replac
     const path = currentPath(hashHistory) + '?' + formatQuery(query);
 
     setUrl(replace, path);
+
+    return currentRoute;
 };
 
 // Update named-params
-const setParams = (params: Record<string, string>, replace = true): void => {
+const setParams = (params: Record<string, string>, replace = true): RouteWithRegex => {
     if (!params) {
         return error('Params are required');
     } else if (!currentRoute.path.includes(':')) {
@@ -111,6 +117,8 @@ const setParams = (params: Record<string, string>, replace = true): void => {
     const path = pathSections.join('/') + window.location.search;
 
     setUrl(replace, path);
+
+    return currentRoute;
 };
 
 export { push, replace, setQuery, setParams };
