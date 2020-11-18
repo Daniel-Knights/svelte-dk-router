@@ -27,7 +27,7 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
     }
 
     //  Cleanup query if not passed
-    if (typeof identifier === 'object' && !identifier.query) {
+    if (!(identifier as PassedRoute).query) {
         delete filteredRoute.query;
     }
 

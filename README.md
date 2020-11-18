@@ -85,9 +85,10 @@ and don't forget to set your rollup config to handle SPA's with `-s`:
 
 ## API
 
-#### `setRoutes(routes: object [, hashMode: boolean])`
+#### `setRoutes(routes: array[object(s)] [, hashMode: boolean])`
 
 Set your routes and optionally set to `hashMode` (prepends all routes with `/#`).
+If no `name` is set for a route, an all-lowercase name is generated based off the root path.
 
 #### `<SView />`
 
