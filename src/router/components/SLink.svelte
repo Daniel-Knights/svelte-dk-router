@@ -14,7 +14,7 @@
 
     href = route ? route.path : null;
 
-    if (href.includes(':') && params) {
+    if (href && href.includes(':') && params) {
         href = formatPathFromParams(href, params);
     }
 
