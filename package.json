@@ -53,6 +53,5 @@
         "router",
         "typescript",
         "javascript"
-    ],
-    "dependencies": {}
+    ]
 }

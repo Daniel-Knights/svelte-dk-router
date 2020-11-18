@@ -10,7 +10,9 @@
 
     let routerActive, href;
 
-    href = compareRoutes(routes, { name, path }).path;
+    const route = compareRoutes(routes, { name, path });
+
+    href = route ? route.path : null;
 
     if (href.includes(':') && params) {
         href = formatPathFromParams(href, params);
