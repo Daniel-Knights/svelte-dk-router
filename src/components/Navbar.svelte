@@ -1,8 +1,8 @@
 <script lang="ts">
     import { push, replace, SLink, setQuery, setParams, route } from '../router';
 
-    let query: Record<string, string> = { id: '1', name: 'dan' };
-    let params: Record<string, string> = { id: '1', name: 'dan' };
+    let query: Record<string, string> = { id: '1', name: 'dan' },
+        params: Record<string, string> = { id: '1', name: 'dan' };
 </script>
 
 <style type="text/scss">
