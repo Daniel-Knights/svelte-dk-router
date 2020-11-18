@@ -27,7 +27,9 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
     }
 
     //  Cleanup query if not passed
-    if (!identifier.query) delete filteredRoute.query;
+    if (typeof identifier === 'object' && !identifier.query) {
+        delete filteredRoute.query;
+    }
 
     // Set route object properties
     if (typeof identifier === 'object') {
@@ -60,7 +62,7 @@ const setQuery = (
     query: Record<string, string>,
     update = false,
     replace = true
-): RouteWithRegex => {
+): RouteWithRegex | void => {
     if (!query) return error('A query argument is required');
     if (typeof query !== 'object') {
         return error('Query argument must be an object');
@@ -86,7 +88,7 @@ const setQuery = (
 };
 
 // Update named-params
-const setParams = (params: Record<string, string>, replace = true): RouteWithRegex => {
+const setParams = (params: Record<string, string>, replace = true): RouteWithRegex | void => {
     if (!params) {
         return error('Params are required');
     } else if (!currentRoute.path.includes(':')) {

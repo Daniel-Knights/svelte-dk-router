@@ -7,7 +7,7 @@ const userAuthenticated = false;
 beforeEach(async (to, from) => {
     // console.log(to, ' - before to');
     // console.log(from, ' - before from');
-    if (!userAuthenticated && to.path === '/about') await replace('/');
+    if (!userAuthenticated && to && to.path === '/about') await replace('/');
 });
 afterEach(async (to, from) => {
     // console.log(to, ' - after to');

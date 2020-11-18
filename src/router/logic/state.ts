@@ -63,7 +63,7 @@ const loadState = (): void => {
 };
 
 // Set provided routes
-const setRoutes = (userRoutes: Route[], hashMode: boolean): void => {
+const setRoutes = (userRoutes: Route[], hashMode = false): void => {
     if (hashMode) hashHistory = true;
 
     // Validate and format

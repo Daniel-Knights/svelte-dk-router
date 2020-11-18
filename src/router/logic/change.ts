@@ -5,7 +5,7 @@ import { beforeCallback, afterCallback } from './guard';
 import { setUrl } from '../static/utils';
 
 // Current route data
-let route: Route = null;
+let route: RouteWithRegex = null;
 // Previous route data
 let fromRoute: Route = null;
 // New route data

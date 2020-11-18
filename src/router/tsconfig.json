@@ -2,7 +2,9 @@
     "extends": "@tsconfig/svelte/tsconfig.json",
     "include": ["./**/*"],
     "compilerOptions": {
-        "module": "es2020",
-        "outDir": "../../dist"
+        "target": "es3",
+        "lib": ["es2017", "DOM"],
+        "outDir": "../../dist",
+        "removeComments": true
     }
 }
