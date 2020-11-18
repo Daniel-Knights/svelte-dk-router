@@ -12,6 +12,14 @@ const currentPath = (hash: boolean): string => {
     return hash ? window.location.hash.split('?')[0] : window.location.pathname;
 };
 
+const setUrl = (replace: boolean, path: string): void => {
+    if (replace) {
+        window.history.replaceState(null, '', path);
+    } else {
+        window.history.pushState(null, '', path);
+    }
+};
+
 const formatQuery = (query: Record<string, string>): string => {
     const formattedQuery = Object.entries(query)
         .map(([key, value], i, arr) => {
@@ -62,7 +70,7 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
 const compareRoutes = (
     routes: Route[] | RouteWithRegex[],
     route: Route | RouteWithRegex,
-    routeIndex: number
+    routeIndex?: number
 ): void | Route | RouteWithRegex => {
     const { name, path } = route;
     let matchedRoute;
@@ -104,6 +112,7 @@ export {
     error,
     warn,
     currentPath,
+    setUrl,
     formatQuery,
     validatePassedParams,
     formatPathFromParams,

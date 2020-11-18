@@ -2,6 +2,7 @@ import type { Route, PassedRoute, RouteWithRegex } from '../static';
 import { error, formatQuery, validatePassedParams, formatPathFromParams } from '../static';
 import { routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
+import { setUrl } from '../static/utils';
 
 // Current route data
 let route: Route = null;
@@ -75,11 +76,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     }
 
     // Update URL/state
-    if (replace) {
-        window.history.replaceState(null, '', newPath);
-    } else {
-        window.history.pushState(null, '', newPath);
-    }
+    setUrl(replace, newPath);
 
     // After route change navigation guard
     if (afterCallback) {

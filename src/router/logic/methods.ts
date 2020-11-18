@@ -1,8 +1,7 @@
 import type { PassedRoute, RouteWithRegex } from '../static';
-import { error, formatQuery } from '../static';
-import { currentPath } from '../static/utils';
-import { changeRoute } from './change';
-import { hashHistory, routes } from './state';
+import { error, warn, setUrl, formatQuery, currentPath } from '../static';
+import { changeRoute, route as currentRoute } from './change';
+import { hashHistory, routes, writableRoute } from './state';
 
 let filteredRoute: RouteWithRegex;
 
@@ -12,11 +11,11 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
         const { name, regex } = route;
 
         if (typeof identifier === 'string') {
-            if (identifier.split('')[0] === '/' && identifier.match(regex)) {
+            const pathMatch = identifier.match(/\//) && identifier.match(regex);
+
+            if (pathMatch || name === identifier) {
                 return route;
             }
-
-            if (name === identifier) return route;
         } else if (identifier.name === name || identifier.path.match(regex)) {
             return route;
         }
@@ -32,15 +31,11 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
 
     // Set route object properties
     if (typeof identifier === 'object') {
-        if (identifier.query) {
-            filteredRoute['query'] = identifier.query;
-        }
-        if (identifier.params) {
-            filteredRoute['params'] = identifier.params;
-        }
-        if (identifier.meta) {
-            filteredRoute['meta'] = identifier.meta;
-        }
+        const { query, params, meta } = identifier;
+
+        if (query) filteredRoute['query'] = query;
+        if (params) filteredRoute['params'] = params;
+        if (meta) filteredRoute['meta'] = meta;
     }
 
     return filteredRoute;
@@ -62,17 +57,60 @@ const replace = (identifier: string | PassedRoute): void => {
 
 // Set or update query params
 const setQuery = (query: Record<string, string> | string, update = false, replace = true): void => {
-    if (typeof query !== 'string') query = formatQuery(query);
-    if (update) query = window.location.search + '&' + query;
-    else query = '?' + query;
-
-    const path = currentPath(hashHistory) + query;
-
-    if (replace) {
-        window.history.replaceState(null, '', path);
-    } else {
-        window.history.pushState(null, '', path);
+    if (!query) return error('A query argument is required');
+    if (typeof query !== 'object') {
+        return error('Query argument must be an object');
     }
+
+    if (update)
+        query = {
+            ...currentRoute.query,
+            ...(query as Record<string, string>),
+        };
+
+    writableRoute.update(routeValue => {
+        routeValue['query'] = query;
+
+        return routeValue;
+    });
+
+    const path = currentPath(hashHistory) + '?' + formatQuery(query);
+
+    setUrl(replace, path);
 };
 
-export { push, replace, setQuery };
+// Update named-params
+const setParams = (params: Record<string, string>, replace = true): void => {
+    if (!params) {
+        return error('Params are required');
+    } else if (!currentRoute.path.includes(':')) {
+        return error('Current route has no defined params');
+    }
+
+    Object.keys(params).forEach(param => {
+        if (!currentRoute.path.includes(':' + param)) {
+            warn('Invalid param: "' + param + '"');
+        }
+
+        writableRoute.update(routeValue => {
+            routeValue.params[param] = params[param];
+
+            return routeValue;
+        });
+    });
+
+    const pathSections = currentPath(hashHistory).split('/');
+
+    currentRoute.path.split('/').forEach((section, i) => {
+        if (!section.includes(':')) return;
+        if (!params[section.split(':')[1]]) return;
+
+        pathSections[i] = params[section.split(':')[1]];
+    });
+
+    const path = pathSections.join('/') + window.location.search;
+
+    setUrl(replace, path);
+};
+
+export { push, replace, setQuery, setParams };
