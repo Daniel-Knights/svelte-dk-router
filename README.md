@@ -59,7 +59,7 @@ Then, use the view component:
 <SView />
 ```
 
-and links to navigate:
+Links to navigate:
 
 ```js
 <script>
@@ -72,6 +72,15 @@ and links to navigate:
 <SLink name={'home'}>Home</SLink>
 <SLink path={'/about'} {query}>Home</SLink>
 <SLink path={'/blog'} {params}>Home</SLink>
+```
+
+and don't forget to set your rollup config to handle SPA's with `-s`:
+
+```
+"scripts": {
+    ...
+    "start": "sirv public -s",
+}
 ```
 
 ## API
