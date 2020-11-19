@@ -1,5 +1,8 @@
 # svelte-dk-router
 
+[![npm](https://img.shields.io/npm/v/svelte-dk-router.svg)](https://www.npmjs.com/package/svelte-dk-router)
+[![svelte](https://img.shields.io/badge/svelte-3.x-red)](https://svelte.dev/)
+
 > A lightweight router for Svelte
 
 ## Installation
