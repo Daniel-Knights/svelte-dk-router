@@ -8,14 +8,14 @@
         params = undefined,
         replace = undefined;
 
-    let routerActive, href;
+    let routerActive;
 
-    const route = compareRoutes(routes, { name, path });
+    const route = compareRoutes(routes, { name, path, params });
 
-    href = route ? route.path : null;
+    path = route ? route.path : null;
 
-    if (href && href.includes(':') && params) {
-        href = formatPathFromParams(href, params);
+    if (path && path.includes(':') && params) {
+        path = formatPathFromParams(path, params);
     }
 
     writableRoute.subscribe(newRoute => {
@@ -28,7 +28,7 @@
 </script>
 
 <a
-    {href}
+    href={path}
     on:click|preventDefault={() => changeRoute({ name, path, query, params }, replace)}
     class={routerActive ? 'router-active' : ''}>
     <slot />

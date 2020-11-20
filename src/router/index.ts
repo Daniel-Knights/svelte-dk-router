@@ -7,5 +7,13 @@ export {
     afterEach,
     setQuery,
     setParams,
+    hash,
+    host,
+    hostname,
+    origin,
+    pathname,
+    href,
+    protocol,
+    search,
 } from './logic';
 export { SLink, SView } from './components';

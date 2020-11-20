@@ -1,4 +1,5 @@
 import type { Route, RouteWithRegex } from './types';
+import { updateLocationData } from '../logic/properties';
 
 const error = (msg: string): void => {
     return console.error('Svelte-Router [Error]: ' + msg);
@@ -18,6 +19,8 @@ const setUrl = (replace: boolean, path: string): void => {
     } else {
         window.history.pushState(null, '', path);
     }
+
+    updateLocationData();
 };
 
 const formatQuery = (query: Record<string, string>): string => {
@@ -61,7 +64,11 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
     let formattedParams = path;
 
     Object.entries(params).forEach(([key, value]) => {
-        formattedParams = formattedParams.replace(':' + key, value);
+        if (formattedParams.includes(':')) {
+            formattedParams = formattedParams.replace(':' + key, value);
+        } else {
+            formattedParams += '/' + value;
+        }
     });
 
     return formattedParams;
@@ -72,8 +79,10 @@ const compareRoutes = (
     route: Route | RouteWithRegex,
     routeIndex?: number
 ): void | Route | RouteWithRegex => {
-    const { name, path } = route;
-    let matchedRoute;
+    const { name, path, params } = route;
+    let matchedRoute, formattedPath;
+
+    if (params) formattedPath = formatPathFromParams(path, params);
 
     routes.forEach((compare, compareIndex) => {
         if (matchedRoute) return;
@@ -93,14 +102,18 @@ const compareRoutes = (
                 error('The "name" property must be unique, duplicates detected: "' + name + '"');
         }
 
-        if (path === compare.path || '/#' + path === compare.path) {
+        if (formattedPath === compare.path || '/#' + formattedPath === compare.path) {
             matchedRoute = compare;
 
             if (sameRoute === false)
-                error('The "path" property must be unique, duplicates detected: "' + path + '"');
+                error(
+                    'The "path" property must be unique, duplicates detected: "' +
+                        formattedPath +
+                        '"'
+                );
         }
 
-        if (path && path.match(regex)) {
+        if (formattedPath && formattedPath.match(regex)) {
             matchedRoute = compare;
         }
     });

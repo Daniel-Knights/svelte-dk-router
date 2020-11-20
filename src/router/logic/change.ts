@@ -17,9 +17,6 @@ writableRoute.subscribe(newRoute => (route = newRoute));
 const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
     const { name, path, query, params } = passedRoute;
 
-    // Set fromRoute before route is updated
-    fromRoute = route;
-
     if (!name && !path) {
         return error('name or path required');
     }
@@ -61,6 +58,9 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         newPath = formatPathFromParams(newPath, params);
     }
 
+    // Set fromRoute before route is updated
+    fromRoute = route;
+
     // Before route change navigation guard
     if (beforeCallback) {
         const beforeResult = await beforeCallback(newRoute, fromRoute);
@@ -79,9 +79,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     setUrl(replace, newPath);
 
     // After route change navigation guard
-    if (afterCallback) {
-        afterCallback(route, fromRoute);
-    }
+    if (afterCallback) afterCallback(route, fromRoute);
 };
 
 export { route, fromRoute, changeRoute };

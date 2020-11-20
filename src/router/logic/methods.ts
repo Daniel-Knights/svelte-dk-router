@@ -1,5 +1,13 @@
-import type { PassedRoute, RouteWithRegex } from '../static';
-import { error, warn, setUrl, formatQuery, currentPath } from '../static';
+import {
+    error,
+    warn,
+    setUrl,
+    formatQuery,
+    currentPath,
+    formatPathFromParams,
+    PassedRoute,
+    RouteWithRegex,
+} from '../static';
 import { changeRoute, route as currentRoute } from './change';
 import { hashHistory, routes, writableRoute } from './state';
 
@@ -16,8 +24,13 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
             if (pathMatch || name === identifier) {
                 return route;
             }
-        } else if (identifier.name === name || identifier.path.match(regex)) {
-            return route;
+        } else {
+            const { path, params } = identifier;
+            const formattedPath = params ? formatPathFromParams(path, params) : path;
+
+            if (identifier.name === name || formattedPath.match(regex)) {
+                return route;
+            }
         }
     })[0];
 
