@@ -142,6 +142,16 @@ Defaults to `window.history.replaceState`, if `replace` is set to false, uses `w
 
 Returns the updated route data.
 
+### Location Data
+
+You can also import variables for each property of `window.location`:
+
+```js
+import { hash, host, hostname, origin, pathname, href, protocol, search } from 'svelte-dk-router';
+```
+
+These variables update on each route change, ensuring simplicity and parity throughout your application.
+
 ## TODO
 
 -   Nested routes
