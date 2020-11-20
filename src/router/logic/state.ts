@@ -81,22 +81,23 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             userRoute['name'] = path === '/' ? 'home' : path.split('/')[1];
         }
 
-        compareRoutes(userRoutes, userRoute, i);
-
         // Generate dynamic regex for each route
-        const routeRegex = path
+        const routeRegex = userRoute.path
             .split('/')
-            .map((section, i, arr) => {
-                if (section === '*') return '.*';
+            .map((section, i) => {
+                if (section === '*') return '.*'; // Fallback
                 if (section.includes(':')) {
-                    if (!arr[i - 1].includes(':')) return '.*';
+                    // Named-params
+                    return '\\/(?:[^\\/]+?)';
                 } else if (i !== 0) return '\\/' + section;
             })
             .join('');
 
-        userRoute['regex'] = new RegExp(routeRegex + '$');
+        userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
 
         if (hashMode) userRoute.path = '/#' + path;
+
+        compareRoutes(userRoutes, userRoute, i);
     });
 
     routes = userRoutes as RouteWithRegex[];
