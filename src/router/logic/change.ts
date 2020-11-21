@@ -14,7 +14,7 @@ let newPath: string, newTitle: string, newRoute: RouteWithRegex;
 writableRoute.subscribe(newRoute => (route = { ...newRoute }));
 
 const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
-    const { name, path, query, params } = passedRoute;
+    const { name, path, query, params, meta } = passedRoute;
 
     if (!name && !path) {
         return error('name or path required');
@@ -32,7 +32,12 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         routeExists = true;
         newPath = routeData.path;
         newRoute = routeData;
+
+        if (meta) {
+            newRoute['meta'] = { ...routeData.meta, ...meta };
+        }
     };
+    console.log(meta);
 
     // Set new route data
     routes.forEach(routeData => {

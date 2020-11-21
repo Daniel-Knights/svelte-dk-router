@@ -3,7 +3,7 @@
 
     let query: Record<string, string> = { id: '1', name: 'dan' },
         params: Record<string, string> = { name: '1', id: 'dan' },
-        meta: { test: 'uowjkdwjndlkwjned' };
+        meta: Record<string, string> = { test: 'uowjkdwjndlkwjned' };
 </script>
 
 <style type="text/scss">
@@ -12,13 +12,17 @@
 <header>
     <h1>Svelte Blog</h1>
     <nav>
-        <SLink name={'home'} {query} replace={true}>Home</SLink>
+        <SLink name={'home'} {query} {meta} replace={true}>Home</SLink>
         <SLink name={'about'}>About</SLink>
         <SLink path={'/blog'} {params} {meta}>Blog</SLink>
         <div on:click={async () => await push('/')}>Push</div>
         <div
             on:click={async () => {
-                await replace({ path: '/blog', params: { id: 'hello', name: 'knsckjsndc' } });
+                await replace({
+                    path: '/blog',
+                    params: { id: 'hello', name: 'knsckjsndc' },
+                    meta: { whaddup: 'its ya boi' },
+                });
             }}>
             Replace
         </div>
