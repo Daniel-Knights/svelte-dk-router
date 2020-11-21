@@ -88,6 +88,8 @@ and don't forget to set your rollup config to handle SPA's with `-s`:
 
 ## API
 
+**NOTE:** All navigations are asynchronous, keep this in mind and use `await` if you encounter inconsistencies with data being defined.
+
 #### `setRoutes(routes: array[object(s)] [, hashMode: boolean])`
 
 Set your routes and optionally set to `hashMode` (prepends all routes with `/#`).
@@ -98,9 +100,9 @@ If no `name` is set for a route, an all-lowercase name is generated based off th
 
 The main view for your routes.
 
-#### `<SLink name={string} path={string} {query} {params}>Slot</SLink>`
+#### `<SLink name={string} path={string} {query} {params} {meta}>Slot</SLink>`
 
-Link to each route. `name` _or_ `path` are required, optional `query` and `params` (if defined).
+Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined) and `meta`.
 
 #### `route`
 
@@ -114,14 +116,14 @@ Programmatically changes the route using `window.history.pushState()`.
 
 Programmatically changes the route using `window.history.replaceState()`.
 
-#### `beforeEach(async: optional (to, from) => {})`
+#### `beforeEach((to, from) => {})`
 
 Navigation guard to run _before_ each route. Optionally asynchronous.
 `to` contains all data for the route navigating to, `from` all data of the current route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
-#### `afterEach(async: optional (to, from) => {})`
+#### `afterEach((to, from) => {})`
 
 Navigation guard to run _after_ each route. Optionally asynchronous.
 `to` contains all data for the route navigated to, `from` all data of the previous route.
