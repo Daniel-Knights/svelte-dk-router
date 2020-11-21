@@ -8,7 +8,7 @@
         params = undefined,
         meta = undefined,
         replace = undefined;
-    console.log('meta', meta);
+
     let routerActive;
 
     if (hashHistory) path = '/#' + path;

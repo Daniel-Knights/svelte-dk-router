@@ -74,9 +74,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
         const { name, path, component } = userRoute;
 
         if (!path || !component) {
-            return console.error(
-                'Svelte-Router [Error]: "path" and "component" are required properties'
-            );
+            return error('"path" and "component" are required properties');
         }
 
         // Set formatted path as route name if no name supplied

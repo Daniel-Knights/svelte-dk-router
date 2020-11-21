@@ -37,7 +37,6 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
             newRoute['meta'] = { ...routeData.meta, ...meta };
         }
     };
-    console.log(meta);
 
     // Set new route data
     routes.forEach(routeData => {
