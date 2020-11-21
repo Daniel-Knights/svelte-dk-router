@@ -1,3 +1,4 @@
+export { SLink, SView } from './components';
 export {
     route,
     setRoutes,
@@ -16,4 +17,3 @@ export {
     protocol,
     search,
 } from './logic';
-export { SLink, SView } from './components';

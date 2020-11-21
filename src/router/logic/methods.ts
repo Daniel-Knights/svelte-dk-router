@@ -1,12 +1,12 @@
 import {
     error,
-    warn,
     setUrl,
     formatQuery,
     currentPath,
     formatPathFromParams,
     PassedRoute,
     RouteWithRegex,
+    validatePassedParams,
 } from '../static';
 import { changeRoute, route as currentRoute } from './change';
 import { hashHistory, routes, writableRoute } from './state';
@@ -19,14 +19,18 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
         const { name, regex } = route;
 
         if (typeof identifier === 'string') {
-            const pathMatch = identifier.match(/\//) && identifier.match(regex);
+            const isPath = identifier.match(/\//);
 
-            if (pathMatch || name === identifier) {
+            if (isPath && hashHistory) identifier = '/#' + identifier;
+
+            if (identifier.match(regex) || name === identifier) {
                 return route;
             }
         } else {
             const { path, params } = identifier;
-            const formattedPath = params ? formatPathFromParams(path, params) : path;
+            let formattedPath = params ? formatPathFromParams(path, params) : path;
+
+            if (hashHistory) formattedPath = '/#' + formattedPath;
 
             if (identifier.name === name || formattedPath.match(regex)) {
                 return route;
@@ -39,10 +43,9 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
         return false;
     }
 
-    //  Cleanup query if not passed
-    if (!(identifier as PassedRoute).query) {
-        delete filteredRoute.query;
-    }
+    //  Cleanup
+    delete filteredRoute.query;
+    delete filteredRoute.params;
 
     // Set route object properties
     if (typeof identifier === 'object') {
@@ -57,17 +60,17 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWit
 };
 
 // Push to the current history entry
-const push = (identifier: string | PassedRoute): void => {
+const push = async (identifier: string | PassedRoute): Promise<void> => {
     if (!processIdentifier(identifier)) return;
 
-    changeRoute(filteredRoute);
+    await changeRoute(filteredRoute);
 };
 
 // Replace the current history entry
-const replace = (identifier: string | PassedRoute): void => {
+const replace = async (identifier: string | PassedRoute): Promise<void> => {
     if (!processIdentifier(identifier)) return;
 
-    changeRoute(filteredRoute, true);
+    await changeRoute(filteredRoute, true);
 };
 
 // Set or update query params
@@ -88,9 +91,7 @@ const setQuery = (
         };
 
     writableRoute.update(routeValue => {
-        routeValue['query'] = query;
-
-        return routeValue;
+        return { ...routeValue, query };
     });
 
     const path = currentPath(hashHistory) + '?' + formatQuery(query);
@@ -108,16 +109,24 @@ const setParams = (params: Record<string, string>, replace = true): RouteWithReg
         return error('Current route has no defined params');
     }
 
+    let query = '';
+
+    validatePassedParams(currentRoute.path, params, true);
+
+    // Remove invalid params
     Object.keys(params).forEach(param => {
-        if (!currentRoute.path.includes(':' + param)) {
-            warn('Invalid param: "' + param + '"');
+        if (!currentRoute.params[param]) {
+            delete params[param];
         }
+    });
 
-        writableRoute.update(routeValue => {
-            routeValue.params[param] = params[param];
+    // Include existing params
+    Object.entries(currentRoute.params).forEach(([key, value]) => {
+        if (!params[key]) params[key] = value;
+    });
 
-            return routeValue;
-        });
+    writableRoute.update(routeValue => {
+        return { ...routeValue, params };
     });
 
     const pathSections = currentPath(hashHistory).split('/');
@@ -129,7 +138,11 @@ const setParams = (params: Record<string, string>, replace = true): RouteWithReg
         pathSections[i] = params[section.split(':')[1]];
     });
 
-    const path = pathSections.join('/') + window.location.search;
+    if (currentRoute.query) {
+        query = hashHistory ? '?' + window.location.hash.split('?')[1] : window.location.search;
+    }
+
+    const path = pathSections.join('/') + query;
 
     setUrl(replace, path);
 

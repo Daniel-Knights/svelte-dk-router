@@ -10,7 +10,7 @@ const warn = (msg: string): void => {
 
 // Hash path or history path
 const currentPath = (hash: boolean): string => {
-    return hash ? window.location.hash.split('?')[0] : window.location.pathname;
+    return hash ? '/' + window.location.hash.split('?')[0] : window.location.pathname;
 };
 
 const setUrl = (replace: boolean, path: string): void => {
@@ -35,18 +35,24 @@ const formatQuery = (query: Record<string, string>): string => {
     return formattedQuery;
 };
 
-const validatePassedParams = (path: string, params: Record<string, string>): boolean => {
+const validatePassedParams = (
+    path: string,
+    params: Record<string, string>,
+    silentError = false
+): boolean => {
     let valid = true;
 
     // Validate required params
-    path.split('/:').forEach((param, i) => {
-        if (i === 0) return;
+    if (path && !silentError) {
+        path.split('/:').forEach((param, i) => {
+            if (i === 0) return;
 
-        if (!params || !params[param]) {
-            valid = false;
-            error('Missing required param: "' + param + '"');
-        }
-    });
+            if (!params || !params[param]) {
+                valid = false;
+                error('Missing required param: "' + param + '"');
+            }
+        });
+    }
 
     if (params) {
         // Compare passed params with path params
@@ -82,7 +88,9 @@ const compareRoutes = (
     const { name, path, params } = route;
     let matchedRoute, formattedPath;
 
-    if (params) formattedPath = formatPathFromParams(path, params);
+    if (params) {
+        formattedPath = formatPathFromParams(path, params);
+    } else formattedPath = path;
 
     routes.forEach((compare, compareIndex) => {
         if (matchedRoute) return;
@@ -111,6 +119,10 @@ const compareRoutes = (
                         formattedPath +
                         '"'
                 );
+        }
+
+        if (path === compare.rootPath && compare.path.includes(':')) {
+            validatePassedParams(compare.path, params);
         }
 
         if (formattedPath && formattedPath.match(regex)) {

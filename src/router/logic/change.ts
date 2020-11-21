@@ -1,8 +1,7 @@
 import type { Route, PassedRoute, RouteWithRegex } from '../static';
-import { error, formatQuery, validatePassedParams, formatPathFromParams } from '../static';
+import { error, setUrl, formatQuery, validatePassedParams, formatPathFromParams } from '../static';
 import { routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
-import { setUrl } from '../static/utils';
 
 // Current route data
 let route: RouteWithRegex = null;
@@ -12,7 +11,7 @@ let fromRoute: Route = null;
 let newPath: string, newTitle: string, newRoute: RouteWithRegex;
 
 // Update route each time writableRoute is updated
-writableRoute.subscribe(newRoute => (route = newRoute));
+writableRoute.subscribe(newRoute => (route = { ...newRoute }));
 
 const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
     const { name, path, query, params } = passedRoute;
@@ -24,10 +23,15 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     let routeExists = false;
 
     const setNewRouteData = routeData => {
+        if (routeData.title) newTitle = routeData.title;
+
+        // Cleanup
+        if (routeData.query) delete routeData.query;
+        if (routeData.params) delete routeData.params;
+
         routeExists = true;
         newPath = routeData.path;
         newRoute = routeData;
-        if (routeData.title) newTitle = routeData.title;
     };
 
     // Set new route data
@@ -68,7 +72,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         if (beforeResult === false) return;
     }
 
-    writableRoute.set(newRoute);
+    await writableRoute.set(newRoute);
 
     // Update page title
     if (newTitle) {
@@ -79,7 +83,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     setUrl(replace, newPath);
 
     // After route change navigation guard
-    if (afterCallback) afterCallback(route, fromRoute);
+    if (afterCallback) await afterCallback(route, fromRoute);
 };
 
 export { route, fromRoute, changeRoute };

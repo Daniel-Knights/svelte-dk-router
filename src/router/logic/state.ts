@@ -1,13 +1,14 @@
 import { writable } from 'svelte/store';
 import type { Route, RouteWithRegex } from '../static';
 import { error, currentPath, compareRoutes } from '../static';
+import { afterCallback, beforeCallback } from './guard';
 
 // Reactive route data
 const writableRoute = writable(null);
 
 // Provided routes
 let routes: RouteWithRegex[];
-let currentRoute: RouteWithRegex, hashHistory;
+let hashHistory;
 
 // Set query params to route object on page-load
 const queryState = (query, route) => {
@@ -23,8 +24,6 @@ const queryState = (query, route) => {
 const paramState = (path, route) => {
     route.path.split('/').forEach((param, i) => {
         if (param.includes(':')) {
-            if (hashHistory) i -= 1;
-
             // Validate
             if (!path.split('/')[i])
                 return error('Missing required param: "' + param.slice(1) + '"');
@@ -37,24 +36,28 @@ const paramState = (path, route) => {
 };
 
 // Determine the current route and update route data
-const loadState = (): void => {
+const loadState = async (): Promise<void> => {
+    const path = currentPath(hashHistory);
+    const query = new URLSearchParams(window.location.search);
+
+    let currentRoute: RouteWithRegex;
+
     if (!routes) return;
-    else
-        currentRoute =
-            routes.filter(singleRoute => {
-                const path = currentPath(hashHistory);
-                const query = new URLSearchParams(window.location.search);
+    else {
+        currentRoute = routes.filter(singleRoute => {
+            // Compare route path against URL path
+            if (path && path.match(singleRoute.regex)) {
+                queryState(query, singleRoute);
+                paramState(path, singleRoute);
 
-                // Compare route path against URL path
-                if (path && path.match(singleRoute.regex)) {
-                    queryState(query, singleRoute);
-                    paramState(path, singleRoute);
+                return singleRoute;
+            }
+        })[0];
+    }
 
-                    return singleRoute;
-                }
-            })[0] || routes[0];
-
-    writableRoute.set(currentRoute);
+    if (beforeCallback) await beforeCallback(currentRoute, null);
+    await writableRoute.set(currentRoute);
+    if (afterCallback) await afterCallback(currentRoute, null);
 
     // Update title
     if (currentRoute && currentRoute.title) {
@@ -82,7 +85,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
         }
 
         // Generate dynamic regex for each route
-        const routeRegex = userRoute.path
+        let routeRegex = path
             .split('/')
             .map((section, i) => {
                 if (section === '*') return '.*'; // Fallback
@@ -93,9 +96,13 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             })
             .join('');
 
-        userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
+        if (hashHistory) {
+            routeRegex = '\\/#' + routeRegex;
+            userRoute.path = '/#' + path;
+        }
 
-        if (hashMode) userRoute.path = '/#' + path;
+        userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
+        userRoute['rootPath'] = hashHistory ? '/#/' + path.split('/')[1] : '/' + path.split('/')[1];
 
         compareRoutes(userRoutes, userRoute, i);
     });
