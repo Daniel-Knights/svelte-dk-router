@@ -2,10 +2,10 @@ import type { Route, RouteWithRegex } from './types';
 import { updateLocationData } from '../logic/properties';
 
 const error = (msg: string): void => {
-    return console.error('Svelte-Router [Error]: ' + msg);
+    console.error('Svelte-Router [Error]: ' + msg);
 };
 const warn = (msg: string): void => {
-    return console.warn('Svelte-Router [Warn]: ' + msg);
+    console.warn('Svelte-Router [Warn]: ' + msg);
 };
 
 // Hash path or history path
