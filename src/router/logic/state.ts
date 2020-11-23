@@ -99,6 +99,10 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             userRoute.path = '/#' + path;
         }
 
+        // Handle base routes
+        if (userRoute.path === '/') routeRegex = '';
+        else if (userRoute.path === '/#/') routeRegex = '\\/#';
+
         userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
         userRoute['rootPath'] = hashHistory ? '/#/' + path.split('/')[1] : '/' + path.split('/')[1];
 
@@ -107,6 +111,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 
     routes = userRoutes as RouteWithRegex[];
     loadState();
+    console.log(routes);
 };
 
 window.addEventListener('popstate', loadState);
