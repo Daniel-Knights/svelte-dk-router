@@ -1,4 +1,4 @@
-import type { Route, RouteWithRegex } from './types';
+import type { Route, FormattedRoute } from './types';
 import { updateLocationData } from '../logic/properties';
 
 const error = (msg: string): void => {
@@ -81,10 +81,10 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
 };
 
 const compareRoutes = (
-    routes: Route[] | RouteWithRegex[],
-    route: Route | RouteWithRegex,
+    routes: Route[] | FormattedRoute[],
+    route: Route | FormattedRoute,
     routeIndex?: number
-): void | Route | RouteWithRegex => {
+): void | Route | FormattedRoute => {
     const { name, path, params } = route;
     let matchedRoute, formattedPath;
 
@@ -92,43 +92,51 @@ const compareRoutes = (
         formattedPath = formatPathFromParams(path, params);
     } else formattedPath = path;
 
-    routes.forEach((compare, compareIndex) => {
-        if (matchedRoute) return;
+    const matchRoute = passedRoutes => {
+        passedRoutes.forEach((compare, compareIndex) => {
+            if (matchedRoute) return;
 
-        const { regex } = compare as RouteWithRegex;
+            const { regex } = compare as FormattedRoute;
 
-        let sameRoute;
+            let sameRoute;
 
-        if (routeIndex) {
-            sameRoute = routeIndex === compareIndex;
-        }
+            if (routeIndex) {
+                sameRoute = routeIndex === compareIndex;
+            }
 
-        if (name === compare.name) {
-            matchedRoute = compare;
+            if (name === compare.name) {
+                matchedRoute = compare;
 
-            if (sameRoute === false)
-                error('The "name" property must be unique, duplicates detected: "' + name + '"');
-        }
+                if (sameRoute === false)
+                    error(
+                        'The "name" property must be unique, duplicates detected: "' + name + '"'
+                    );
+            }
 
-        if (formattedPath === compare.path || '/#' + formattedPath === compare.path) {
-            matchedRoute = compare;
+            if (formattedPath === compare || '/#' + formattedPath === compare) {
+                matchedRoute = compare;
 
-            if (sameRoute === false)
-                error(
-                    'The "path" property must be unique, duplicates detected: "' +
-                        formattedPath +
-                        '"'
-                );
-        }
+                if (sameRoute === false)
+                    error(
+                        'The "path" property must be unique, duplicates detected: "' +
+                            formattedPath +
+                            '"'
+                    );
+            }
 
-        if (path === compare.rootPath && compare.path.includes(':')) {
-            validatePassedParams(compare.path, params);
-        }
+            if (path === compare.rootPath && compare.path.includes(':')) {
+                validatePassedParams(compare.path, params);
+            }
 
-        if (formattedPath && formattedPath.match(regex)) {
-            matchedRoute = compare;
-        }
-    });
+            if (formattedPath && formattedPath.match(regex)) {
+                matchedRoute = compare;
+            }
+
+            if (compare.children) matchRoute(compare.children);
+        });
+    };
+
+    matchRoute(routes);
 
     return matchedRoute;
 };

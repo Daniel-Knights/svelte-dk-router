@@ -1,11 +1,20 @@
 <script>
-    import { writableRoute } from '../logic';
+    import { getContext, onMount, setContext } from 'svelte';
+    import { writableDepthChart } from '../logic';
 
-    let component;
+    let depthChart = {},
+        render = false,
+        depth = getContext('depth') || 1;
 
-    writableRoute.subscribe(newRoute => {
-        if (newRoute) component = newRoute.component;
-    });
+    writableDepthChart.subscribe(chart => (depthChart = chart));
+
+    // Increment depth for each nested view
+    setContext('depth', depth + 1);
+
+    // Ensure staggered render of nested views
+    onMount(() => (render = true));
 </script>
 
-<svelte:component this={component} />
+{#if render && depthChart && depthChart[depth]}
+    <svelte:component this={depthChart[depth].component} />
+{/if}

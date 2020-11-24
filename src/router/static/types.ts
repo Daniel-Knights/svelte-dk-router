@@ -2,15 +2,22 @@ export interface Route {
     name?: string;
     title?: string;
     path: string;
-    rootPath?: string;
     component;
     query?: Record<string, string>;
     params?: Record<string, string>;
     meta?: Record<string, unknown>;
+    children?: Route[];
 }
 
-export interface RouteWithRegex extends Route {
+export interface FormattedRoute extends Route {
+    fullPath: string;
+    rootPath: string;
     regex: RegExp;
+    depth: number;
+    trace: string[];
+    children?: FormattedRoute[];
+    parent?: FormattedRoute;
+    rootParent?: FormattedRoute;
 }
 
 export interface PassedRoute {

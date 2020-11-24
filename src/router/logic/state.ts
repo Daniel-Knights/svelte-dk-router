@@ -1,13 +1,14 @@
 import { writable } from 'svelte/store';
-import type { Route, RouteWithRegex } from '../static';
+import type { Route, FormattedRoute } from '../static';
 import { error, currentPath, compareRoutes } from '../static';
 import { afterCallback, beforeCallback } from './guard';
+import { chartState } from './nested';
 
 // Reactive route data
 const writableRoute = writable(null);
 
 // Provided routes
-let routes: RouteWithRegex[];
+let routes: FormattedRoute[];
 let hashHistory;
 
 // Set query params to route object on page-load
@@ -40,23 +41,40 @@ const loadState = async (): Promise<void> => {
     const path = currentPath(hashHistory);
     const query = new URLSearchParams(window.location.search);
 
-    let currentRoute: RouteWithRegex;
+    let currentRoute: FormattedRoute;
 
     if (!routes) return;
     else {
-        currentRoute = routes.filter(singleRoute => {
-            // Compare route path against URL path
-            if (path && path.match(singleRoute.regex)) {
-                queryState(query, singleRoute);
-                paramState(path, singleRoute);
+        const filterRoutes = (passedRoutes, rootParent?) => {
+            passedRoutes.forEach(singleRoute => {
+                if (currentRoute) return;
 
-                return singleRoute;
-            }
-        })[0];
+                const { regex, children, rootParent: ancestor } = singleRoute;
+
+                // Compare route path against URL path
+                if (path && path.match(regex)) {
+                    queryState(query, singleRoute);
+
+                    if (!rootParent) {
+                        paramState(path, singleRoute);
+                    } else {
+                        paramState(path, rootParent);
+                    }
+
+                    currentRoute = singleRoute;
+                } else if (children) {
+                    // Recursively filter through child routes
+                    filterRoutes(children, ancestor);
+                }
+            });
+        };
+
+        filterRoutes(routes);
     }
 
     if (beforeCallback) await beforeCallback(currentRoute, null);
     await writableRoute.set(currentRoute);
+    await chartState(currentRoute);
     if (afterCallback) await afterCallback(currentRoute, null);
 
     // Update title
@@ -67,51 +85,96 @@ const loadState = async (): Promise<void> => {
 
 // Set provided routes
 const setRoutes = (userRoutes: Route[], hashMode = false): void => {
+    const depth = 1;
+
     if (hashMode) hashHistory = true;
 
     // Validate and format
-    userRoutes.forEach((userRoute, i) => {
-        const { name, path, component } = userRoute;
+    const formatRoutes = (passedRoutes, parent?: FormattedRoute) => {
+        passedRoutes.forEach((userRoute, i) => {
+            const { name, path, component } = userRoute;
 
-        if (!path || !component) {
-            return error('"path" and "component" are required properties');
-        }
+            if (!path || !component) {
+                return error('"path" and "component" are required properties');
+            }
 
-        // Set formatted path as route name if no name supplied
-        if (!name) {
-            userRoute['name'] = path === '/' ? 'home' : path.split('/')[1];
-        }
+            // Set formatted path as route name if no name supplied
+            if (!name) {
+                userRoute['name'] = path === '/' ? 'home' : path.split('/')[1];
+            }
 
-        // Generate dynamic regex for each route
-        let routeRegex = path
-            .split('/')
-            .map((section, i) => {
-                if (section === '*') return '.*'; // Fallback
-                if (section.includes(':')) {
-                    // Named-params
-                    return '\\/(?:[^\\/]+?)';
-                } else if (i !== 0) return '\\/' + section;
-            })
-            .join('');
+            // Set path properties
+            userRoute['fullPath'] = path;
 
-        if (hashHistory) {
-            routeRegex = '\\/#' + routeRegex;
-            userRoute.path = '/#' + path;
-        }
+            if (hashMode && path !== '*') {
+                userRoute.path = '/#' + path;
+                userRoute['fullPath'] = parent ? parent.fullPath + path : userRoute.path;
+                userRoute['rootPath'] = parent ? parent.rootPath : '/#/' + path.split('/')[1];
+            } else if (parent) {
+                userRoute['fullPath'] = parent.fullPath + path;
+                userRoute['rootPath'] = parent.rootPath;
+            } else if (path.split('/')[1]) {
+                userRoute['rootPath'] = '/' + path.split('/')[1];
+            }
 
-        // Handle base routes
-        if (userRoute.path === '/') routeRegex = '';
-        else if (userRoute.path === '/#/') routeRegex = '\\/#';
+            // Set parent properties
+            if (parent) {
+                userRoute['parent'] = parent;
 
-        userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
-        userRoute['rootPath'] = hashHistory ? '/#/' + path.split('/')[1] : '/' + path.split('/')[1];
+                if (parent.rootParent) {
+                    userRoute['rootParent'] = parent.rootParent;
+                } else userRoute['rootParent'] = parent;
+            }
 
-        compareRoutes(userRoutes, userRoute, i);
-    });
+            // Array of path-sections to trace origins
+            if (!userRoute.parent) {
+                userRoute['trace'] = [userRoute.name];
+            } else {
+                userRoute['trace'] = [...userRoute.parent.trace, userRoute.name];
+            }
 
-    routes = userRoutes as RouteWithRegex[];
+            // Generate dynamic regex for each route
+            let routeRegex = userRoute.fullPath
+                .split('/')
+                .map((section, i) => {
+                    if (section === '*') return '.*'; // Fallback
+                    if (section.includes(':')) {
+                        // Named-params
+                        return '\\/(?:[^\\/]+?)';
+                    } else if (i !== 0) return '\\/' + section;
+                })
+                .join('');
+
+            if (hashMode && path !== '*') {
+                routeRegex = '\\/#' + routeRegex;
+            }
+
+            // Handle base-path
+            if (userRoute.fullPath === '/') routeRegex = '';
+            else if (userRoute.fullPath === '/#/') routeRegex = '\\/#';
+
+            userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
+
+            // Set depth of route/nested-route
+            if (userRoute.parent) {
+                userRoute['depth'] = userRoute.parent.depth + 1;
+            } else {
+                userRoute['depth'] = depth;
+            }
+
+            compareRoutes(passedRoutes, userRoute, i);
+
+            if (userRoute.children) {
+                // Recursively format children
+                formatRoutes(userRoute.children, userRoute);
+            }
+        });
+    };
+
+    formatRoutes(userRoutes, null);
+
+    routes = userRoutes as FormattedRoute[];
     loadState();
-    console.log(routes);
 };
 
 window.addEventListener('popstate', loadState);

@@ -1,5 +1,8 @@
 import home from './views/home.svelte';
 import about from './views/about.svelte';
+import origins from './views/nested/origins.svelte';
+import future from './views/nested/future.svelte';
+import more from './views/nested/more.svelte';
 import blog from './views/blog.svelte';
 import fallback from './views/fallback.svelte';
 
@@ -16,6 +19,15 @@ const routes = [
         title: 'About',
         path: '/about',
         component: about,
+        children: [
+            {
+                title: 'Future | About',
+                path: '/future',
+                component: future,
+                children: [{ title: 'More | About', path: '/more', component: more }],
+            },
+            { title: 'Origins | About', path: '/origins', component: origins },
+        ],
     },
     {
         title: 'Blog',

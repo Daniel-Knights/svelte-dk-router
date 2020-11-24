@@ -1,14 +1,15 @@
-import type { Route, PassedRoute, RouteWithRegex } from '../static';
+import type { Route, PassedRoute, FormattedRoute } from '../static';
 import { error, setUrl, formatQuery, validatePassedParams, formatPathFromParams } from '../static';
 import { routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
+import { chartState } from './nested';
 
 // Current route data
-let route: RouteWithRegex = null;
+let route: FormattedRoute = null;
 // Previous route data
 let fromRoute: Route = null;
 // New route data
-let newPath: string, newTitle: string, newRoute: RouteWithRegex;
+let newPath: string, newTitle: string, newRoute: FormattedRoute;
 
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => (route = { ...newRoute }));
@@ -30,7 +31,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
         if (routeData.params) delete routeData.params;
 
         routeExists = true;
-        newPath = routeData.path;
+        newPath = routeData.fullPath;
         newRoute = routeData;
 
         if (meta) {
@@ -39,16 +40,23 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     };
 
     // Set new route data
-    routes.forEach(routeData => {
-        if (routeExists) return;
-        if (name && routeData.name === name) {
-            // If route changed by name
-            setNewRouteData(routeData);
-        } else if (path && path.match(routeData.regex)) {
-            // If route changed by path
-            setNewRouteData(routeData);
-        }
-    });
+    const matchRoute = passedRoutes => {
+        passedRoutes.forEach(routeData => {
+            if (routeExists) return;
+            if (name && routeData.name === name) {
+                // If route changed by name
+                setNewRouteData(routeData);
+            } else if (path && path.match(routeData.regex)) {
+                // If route changed by path
+                setNewRouteData(routeData);
+            } else if (routeData.children) {
+                // Recursively filter child routes
+                matchRoute(routeData.children);
+            }
+        });
+    };
+
+    matchRoute(routes);
 
     if (!routeExists) return error('unknown route');
 
@@ -77,6 +85,7 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
     }
 
     await writableRoute.set(newRoute);
+    await chartState(newRoute);
 
     // Update page title
     if (newTitle) {

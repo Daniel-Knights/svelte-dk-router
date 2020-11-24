@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    import { route } from '../router';
+    import { route, SView, SLink } from '../router';
 
     onMount(() => {
         console.log(route);
@@ -10,4 +10,6 @@
 
 <main id="about">
     <h1>About</h1>
+    <SLink name={'more'}>MORE Link</SLink>
+    <SView />
 </main>

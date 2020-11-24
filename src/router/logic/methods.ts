@@ -5,15 +5,15 @@ import {
     currentPath,
     formatPathFromParams,
     PassedRoute,
-    RouteWithRegex,
+    FormattedRoute,
     validatePassedParams,
 } from '../static';
 import { changeRoute, route as currentRoute } from './change';
 import { hashHistory, routes, writableRoute } from './state';
 
-let filteredRoute: RouteWithRegex;
+let filteredRoute: FormattedRoute;
 
-const processIdentifier = (identifier: string | PassedRoute): boolean | RouteWithRegex => {
+const processIdentifier = (identifier: string | PassedRoute): boolean | FormattedRoute => {
     // Filter route using identifier
     filteredRoute = routes.filter(route => {
         const { name, regex } = route;
@@ -78,7 +78,7 @@ const setQuery = (
     query: Record<string, string>,
     update = false,
     replace = true
-): RouteWithRegex | void => {
+): FormattedRoute | void => {
     if (!query) return error('A query argument is required');
     if (typeof query !== 'object') {
         return error('Query argument must be an object');
@@ -102,7 +102,7 @@ const setQuery = (
 };
 
 // Update named-params
-const setParams = (params: Record<string, string>, replace = true): RouteWithRegex | void => {
+const setParams = (params: Record<string, string>, replace = true): FormattedRoute | void => {
     if (!params) {
         return error('Params are required');
     } else if (!currentRoute.path.includes(':')) {
