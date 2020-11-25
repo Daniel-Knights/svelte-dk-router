@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Route, FormattedRoute } from '../static';
-import { error, currentPath, compareRoutes } from '../static';
+import { error, currentPath, validateRoutes } from '../static';
 import { afterCallback, beforeCallback } from './guard';
 import { chartState } from './nested';
 
@@ -182,8 +182,6 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
                 userRoute['depth'] = depth;
             }
 
-            compareRoutes(passedRoutes, userRoute, i);
-
             if (userRoute.children) {
                 // Recursively format children
                 formatRoutes(userRoute.children, userRoute);
@@ -192,6 +190,8 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
     };
 
     formatRoutes(userRoutes, null);
+
+    validateRoutes(userRoutes);
 
     routes = userRoutes as FormattedRoute[];
     loadState();

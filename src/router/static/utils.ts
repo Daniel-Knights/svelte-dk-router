@@ -35,46 +35,8 @@ const formatQuery = (query: Record<string, string>): string => {
     return formattedQuery;
 };
 
-const validatePassedParams = (
-    path: string,
-    params: Record<string, string>,
-    silentError = false
-): boolean => {
-    let valid = true;
-
-    // Validate required params
-    if (path && !silentError) {
-        path.split('/').forEach((section, i) => {
-            if (i === 0 || section.split('')[0] !== ':') return;
-
-            section = section.split(':')[1];
-
-            if (!params || !params[section]) {
-                valid = false;
-                error('Missing required param: "' + section + '"');
-            }
-        });
-    }
-
-    if (params) {
-        // Compare passed params with path params
-        Object.keys(params).forEach(passedParam => {
-            if (!path.includes('/:' + passedParam)) {
-                warn('Invalid param: "' + passedParam + '"');
-
-                // Cleanup
-                delete params[passedParam];
-            }
-        });
-    }
-
-    return valid;
-};
-
 const formatPathFromParams = (path: string, params: Record<string, string>): string => {
-    if (!validatePassedParams(path, params) || !params) {
-        return path;
-    }
+    if (!path || !params) return;
 
     Object.entries(params).forEach(([key, value]) => {
         if (path.includes('/:')) {
@@ -85,39 +47,20 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
     return path;
 };
 
-const validateRoute = (passedRoute, compareRoute) => {
-    const { name, path, index } = passedRoute;
-
-    if (!index || index === compareRoute.index) return;
-
-    if (name === compareRoute.name)
-        error('The "name" property must be unique, duplicates detected: "' + name + '"');
-
-    if (path === compareRoute.path || '/#' + path === compareRoute.path) {
-        error('The "path" property must be unique, duplicates detected: "' + path + '"');
-    }
-};
-
 const compareRoutes = (
     routes: Route[] | FormattedRoute[],
-    route: Route | FormattedRoute,
-    routeIndex?: number
+    route: Route | FormattedRoute
 ): void | Route | FormattedRoute => {
     const { name, path } = route;
     let matchedRoute, fallbackRoute;
 
     const matchRoute = passedRoutes => {
-        passedRoutes.forEach((compare, compareIndex) => {
+        passedRoutes.forEach(compare => {
             if (matchedRoute) return;
 
             const { regex, fullRegex } = compare as FormattedRoute;
 
             if (compare.path === '(*)') fallbackRoute = compare;
-
-            validateRoute(
-                { ...route, index: routeIndex },
-                { ...compare, index: compareIndex }
-            );
 
             if (path && (regex || fullRegex))
                 if (path.match(fullRegex) || path.match(regex)) {
@@ -144,7 +87,6 @@ export {
     currentPath,
     setUrl,
     formatQuery,
-    validatePassedParams,
     formatPathFromParams,
     compareRoutes,
 };
