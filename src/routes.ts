@@ -24,7 +24,20 @@ const routes = [
                 title: 'Future | About',
                 path: '/future',
                 component: future,
-                children: [{ title: 'More | About', path: '/more', component: more }],
+                children: [
+                    {
+                        title: 'More | About',
+                        path: '/more',
+                        component: more,
+                        children: [
+                            {
+                                title: 'Even More | About',
+                                path: '/even-more',
+                                component: more,
+                            },
+                        ],
+                    },
+                ],
             },
             { title: 'Origins | About', path: '/origins', component: origins },
         ],
@@ -33,11 +46,21 @@ const routes = [
         title: 'Blog',
         path: '/blog/:id/:name',
         component: blog,
+        children: [
+            {
+                name: 'blog future',
+                title: 'Future | Blog',
+                path: '/future',
+                component: future,
+                children: [{ name: 'blog more', path: '/more', component: more }],
+            },
+            { title: 'Origins | Blog', path: '/origins', component: origins },
+        ],
     },
     {
         name: 'Fallback',
         title: '404',
-        path: '*',
+        path: '(*)',
         component: fallback,
     },
 ];

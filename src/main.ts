@@ -23,7 +23,6 @@ afterEach((to, from) => {
 });
 
 setRoutes(routes);
-// console.log('hello');
 
 const app = new App({ target: document.body });
 

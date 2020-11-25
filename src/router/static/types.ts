@@ -13,6 +13,7 @@ export interface FormattedRoute extends Route {
     fullPath: string;
     rootPath: string;
     regex: RegExp;
+    fullRegex: RegExp;
     depth: number;
     trace: string[];
     children?: FormattedRoute[];

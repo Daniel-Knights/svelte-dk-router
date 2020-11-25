@@ -1,5 +1,11 @@
 import type { Route, PassedRoute, FormattedRoute } from '../static';
-import { error, setUrl, formatQuery, validatePassedParams, formatPathFromParams } from '../static';
+import {
+    error,
+    setUrl,
+    formatQuery,
+    validatePassedParams,
+    formatPathFromParams,
+} from '../static';
 import { routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
 import { chartState } from './nested';
@@ -14,7 +20,10 @@ let newPath: string, newTitle: string, newRoute: FormattedRoute;
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => (route = { ...newRoute }));
 
-const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise<void> => {
+const changeRoute = async (
+    passedRoute: PassedRoute,
+    replace?: boolean
+): Promise<void> => {
     const { name, path, query, params, meta } = passedRoute;
 
     if (!name && !path) {
@@ -46,7 +55,10 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
             if (name && routeData.name === name) {
                 // If route changed by name
                 setNewRouteData(routeData);
-            } else if (path && path.match(routeData.regex)) {
+            } else if (
+                path &&
+                (path.match(routeData.fullRegex) || path.match(routeData.regex))
+            ) {
                 // If route changed by path
                 setNewRouteData(routeData);
             } else if (routeData.children) {
@@ -58,9 +70,11 @@ const changeRoute = async (passedRoute: PassedRoute, replace?: boolean): Promise
 
     matchRoute(routes);
 
-    if (!routeExists) return error('unknown route');
+    if (!routeExists || newPath === '(*)') {
+        return error('unknown route');
+    }
 
-    if (!validatePassedParams(newRoute.path, params)) return;
+    if (!validatePassedParams(newRoute.fullPath, params)) return;
 
     // Query handling
     if (query) {

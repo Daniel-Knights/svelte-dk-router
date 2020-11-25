@@ -16,18 +16,17 @@
     // Match identifier to set routes
     const route = compareRoutes(routes, { name, path, params }, null);
 
-    path = route ? route.path : null;
+    if (route) path = route.fullPath;
 
     // Handle named-params
-    if (path && path.includes(':') && params) {
-        path = formatPathFromParams(path, params);
-    }
+    path = formatPathFromParams(path, params);
 
     // Router-active class matching
     writableRoute.subscribe(newRoute => {
         if (!newRoute || newRoute.path === '*') return;
 
-        const matches = (path && path.match(newRoute.regex)) || newRoute.name === name;
+        const matches =
+            (path && path.match(newRoute.fullRegex)) || (name && name === newRoute.name);
 
         routerActive = matches ? true : false;
     });

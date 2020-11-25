@@ -44,12 +44,14 @@ const validatePassedParams = (
 
     // Validate required params
     if (path && !silentError) {
-        path.split('/:').forEach((param, i) => {
-            if (i === 0) return;
+        path.split('/').forEach((section, i) => {
+            if (i === 0 || !section.includes(':')) return;
 
-            if (!params || !params[param]) {
+            section = section.split(':')[1];
+
+            if (!params || !params[section]) {
                 valid = false;
-                error('Missing required param: "' + param + '"');
+                error('Missing required param: "' + section + '"');
             }
         });
     }
@@ -67,17 +69,28 @@ const validatePassedParams = (
 };
 
 const formatPathFromParams = (path: string, params: Record<string, string>): string => {
-    let formattedParams = path;
+    if (!validatePassedParams(path, params) || !params) return;
 
     Object.entries(params).forEach(([key, value]) => {
-        if (formattedParams.includes(':')) {
-            formattedParams = formattedParams.replace(':' + key, value);
-        } else {
-            formattedParams += '/' + value;
+        if (path.includes(':')) {
+            path = path.replace(':' + key, value);
         }
     });
 
-    return formattedParams;
+    return path;
+};
+
+const validateRoute = (passedRoute, compareRoute) => {
+    const { name, path, index } = passedRoute;
+
+    if (!index || index === compareRoute.index) return;
+
+    if (name === compareRoute.name)
+        error('The "name" property must be unique, duplicates detected: "' + name + '"');
+
+    if (path === compareRoute.path || '/#' + path === compareRoute.path) {
+        error('The "path" property must be unique, duplicates detected: "' + path + '"');
+    }
 };
 
 const compareRoutes = (
@@ -85,51 +98,29 @@ const compareRoutes = (
     route: Route | FormattedRoute,
     routeIndex?: number
 ): void | Route | FormattedRoute => {
-    const { name, path, params } = route;
-    let matchedRoute, formattedPath;
-
-    if (params) {
-        formattedPath = formatPathFromParams(path, params);
-    } else formattedPath = path;
+    const { name, path } = route;
+    let matchedRoute, fallbackRoute;
 
     const matchRoute = passedRoutes => {
         passedRoutes.forEach((compare, compareIndex) => {
             if (matchedRoute) return;
 
-            const { regex } = compare as FormattedRoute;
+            const { regex, fullRegex } = compare as FormattedRoute;
 
-            let sameRoute;
+            if (compare.path === '(*)') fallbackRoute = compare;
 
-            if (routeIndex) {
-                sameRoute = routeIndex === compareIndex;
-            }
+            validateRoute(
+                { ...route, index: routeIndex },
+                { ...compare, index: compareIndex }
+            );
+
+            if (path && (regex || fullRegex))
+                if (path.match(fullRegex) || path.match(regex)) {
+                    return (matchedRoute = compare);
+                }
 
             if (name === compare.name) {
-                matchedRoute = compare;
-
-                if (sameRoute === false)
-                    error(
-                        'The "name" property must be unique, duplicates detected: "' + name + '"'
-                    );
-            }
-
-            if (formattedPath === compare || '/#' + formattedPath === compare) {
-                matchedRoute = compare;
-
-                if (sameRoute === false)
-                    error(
-                        'The "path" property must be unique, duplicates detected: "' +
-                            formattedPath +
-                            '"'
-                    );
-            }
-
-            if (path === compare.rootPath && compare.path.includes(':')) {
-                validatePassedParams(compare.path, params);
-            }
-
-            if (formattedPath && formattedPath.match(regex)) {
-                matchedRoute = compare;
+                return (matchedRoute = compare);
             }
 
             if (compare.children) matchRoute(compare.children);
@@ -138,7 +129,8 @@ const compareRoutes = (
 
     matchRoute(routes);
 
-    return matchedRoute;
+    if (!matchedRoute) return fallbackRoute;
+    else return matchedRoute;
 };
 
 export {

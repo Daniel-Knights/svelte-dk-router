@@ -2,7 +2,7 @@
     import { push, replace, SLink, setQuery, setParams, route } from '../router';
 
     let query: Record<string, string> = { id: '1', name: 'dan' },
-        params: Record<string, string> = { name: '1', id: 'dan' },
+        params: Record<string, string> = { id: '1', name: 'dan' },
         meta: Record<string, string> = { test: 'uowjkdwjndlkwjned' };
 </script>
 

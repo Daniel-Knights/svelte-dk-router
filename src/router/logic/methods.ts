@@ -3,7 +3,6 @@ import {
     setUrl,
     formatQuery,
     currentPath,
-    formatPathFromParams,
     PassedRoute,
     FormattedRoute,
     validatePassedParams,
@@ -13,10 +12,12 @@ import { hashHistory, routes, writableRoute } from './state';
 
 let filteredRoute: FormattedRoute;
 
-const processIdentifier = (identifier: string | PassedRoute): boolean | FormattedRoute => {
+const processIdentifier = (
+    identifier: string | PassedRoute
+): boolean | FormattedRoute => {
     // Filter route using identifier
     filteredRoute = routes.filter(route => {
-        const { name, regex } = route;
+        const { name, regex, fullRegex } = route;
 
         if (typeof identifier === 'string') {
             const isPath = identifier.match(/\//);
@@ -27,14 +28,13 @@ const processIdentifier = (identifier: string | PassedRoute): boolean | Formatte
                 return route;
             }
         } else {
-            const { path, params } = identifier;
-            let formattedPath = params ? formatPathFromParams(path, params) : path;
+            let { path } = identifier;
 
-            if (hashHistory) formattedPath = '/#' + formattedPath;
+            if (hashHistory) path = '/#' + path;
 
-            if (identifier.name === name || formattedPath.match(regex)) {
-                return route;
-            }
+            if (path.match(fullRegex)) return route;
+            if (identifier.name === name) return route;
+            if (path.match(regex)) return route;
         }
     })[0];
 
@@ -102,7 +102,10 @@ const setQuery = (
 };
 
 // Update named-params
-const setParams = (params: Record<string, string>, replace = true): FormattedRoute | void => {
+const setParams = (
+    params: Record<string, string>,
+    replace = true
+): FormattedRoute | void => {
     if (!params) {
         return error('Params are required');
     } else if (!currentRoute.path.includes(':')) {
@@ -139,7 +142,9 @@ const setParams = (params: Record<string, string>, replace = true): FormattedRou
     });
 
     if (currentRoute.query) {
-        query = hashHistory ? '?' + window.location.hash.split('?')[1] : window.location.search;
+        query = hashHistory
+            ? '?' + window.location.hash.split('?')[1]
+            : window.location.search;
     }
 
     const path = pathSections.join('/') + query;

@@ -49,10 +49,10 @@ const loadState = async (): Promise<void> => {
             passedRoutes.forEach(singleRoute => {
                 if (currentRoute) return;
 
-                const { regex, children, rootParent: ancestor } = singleRoute;
+                const { regex, fullRegex, children, rootParent: ancestor } = singleRoute;
 
                 // Compare route path against URL path
-                if (path && path.match(regex)) {
+                if (path && (path.match(fullRegex) || path.match(regex))) {
                     queryState(query, singleRoute);
 
                     if (!rootParent) {
@@ -109,7 +109,9 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             if (hashMode && path !== '*') {
                 userRoute.path = '/#' + path;
                 userRoute['fullPath'] = parent ? parent.fullPath + path : userRoute.path;
-                userRoute['rootPath'] = parent ? parent.rootPath : '/#/' + path.split('/')[1];
+                userRoute['rootPath'] = parent
+                    ? parent.rootPath
+                    : '/#/' + path.split('/')[1];
             } else if (parent) {
                 userRoute['fullPath'] = parent.fullPath + path;
                 userRoute['rootPath'] = parent.rootPath;
@@ -134,10 +136,17 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             }
 
             // Generate dynamic regex for each route
-            let routeRegex = userRoute.fullPath
+            let regex = userRoute.path
                 .split('/')
                 .map((section, i) => {
-                    if (section === '*') return '.*'; // Fallback
+                    if (section.includes(':')) return '';
+                    else if (i !== 0) return '\\/' + section;
+                })
+                .join('');
+
+            let fullRegex = userRoute.fullPath
+                .split('/')
+                .map((section, i) => {
                     if (section.includes(':')) {
                         // Named-params
                         return '\\/(?:[^\\/]+?)';
@@ -145,15 +154,17 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
                 })
                 .join('');
 
-            if (hashMode && path !== '*') {
-                routeRegex = '\\/#' + routeRegex;
-            }
-
             // Handle base-path
-            if (userRoute.fullPath === '/') routeRegex = '';
-            else if (userRoute.fullPath === '/#/') routeRegex = '\\/#';
+            if (userRoute.path === '/') regex = '';
+            else if (userRoute.path === '/#/') regex = '\\/#';
 
-            userRoute['regex'] = new RegExp('^' + routeRegex + '\\/?$', 'i');
+            if (userRoute.fullPath === '/') fullRegex = '';
+            else if (userRoute.fullPath === '/#/') fullRegex = '\\/#';
+
+            if (userRoute.path !== '(*)') {
+                userRoute['regex'] = new RegExp('^' + regex + '\\/?$', 'i');
+                userRoute['fullRegex'] = new RegExp('^' + fullRegex + '\\/?$', 'i');
+            }
 
             // Set depth of route/nested-route
             if (userRoute.parent) {
