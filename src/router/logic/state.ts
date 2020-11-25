@@ -23,8 +23,8 @@ const queryState = (query, route) => {
 
 // Set named params to route object on page-load
 const paramState = (path, route) => {
-    route.path.split('/').forEach((param, i) => {
-        if (param.includes(':')) {
+    route.fullPath.split('/').forEach((param, i) => {
+        if (param.split('')[0] === ':') {
             // Validate
             if (!path.split('/')[i])
                 return error('Missing required param: "' + param.slice(1) + '"');
@@ -139,7 +139,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             let regex = userRoute.path
                 .split('/')
                 .map((section, i) => {
-                    if (section.includes(':')) return '';
+                    if (section.split('')[0] === ':') return '';
                     else if (i !== 0) return '\\/' + section;
                 })
                 .join('');
@@ -147,7 +147,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             let fullRegex = userRoute.fullPath
                 .split('/')
                 .map((section, i) => {
-                    if (section.includes(':')) {
+                    if (section.split('')[0] === ':') {
                         // Named-params
                         return '\\/(?:[^\\/]+?)';
                     } else if (i !== 0) return '\\/' + section;

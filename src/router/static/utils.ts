@@ -45,7 +45,7 @@ const validatePassedParams = (
     // Validate required params
     if (path && !silentError) {
         path.split('/').forEach((section, i) => {
-            if (i === 0 || !section.includes(':')) return;
+            if (i === 0 || section.split('')[0] !== ':') return;
 
             section = section.split(':')[1];
 
@@ -72,8 +72,8 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
     if (!validatePassedParams(path, params) || !params) return;
 
     Object.entries(params).forEach(([key, value]) => {
-        if (path.includes(':')) {
-            path = path.replace(':' + key, value);
+        if (path.includes('/:')) {
+            path = path.replace('/:' + key, '/' + value);
         }
     });
 

@@ -108,13 +108,13 @@ const setParams = (
 ): FormattedRoute | void => {
     if (!params) {
         return error('Params are required');
-    } else if (!currentRoute.path.includes(':')) {
+    } else if (!currentRoute.fullPath.includes('/:')) {
         return error('Current route has no defined params');
     }
 
     let query = '';
 
-    validatePassedParams(currentRoute.path, params, true);
+    validatePassedParams(currentRoute.fullPath, params, true);
 
     // Remove invalid params
     Object.keys(params).forEach(param => {
@@ -134,8 +134,8 @@ const setParams = (
 
     const pathSections = currentPath(hashHistory).split('/');
 
-    currentRoute.path.split('/').forEach((section, i) => {
-        if (!section.includes(':')) return;
+    currentRoute.fullPath.split('/').forEach((section, i) => {
+        if (section.split('')[0] !== ':') return;
         if (!params[section.split(':')[1]]) return;
 
         pathSections[i] = params[section.split(':')[1]];

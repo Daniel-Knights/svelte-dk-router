@@ -52,7 +52,7 @@ const routes = [
                 title: 'Future | Blog',
                 path: '/future',
                 component: future,
-                children: [{ name: 'blog more', path: '/more', component: more }],
+                children: [{ name: 'blog more', path: '/more:hey', component: more }],
             },
             { title: 'Origins | Blog', path: '/origins', component: origins },
         ],
