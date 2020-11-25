@@ -59,8 +59,11 @@ const validatePassedParams = (
     if (params) {
         // Compare passed params with path params
         Object.keys(params).forEach(passedParam => {
-            if (!path.includes(':' + passedParam)) {
+            if (!path.includes('/:' + passedParam)) {
                 warn('Invalid param: "' + passedParam + '"');
+
+                // Cleanup
+                delete params[passedParam];
             }
         });
     }
@@ -69,7 +72,9 @@ const validatePassedParams = (
 };
 
 const formatPathFromParams = (path: string, params: Record<string, string>): string => {
-    if (!validatePassedParams(path, params) || !params) return;
+    if (!validatePassedParams(path, params) || !params) {
+        return path;
+    }
 
     Object.entries(params).forEach(([key, value]) => {
         if (path.includes('/:')) {
