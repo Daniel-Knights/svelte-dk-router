@@ -1,6 +1,6 @@
 <script>
-    import { writableRoute, changeRoute, routes, hashHistory } from '../logic';
-    import { formatPathFromParams, compareRoutes } from '../static';
+    import { changeRoute, routes, hashHistory, writableDepthChart } from '../logic';
+    import { formatPathFromParams, compareRoutes, validatePassedParams } from '../static';
 
     export let name = undefined,
         path = undefined,
@@ -19,14 +19,24 @@
     if (route) path = route.fullPath;
 
     // Handle named-params
-    path = formatPathFromParams(path, params);
+    if (validatePassedParams(path, params) || !params) {
+        path = formatPathFromParams(path, params);
+    }
 
     // Router-active class matching
-    writableRoute.subscribe(newRoute => {
-        if (!newRoute || newRoute.path === '*') return;
+    writableDepthChart.subscribe(chart => {
+        let matches;
 
-        const matches =
-            (path && path.match(newRoute.fullRegex)) || (name && name === newRoute.name);
+        Object.values(chart).forEach(routeValue => {
+            if (!routeValue || routeValue.path === '*') return;
+
+            const pathMatch = path && path.match(routeValue.fullRegex);
+            const nameMatch = name && name === routeValue.name;
+
+            if (pathMatch || nameMatch) {
+                matches = true;
+            }
+        });
 
         routerActive = matches ? true : false;
     });

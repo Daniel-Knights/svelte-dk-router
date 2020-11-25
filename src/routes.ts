@@ -54,7 +54,12 @@ const routes = [
                 component: future,
                 children: [{ name: 'blog more', path: '/more:hey', component: more }],
             },
-            { title: 'Origins | Blog', path: '/origins', component: origins },
+            {
+                name: 'blog origins',
+                title: 'Origins | Blog',
+                path: '/origins',
+                component: origins,
+            },
         ],
     },
     {

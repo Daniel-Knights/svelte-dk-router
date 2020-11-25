@@ -165,8 +165,6 @@ import {
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.
 
-## TODO
-
--   Tag option
+---
 
 Contributions welcome.
