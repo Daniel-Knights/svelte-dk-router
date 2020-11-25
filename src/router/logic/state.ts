@@ -72,6 +72,15 @@ const loadState = async (): Promise<void> => {
         filterRoutes(routes);
     }
 
+    // Determine if route has nested base-path
+    if (currentRoute && currentRoute.children) {
+        currentRoute.children.forEach(child => {
+            if (child.path === '' || child.path === '/') {
+                currentRoute = child;
+            }
+        });
+    }
+
     if (beforeCallback) await beforeCallback(currentRoute, null);
     await writableRoute.set(currentRoute);
     await chartState(currentRoute);
@@ -106,7 +115,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             // Set path properties
             userRoute['fullPath'] = path;
 
-            if (hashMode && path !== '*') {
+            if (hashMode && path !== '(*)') {
                 userRoute.path = '/#' + path;
                 userRoute['fullPath'] = parent ? parent.fullPath + path : userRoute.path;
                 userRoute['rootPath'] = parent

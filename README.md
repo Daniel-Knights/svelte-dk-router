@@ -44,12 +44,14 @@ const routes = [
     {
         name: 'Fallback',
         title: '404',
-        path: '*',
+        path: '(*)',
         component: fallback,
     },
 ];
 
 setRoutes(routes);
+// Or, for hash-based routing:
+setRoutes(routes, true);
 ```
 
 Then, use the view component:
@@ -100,9 +102,9 @@ If no `name` is set for a route, an all-lowercase name is generated based off th
 
 The main view for your routes.
 
-#### `<SLink name={string} path={string} {query} {params} {meta}>Slot</SLink>`
+#### `<SLink name={string} path={string} {query} {params} {meta} replace={boolean}>Slot</SLink>`
 
-Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined) and `meta`.
+Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined), `meta` and `replace`. `replace` defaults to `false`, meaning `pushState` is used instead of `replaceState`.
 
 #### `route`
 
@@ -149,13 +151,22 @@ Returns the updated route data.
 You can also import variables for each property of `window.location`:
 
 ```js
-import { hash, host, hostname, origin, pathname, href, protocol, search } from 'svelte-dk-router';
+import {
+    hash,
+    host,
+    hostname,
+    origin,
+    pathname,
+    href,
+    protocol,
+    search,
+} from 'svelte-dk-router';
 ```
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.
 
 ## TODO
 
--   Nested routes
+-   Tag option
 
 Contributions welcome.

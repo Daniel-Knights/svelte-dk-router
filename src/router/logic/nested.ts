@@ -9,9 +9,9 @@ const chartState = async (route: FormattedRoute): Promise<void> => {
     const tempChart = { 1: rootParent };
     let tempDepth = 1;
 
-    const filterChildren = passedRoutes => {
+    const filterChildren = passedRoute => {
         // Populate tempChart with matching nested route
-        passedRoutes.children.forEach(child => {
+        passedRoute.children.forEach(child => {
             if (child.name === trace[tempDepth]) {
                 tempChart[child.depth] = child;
                 tempDepth += 1;

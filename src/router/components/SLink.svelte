@@ -34,7 +34,9 @@
 
 <a
     href={path}
-    on:click|preventDefault={() => changeRoute({ name, path, query, params, meta }, replace)}
+    on:click|preventDefault={() => {
+        changeRoute({ name, path, query, params, meta }, replace);
+    }}
     class={routerActive ? 'router-active' : ''}>
     <slot />
 </a>

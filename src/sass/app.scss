@@ -16,4 +16,8 @@ body {
 a {
     color: unset;
     text-decoration: unset;
+
+    &:hover {
+        color: grey;
+    }
 }

@@ -43,6 +43,14 @@ const changeRoute = async (
         newPath = routeData.fullPath;
         newRoute = routeData;
 
+        if (newRoute.children) {
+            newRoute.children.forEach(child => {
+                if (child.path === '' || child.path === '/') {
+                    newRoute = child;
+                }
+            });
+        }
+
         if (meta) {
             newRoute['meta'] = { ...routeData.meta, ...meta };
         }

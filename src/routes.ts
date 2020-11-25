@@ -50,7 +50,7 @@ const routes = [
             {
                 name: 'blog future',
                 title: 'Future | Blog',
-                path: '/future',
+                path: '/',
                 component: future,
                 children: [{ name: 'blog more', path: '/more:hey', component: more }],
             },

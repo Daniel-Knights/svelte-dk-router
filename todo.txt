@@ -1,3 +1,1 @@
-named-params at different positions
-nested root paths
 Check all names against each other, including nested
