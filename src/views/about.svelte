@@ -10,6 +10,6 @@
 
 <main id="about">
     <h1>About</h1>
-    <SLink name={'more'}>MORE Link</SLink>
+    <SLink path={'/about/origins/more'}>MORE Link</SLink>
     <SView />
 </main>

@@ -12,12 +12,13 @@
 <header>
     <h1>Svelte Blog</h1>
     <nav>
-        <SLink name={'home'} {query} {meta} replace={true}>Home</SLink>
-        <SLink name={'about'}>About</SLink>
+        <SLink name={'Home'} {query} {meta} replace={true}>Home</SLink>
+        <SLink name={'About'}>About</SLink>
         <SLink path={'/blog'} {params} {meta}>Blog</SLink>
         <SLink path={'/blog'} params={paramsTwo} {meta}>Blog - Missing Params</SLink>
         <SLink path={'/blog'} params={paramsThree} {meta}>Blog - Invalid Params</SLink>
         <SLink path={'/blog'} params={paramsFour} {meta}>Blog - Missing + Invalid Params</SLink>
+        <SLink path={'/sadcasdc'}>Unknown Route</SLink>
         <div on:click={async () => await push('/')}>Push</div>
         <div
             on:click={async () => {
@@ -62,6 +63,13 @@
                 console.log(route);
             }}>
             Set Params
+        </div>
+        <div
+            on:click={() => {
+                setParams({ id: 'steve', name: 'iwjndkjwend', test: 'asdasd' });
+                console.log(route);
+            }}>
+            Set Params - Invalid params
         </div>
     </nav>
 </header>

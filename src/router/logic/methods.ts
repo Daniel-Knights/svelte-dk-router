@@ -24,7 +24,11 @@ const processIdentifier = (
 
             if (isPath && hashHistory) identifier = '/#' + identifier;
 
-            if (identifier.match(regex) || name === identifier) {
+            if (
+                identifier.match(fullRegex) ||
+                name === identifier ||
+                identifier.match(regex)
+            ) {
                 return route;
             }
         } else {
@@ -118,7 +122,7 @@ const setParams = (
 
     // Remove invalid params
     Object.keys(params).forEach(param => {
-        if (!currentRoute.params[param]) {
+        if (currentRoute.params && !currentRoute.params[param]) {
             delete params[param];
         }
     });

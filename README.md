@@ -19,11 +19,15 @@ First set your routes:
 import { setRoutes } from 'svelte-dk-router';
 import home from './views/home.svelte';
 import about from './views/about.svelte';
+import origins from './views/nested/origins.svelte';
+import future from './views/nested/future.svelte';
+import more from './views/nested/more.svelte';
 import blog from './views/blog.svelte';
 import fallback from './views/fallback.svelte';
 
 const routes = [
     {
+        name: 'Home',
         title: 'Home',
         path: '/',
         component: home,
@@ -32,12 +36,45 @@ const routes = [
         },
     },
     {
+        // If no name passed,
+        // Defaults to components' name
         title: 'About',
         path: '/about',
         component: about,
+        children: [
+            {
+                name: 'Default About',
+                // Pass an empty path to display a default child
+                path: '',
+                component: future,
+                children: [
+                    {
+                        title: 'More | About',
+                        // Full-path: /about/more
+                        path: '/more',
+                        component: more,
+                    },
+                ],
+            },
+            {
+                title: 'Origins | About',
+                path: '/origins',
+                component: origins,
+                children: [
+                    {
+                        name: 'More About'
+                        title: 'More | About',
+                        // Full-path: /about/origins/more
+                        path: '/more',
+                        component: more,
+                    },
+                ],
+            },
+        ],
     },
     {
         title: 'Blog',
+        // Named-params
         path: '/blog/:id/:name',
         component: blog,
     },
@@ -71,12 +108,18 @@ Links to navigate:
     import { SLink } from 'svelte-dk-router';
 
     let params = { id: '1', name: 'dan' },
-        query = { id: '1', name: 'dan' };
+        query = { id: '1', name: 'dan' },
+        meta = { some: 'extra information' };
 </script>
 
-<SLink name={'home'}>Home</SLink>
-<SLink path={'/about'} {query}>Home</SLink>
-<SLink path={'/blog'} {params}>Home</SLink>
+<SLink name={'Home'}>Home</SLink>
+// Using meta allows you to pass any data to the next page
+<SLink path={'/about'} {query} {meta}>About</SLink>
+<SLink path={'/blog'} {params} replace={true}>Blog</SLink>
+// Navigate to a nested route
+<SLink name={'More About'}>More Info</SLink>
+// Full paths are also supported
+<SLink path={'/about/origins/more'}>More Info</SLink>
 ```
 
 and don't forget to set your rollup config to handle SPA's with `-s`:

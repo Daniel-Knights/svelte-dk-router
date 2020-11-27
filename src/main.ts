@@ -9,16 +9,21 @@ beforeEach(async (to, from) => {
     // console.log('before', from, to, pathname);
     // console.log(to, ' - before to');
     // console.log(from, ' - before from');
-    // if (!userAuthenticated && to.path === '/#/about') {
+    // if (!userAuthenticated && to.path === '/about') {
     //     await replace('/');
     //     console.log(1);
     // }
 });
-afterEach((to, from) => {
+afterEach(async (to, from) => {
+    // console.log(hash, host, hostname, origin, pathname, href, protocol, search);
     // console.log('after', from, to, pathname);
     // console.log(to, ' - after to');
-    // if (to.path === '/about') push({ path: '/blog', params: { id: 'name', name: 'id' } });
-    // if (to.path === '/') await replace('/about');
+    // if (to.path === '/about') {
+    //     console.log(1);
+    //     await push({ path: '/blog', params: { id: 'name', name: 'id' } });
+    //     console.log(2);
+    // }
+    // if (to.path === '/') replace('/about');
     // console.log(from, ' - after from');
 });
 

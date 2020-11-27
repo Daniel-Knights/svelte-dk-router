@@ -1,5 +1,5 @@
 <script>
-    import { changeRoute, routes, hashHistory, writableDepthChart } from '../logic';
+    import { routes, hashHistory, changeRoute, writableDepthChart } from '../logic';
     import { formatPathFromParams, compareRoutes, validatePassedParams } from '../static';
 
     export let name = undefined,
@@ -16,10 +16,13 @@
     // Match identifier to set routes
     const route = compareRoutes(routes, { name, path, params }, null);
 
-    if (route) path = route.fullPath;
+    if (route) {
+        name = route.name;
+        path = route.fullPath;
+    }
 
     // Handle named-params
-    if (validatePassedParams(path, params) || !params) {
+    if (validatePassedParams(path, params) && params) {
         path = formatPathFromParams(path, params);
     }
 
@@ -28,7 +31,7 @@
         let matches;
 
         Object.values(chart).forEach(routeValue => {
-            if (!routeValue || routeValue.path === '*') return;
+            if (!routeValue || routeValue.path === '(*)') return;
 
             const pathMatch = path && path.match(routeValue.fullRegex);
             const nameMatch = name && name === routeValue.name;

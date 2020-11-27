@@ -23,6 +23,87 @@ const setUrl = (replace: boolean, path: string): void => {
     updateLocationData();
 };
 
+// Set query params to route object on page-load
+const queryState = (query: URLSearchParams, route: FormattedRoute): void => {
+    if (!query) return;
+
+    query.forEach((value, key) => {
+        if (!route.query) route['query'] = {};
+
+        route.query[key] = value;
+    });
+};
+
+// Set named params to route object on page-load
+const paramState = (path: string, route: FormattedRoute): void => {
+    if (!route.fullPath) return;
+
+    route.fullPath.split('/').forEach((param, i) => {
+        if (param.split('')[0] === ':') {
+            // Validate
+            if (!path.split('/')[i])
+                return error('Missing required param: "' + param.slice(1) + '"');
+
+            if (!route.params) route.params = {};
+
+            route.params[param.split(':')[1]] = path.split('/')[i];
+        }
+    });
+};
+
+const formatPaths = (
+    passedRoute: FormattedRoute,
+    path: string,
+    hashMode: boolean
+): void => {
+    const { parent } = passedRoute;
+    // Set path properties
+    passedRoute['fullPath'] = path;
+
+    if (hashMode && path !== '(*)') {
+        passedRoute.path = '/#' + path;
+        passedRoute['fullPath'] = parent ? parent.fullPath + path : passedRoute.path;
+        passedRoute['rootPath'] = parent ? parent.rootPath : '/#/' + path.split('/')[1];
+    } else if (parent) {
+        passedRoute['fullPath'] = parent.fullPath + path;
+        passedRoute['rootPath'] = parent.rootPath;
+    } else if (path.split('/')[1]) {
+        passedRoute['rootPath'] = '/' + path.split('/')[1];
+    }
+};
+
+const formatRegex = (passedRoute: FormattedRoute): void => {
+    let regex = passedRoute.path
+        .split('/')
+        .map((section, i) => {
+            if (section.split('')[0] === ':') return '';
+            else if (i !== 0) return '\\/' + section;
+        })
+        .join('');
+
+    let fullRegex = passedRoute.fullPath
+        .split('/')
+        .map((section, i) => {
+            if (section.split('')[0] === ':') {
+                // Named-params
+                return '\\/(?:[^\\/]+?)';
+            } else if (i !== 0) return '\\/' + section;
+        })
+        .join('');
+
+    // Handle base-path
+    if (passedRoute.path === '/') regex = '';
+    else if (passedRoute.path === '/#/') regex = '\\/#';
+
+    if (passedRoute.fullPath === '/') fullRegex = '';
+    else if (passedRoute.fullPath === '/#/') fullRegex = '\\/#';
+
+    if (passedRoute.path !== '(*)') {
+        passedRoute['regex'] = new RegExp('^' + regex + '\\/?$', 'i');
+        passedRoute['fullRegex'] = new RegExp('^' + fullRegex + '\\/?$', 'i');
+    }
+};
+
 const formatQuery = (query: Record<string, string>): string => {
     const formattedQuery = Object.entries(query)
         .map(([key, value], i, arr) => {
@@ -62,7 +143,7 @@ const compareRoutes = (
 
             if (compare.path === '(*)') fallbackRoute = compare;
 
-            if (path && (regex || fullRegex))
+            if (path && (fullRegex || regex))
                 if (path.match(fullRegex) || path.match(regex)) {
                     return (matchedRoute = compare);
                 }
@@ -86,6 +167,10 @@ export {
     warn,
     currentPath,
     setUrl,
+    queryState,
+    paramState,
+    formatPaths,
+    formatRegex,
     formatQuery,
     formatPathFromParams,
     compareRoutes,

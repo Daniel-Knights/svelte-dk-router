@@ -3,5 +3,5 @@
 </script>
 
 <main>MORE</main>
-<SLink name={'even-more'}>EVEN MORE</SLink>
+<SLink name={'More'}>EVEN MORE</SLink>
 <SView />

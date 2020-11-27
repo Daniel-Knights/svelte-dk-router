@@ -22,5 +22,5 @@
 </style>
 
 <Post {...post} />
-<SLink name={'blog future'} {params}>NESTED</SLink>
+<SLink name={'Future'} {params}>NESTED</SLink>
 <SView />

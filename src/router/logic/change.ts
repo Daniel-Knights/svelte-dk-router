@@ -27,7 +27,7 @@ const changeRoute = async (
     const { name, path, query, params, meta } = passedRoute;
 
     if (!name && !path) {
-        return error('name or path required');
+        return error('Name or path required');
     }
 
     let routeExists = false;
@@ -45,7 +45,7 @@ const changeRoute = async (
 
         if (newRoute.children) {
             newRoute.children.forEach(child => {
-                if (child.path === '' || child.path === '/') {
+                if (child.path === '' || child.path === '/#') {
                     newRoute = child;
                 }
             });
@@ -79,7 +79,7 @@ const changeRoute = async (
     matchRoute(routes);
 
     if (!routeExists || newPath === '(*)') {
-        return error('unknown route');
+        return error('Unknown route');
     }
 
     if (!validatePassedParams(newRoute.fullPath, params)) return;

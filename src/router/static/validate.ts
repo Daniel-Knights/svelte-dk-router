@@ -16,22 +16,26 @@ const validateRoutes = (routes: Route[]): void => {
 
     flattenRoutes(routes);
 
-    flattened.forEach((outerRoute, outerIndex) => {
-        flattened.forEach((innerRoute, innerIndex) => {
-            if (outerIndex === innerIndex) return;
+    flattened.forEach((routeOne, indexOne) => {
+        flattened.forEach((routeTwo, indexTwo) => {
+            if (indexOne === indexTwo) return;
 
-            if (outerRoute.name === innerRoute.name) {
+            if (routeOne.name === routeTwo.name) {
                 error(
                     'The "name" property must be unique. Duplicates detected: "' +
-                        outerRoute.name +
+                        routeOne.name +
                         '"'
                 );
             }
 
-            if (outerRoute.fullPath === innerRoute.fullPath) {
+            if (
+                routeOne.fullPath === routeTwo.fullPath &&
+                routeOne.parent !== routeTwo &&
+                routeTwo.parent !== routeOne
+            ) {
                 error(
                     'Paths must be unique. Duplicates detected: "' +
-                        outerRoute.fullPath +
+                        routeOne.fullPath +
                         '"'
                 );
             }
@@ -63,7 +67,7 @@ const validatePassedParams = (
     if (params) {
         // Compare passed params with path params
         Object.keys(params).forEach(passedParam => {
-            if (!path.includes('/:' + passedParam)) {
+            if (!path || !path.includes('/:' + passedParam)) {
                 warn('Invalid param: "' + passedParam + '"');
 
                 // Cleanup

@@ -1,13 +1,13 @@
 export { SLink, SView } from './components';
 export {
     route,
-    setRoutes,
     push,
     replace,
     beforeEach,
     afterEach,
     setQuery,
     setParams,
+    setRoutes,
     hash,
     host,
     hostname,

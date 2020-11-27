@@ -21,6 +21,7 @@ const routes = [
         component: about,
         children: [
             {
+                name: 'future',
                 title: 'Future | About',
                 path: '/future',
                 component: future,
@@ -31,6 +32,7 @@ const routes = [
                         component: more,
                         children: [
                             {
+                                name: 'hello',
                                 title: 'Even More | About',
                                 path: '/even-more',
                                 component: more,
@@ -39,7 +41,19 @@ const routes = [
                     },
                 ],
             },
-            { title: 'Origins | About', path: '/origins', component: origins },
+            {
+                title: 'Origins | About',
+                path: '/origins',
+                component: origins,
+                children: [
+                    {
+                        name: 'Origins | More',
+                        title: 'More | About',
+                        path: '/more',
+                        component: more,
+                    },
+                ],
+            },
         ],
     },
     {
@@ -48,9 +62,8 @@ const routes = [
         component: blog,
         children: [
             {
-                name: 'blog future',
                 title: 'Future | Blog',
-                path: '/',
+                path: '',
                 component: future,
                 children: [{ name: 'blog more', path: '/more:hey', component: more }],
             },
