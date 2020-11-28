@@ -34,7 +34,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
                 return error('"path" and "component" are required properties');
             }
 
-            // Set formatted path as route name if no name supplied
+            // Set component name as route name if none supplied
             if (!name) {
                 userRoute['name'] = component.name;
             }
