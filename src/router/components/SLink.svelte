@@ -14,7 +14,7 @@
     if (hashHistory) path = '/#' + path;
 
     // Match identifier to set routes
-    const route = compareRoutes(routes, { name, path, params }, null);
+    const route = compareRoutes(routes, { name, path, params });
 
     if (route) {
         name = route.name;
