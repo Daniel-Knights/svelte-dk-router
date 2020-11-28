@@ -48,7 +48,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
                 } else userRoute['rootParent'] = parent;
             }
 
-            // Array of path-sections to trace origins
+            // Array of route names to trace origins
             if (!userRoute.parent) {
                 userRoute['trace'] = [userRoute.name];
             } else {

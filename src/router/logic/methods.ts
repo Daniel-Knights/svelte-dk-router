@@ -91,7 +91,7 @@ const setQuery = (
     if (update)
         query = {
             ...currentRoute.query,
-            ...(query as Record<string, string>),
+            ...query,
         };
 
     writableRoute.update(routeValue => {
