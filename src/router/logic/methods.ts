@@ -10,42 +10,51 @@ import {
 import { changeRoute, route as currentRoute } from './change';
 import { hashHistory, routes, writableRoute } from './state';
 
-let filteredRoute: FormattedRoute;
+const processIdentifier = (identifier: string | PassedRoute): FormattedRoute => {
+    let filteredRoute;
 
-const processIdentifier = (
-    identifier: string | PassedRoute
-): boolean | FormattedRoute => {
     // Filter route using identifier
-    filteredRoute = routes.filter(route => {
-        const { name, regex, fullRegex } = route;
+    const filterRoutes = passedRoutes => {
+        passedRoutes.forEach(route => {
+            if (filteredRoute) return;
 
-        if (typeof identifier === 'string') {
-            const isPath = identifier.match(/\//);
+            const { name, regex, fullRegex } = route;
 
-            if (isPath && hashHistory) identifier = '/#' + identifier;
+            if (typeof identifier === 'string') {
+                const isPath = identifier.match(/\//);
 
-            if (
-                identifier.match(fullRegex) ||
-                name === identifier ||
-                identifier.match(regex)
-            ) {
-                return route;
+                if (isPath && hashHistory) identifier = '/#' + identifier;
+
+                if (identifier.match(fullRegex)) {
+                    filteredRoute = route;
+                } else if (name === identifier) {
+                    filteredRoute = route;
+                } else if (identifier.match(regex)) {
+                    filteredRoute = route;
+                }
+            } else if (typeof identifier === 'object') {
+                let { path } = identifier;
+
+                if (hashHistory) path = '/#' + path;
+
+                if (path && path.match(fullRegex)) {
+                    filteredRoute = route;
+                } else if (identifier.name === name) {
+                    filteredRoute = route;
+                } else if (path && path.match(regex)) {
+                    filteredRoute = route;
+                }
             }
-        } else {
-            let { path } = identifier;
 
-            if (hashHistory) path = '/#' + path;
+            if (route.children && !filteredRoute) {
+                filterRoutes(route.children);
+            }
+        });
+    };
 
-            if (path.match(fullRegex)) return route;
-            if (identifier.name === name) return route;
-            if (path.match(regex)) return route;
-        }
-    })[0];
+    filterRoutes(routes);
 
-    if (!filteredRoute) {
-        error('Invalid route');
-        return false;
-    }
+    if (!filteredRoute) error('Invalid route');
 
     //  Cleanup
     delete filteredRoute.query;
@@ -65,14 +74,18 @@ const processIdentifier = (
 
 // Push to the current history entry
 const push = async (identifier: string | PassedRoute): Promise<void> => {
-    if (!processIdentifier(identifier)) return;
+    const filteredRoute = processIdentifier(identifier);
+
+    if (!filteredRoute) return;
 
     await changeRoute(filteredRoute);
 };
 
 // Replace the current history entry
 const replace = async (identifier: string | PassedRoute): Promise<void> => {
-    if (!processIdentifier(identifier)) return;
+    const filteredRoute = processIdentifier(identifier);
+
+    if (!filteredRoute) return;
 
     await changeRoute(filteredRoute, true);
 };
