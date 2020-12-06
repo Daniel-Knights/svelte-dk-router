@@ -139,8 +139,10 @@ const loadState = async (): Promise<void> => {
     if (afterCallback) await afterCallback(currentRoute, null);
 
     // Update title
-    if (currentRoute && currentRoute.title) {
-        document.getElementsByTagName('title')[0].innerHTML = currentRoute.title;
+    const title = document.getElementsByTagName('title')[0];
+
+    if (currentRoute && currentRoute.title && title) {
+        title.innerHTML = currentRoute.title;
     }
 };
 

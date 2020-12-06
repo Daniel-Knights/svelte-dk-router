@@ -110,8 +110,10 @@ const changeRoute = async (
     await chartState(newRoute);
 
     // Update page title
-    if (newTitle) {
-        document.getElementsByTagName('title')[0].innerHTML = newTitle;
+    const title = document.getElementsByTagName('title')[0];
+
+    if (newTitle && title) {
+        title.innerHTML = newTitle;
     }
 
     // Update URL/state

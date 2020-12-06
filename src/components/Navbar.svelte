@@ -17,9 +17,12 @@
         <SLink path={'/blog'} {params} {meta}>Blog</SLink>
         <SLink path={'/blog'} params={paramsTwo} {meta}>Blog - Missing Params</SLink>
         <SLink path={'/blog'} params={paramsThree} {meta}>Blog - Invalid Params</SLink>
-        <SLink path={'/blog'} params={paramsFour} {meta}>Blog - Missing + Invalid Params</SLink>
+        <SLink path={'/blog'} params={paramsFour} {meta}>
+            Blog - Missing + Invalid Params
+        </SLink>
         <SLink path={'/sadcasdc'}>Unknown Route</SLink>
         <div on:click={async () => await push('/')}>Push</div>
+        <div on:click={async () => await push('/about/future')}>Push Future</div>
         <div
             on:click={async () => {
                 await replace({
@@ -38,13 +41,19 @@
         </div>
         <div
             on:click={async () => {
-                await replace({ path: '/blog', params: { id: 'hello', name: 'john', test: 'sa' } });
+                await replace({
+                    path: '/blog',
+                    params: { id: 'hello', name: 'john', test: 'sa' },
+                });
             }}>
             Replace - Invalid Params
         </div>
         <div
             on:click={async () => {
-                await replace({ path: '/blog', params: { id: 'hello', test: 'heasasd' } });
+                await replace({
+                    path: '/blog',
+                    params: { id: 'hello', test: 'heasasd' },
+                });
             }}>
             Replace - Missing + Invalid Params
         </div>

@@ -1,4 +1,4 @@
-import type { Route, FormattedRoute } from './types';
+import type { PassedRoute, FormattedRoute } from './types';
 import { updateLocationData } from '../logic/properties';
 
 const error = (msg: string): void => {
@@ -129,17 +129,19 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
 };
 
 const compareRoutes = (
-    routes: Route[] | FormattedRoute[],
-    route: Route | FormattedRoute
-): void | Route | FormattedRoute => {
+    routes: FormattedRoute[],
+    route: PassedRoute
+): void | FormattedRoute => {
     const { name, path } = route;
     let matchedRoute, fallbackRoute;
 
     const matchRoute = passedRoutes => {
+        if (!passedRoutes) return;
+
         passedRoutes.forEach(compare => {
             if (matchedRoute) return;
 
-            const { regex, fullRegex } = compare as FormattedRoute;
+            const { regex, fullRegex } = compare;
 
             if (compare.path === '(*)') fallbackRoute = compare;
 

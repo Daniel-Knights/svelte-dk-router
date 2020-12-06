@@ -3,9 +3,9 @@
 
     import { route, SView, SLink } from '../router';
 
-    onMount(() => {
-        console.log(route);
-    });
+    // onMount(() => {
+    //     console.log(route);
+    // });
 </script>
 
 <main id="about">
