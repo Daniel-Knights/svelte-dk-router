@@ -1,6 +1,6 @@
 {
     "name": "svelte-dk-router",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "main": "dist/index.js",
     "svelte": "dist/index.js",
     "description": "History or hash-based routing for Svelte.",
