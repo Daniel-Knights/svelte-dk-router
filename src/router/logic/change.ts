@@ -100,7 +100,7 @@ const changeRoute = async (
     }
 
     // Set fromRoute before route is updated
-    fromRoute = route;
+    if (!replace) fromRoute = route;
 
     // Before route change navigation guard
     if (beforeCallback) {
