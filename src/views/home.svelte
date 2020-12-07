@@ -4,10 +4,12 @@
     import { route } from '../router';
     import { SView } from '../router';
 
+    export let id = undefined;
+
     // onMount(() => console.log(route));
 </script>
 
-<main id="home">
-    <h1 id="home-view-rendered">Home</h1>
+<main id="home-view-rendered" data-testid={id}>
+    <h1>Home</h1>
     <SView />
 </main>

@@ -13,7 +13,7 @@ import { chartState } from './nested';
 // Current route data
 let route: FormattedRoute = null;
 // Previous route data
-let fromRoute: Route = null;
+let fromRoute: FormattedRoute = null;
 // New route data
 let newPath: string, newTitle: string, newRoute: FormattedRoute;
 
@@ -78,8 +78,11 @@ const changeRoute = async (
 
     matchRoute(routes);
 
-    if (!routeExists || newPath === '(*)') {
-        return error('Unknown route');
+    if (!routeExists) return error('Unknown route');
+
+    if (newPath === '(*)') {
+        newPath = path;
+        error('Unknown route');
     }
 
     if (!validatePassedParams(newRoute.fullPath, params)) return;

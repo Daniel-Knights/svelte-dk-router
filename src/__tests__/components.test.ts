@@ -16,14 +16,27 @@ test('Instantiates components', () => {
     expect(() => render(SView)).not.toThrow();
 });
 
-test('SView renders correct routes', async () => {
-    const { findByText } = render(SView);
-    const home = await findByText('Home');
+test('SView - Renders correct routes', async () => {
+    const { getByTestId } = render(SView, {
+        props: { id: 'sview-depth-one' },
+    });
+    const depthOneView = getByTestId('sview-depth-one');
 
-    expect(home.id).toBe('home-view-rendered');
+    expect(depthOneView).not.toBeNull;
+    expect(depthOneView.id).toBe('home-view-rendered');
+
+    await push('future');
+
+    const depthOneViewUpdated = getByTestId('sview-depth-one');
+    const depthTwoView = document.getElementById('future-view-rendered');
+
+    // Parent-view
+    expect(depthOneViewUpdated.id).toBe('about-view-rendered');
+    // Nested-view
+    expect(depthTwoView).not.toBeNull;
 });
 
-test('Changes route by name', async () => {
+test('SLink - Changes route by name', async () => {
     const { getByTestId } = render(SLink, {
         props: { name: 'About', routes, id: '1' },
     });
@@ -35,7 +48,7 @@ test('Changes route by name', async () => {
     expect(route.name).toBe('About');
 });
 
-test('Changes route by path', async () => {
+test('SLink - Changes route by path', async () => {
     const { getByTestId } = render(SLink, {
         props: { path: '/about', routes, id: '2' },
     });
@@ -47,7 +60,7 @@ test('Changes route by path', async () => {
     expect(route.name).toBe('About');
 });
 
-test('Changes route with query, params and meta, defaults to first child', async () => {
+test('SLink - Changes route with query, params and meta, defaults to first child', async () => {
     const { getByTestId } = render(SLink, {
         props: {
             path: '/blog',
@@ -69,7 +82,7 @@ test('Changes route with query, params and meta, defaults to first child', async
     expect(route.meta).toMatchObject({ test: 'test' });
 });
 
-test('Changes route using window.history.replaceState', async () => {
+test('SLink - Changes route using window.history.replaceState', async () => {
     const { getByTestId } = render(SLink, {
         props: { path: '/about', replace: true, routes, id: '4' },
     });
@@ -81,7 +94,7 @@ test('Changes route using window.history.replaceState', async () => {
     expect(route.name).toBe('About');
 });
 
-test('Applies router-active class', async () => {
+test('SLink - Applies router-active class', async () => {
     const { getByTestId } = render(SLink, {
         props: { path: '/', routes, id: '4' },
     });

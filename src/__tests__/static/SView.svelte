@@ -2,6 +2,8 @@
     import { getContext, onMount, setContext } from 'svelte';
     import { writableDepthChart } from '../../router/logic';
 
+    export let id = undefined;
+
     let depthChart = {},
         render = false,
         depth = getContext('depth') || 1;
@@ -16,5 +18,5 @@
 </script>
 
 {#if render && depthChart && depthChart[depth]}
-    <svelte:component this={depthChart[depth].component} />
+    <svelte:component this={depthChart[depth].component} {id} />
 {/if}

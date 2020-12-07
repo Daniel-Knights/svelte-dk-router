@@ -24,7 +24,7 @@
 
     if (route) {
         name = route.name;
-        path = route.fullPath;
+        path = route.path !== '(*)' ? route.fullPath : path;
     }
 
     // Handle named-params

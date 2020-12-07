@@ -1,5 +1,4 @@
 Tests
     hash
     error-handling
-    SView
     guards

@@ -8,17 +8,19 @@ beforeAll(() => setRoutes(userRoutes));
 
 test('Set routes', () => expect(routes).toEqual(userRoutes));
 
-test('Use window.history.pushState to change route', async () => {
+test('Push - Use window.history.pushState to change route', async () => {
     expect(route).toMatchObject(homeRoute);
 
     await push('/about');
 
     cleanupChildren();
     expect(route).toMatchObject(aboutRoute);
+    expect(window.location.pathname).toBe('/about');
 
     await push('Home');
 
     expect(route).toMatchObject(homeRoute);
+    expect(window.location.pathname).toBe('/');
 
     await push({
         path: '/blog',
@@ -30,9 +32,11 @@ test('Use window.history.pushState to change route', async () => {
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
+    expect(window.location.pathname).toBe('/blog/1/dan');
+    expect(window.location.search).toBe('?test=test');
 });
 
-test('Use window.history.replaceState to change route', async () => {
+test('Replace - Use window.history.replaceState to change route', async () => {
     await replace('/about');
 
     cleanupChildren();
@@ -48,25 +52,35 @@ test('Use window.history.replaceState to change route', async () => {
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
+    expect(window.location.pathname).toBe('/blog/1/dan');
+    expect(window.location.search).toBe('?test=test');
 });
 
-test('Set the current query', () => {
+test('setQuery - Set the current query', () => {
     setQuery({ test: 'test' });
 
     expect(route.query).toMatchObject({ test: 'test' });
+    expect(window.location.search).toBe('?test=test');
 });
 
-test('Update the current query', () => {
-    setQuery({ test: 'test', updated: 'not updated' });
+test('setQuery - Update the current query', () => {
+    setQuery({ test: 'test', updated: 'not-updated' });
+
+    expect(window.location.search).toBe('?test=test&updated=not-updated');
+
     setQuery({ updated: 'updated' }, true);
 
     expect(route.query).toMatchObject({ test: 'test', updated: 'updated' });
+    expect(window.location.search).toBe('?test=test&updated=updated');
 });
 
-test('Set named-params', async () => {
+test('setParams - Set named-params', async () => {
     await push({ path: '/blog', params: { id: '1', name: 'dan' } });
+
+    expect(window.location.pathname).toBe('/blog/1/dan');
 
     setParams({ id: '2', name: 'John' });
 
+    expect(window.location.pathname).toBe('/blog/2/John');
     expect(route.params).toMatchObject({ id: '2', name: 'John' });
 });

@@ -5,6 +5,8 @@
 
     import Post from '../components/Post.svelte';
 
+    export let id = undefined;
+
     let post: object = {
         title: 'Post 1',
         body:
@@ -18,9 +20,8 @@
     });
 </script>
 
-<style type="text/scss">
-</style>
-
-<Post {...post} />
-<SLink name={'Future'} {params}>NESTED</SLink>
-<SView />
+<main id="blog-view-rendered" data-testid={id}>
+    <Post {...post} />
+    <SLink name={'Future'} {params}>NESTED</SLink>
+    <SView />
+</main>
