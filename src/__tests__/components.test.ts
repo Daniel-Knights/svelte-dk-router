@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/svelte';
-import { setRoutes, route, push } from '../router';
-import { aboutRoute, blogDefaultChildRoute } from './static/routes';
+import { setRoutes, route, push, afterEach } from '../router';
+import { aboutRoute, blogDefaultChildRoute, homeRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import SLink from './static/SLink.svelte';
 import SView from './static/SView.svelte';
@@ -40,10 +40,10 @@ test('SView - Renders correct routes', async () => {
 
 test('SLink - Changes route by name', async () => {
     const { getByTestId } = render(SLink, {
-        props: { name: 'About', routes, id: '1' },
+        props: { name: 'About', routes, id: 'khjb23' },
     });
 
-    const link = getByTestId('1');
+    const link = getByTestId('khjb23');
 
     await fireEvent.click(link);
 
@@ -53,10 +53,10 @@ test('SLink - Changes route by name', async () => {
 
 test('SLink - Changes route by path', async () => {
     const { getByTestId } = render(SLink, {
-        props: { path: '/about', routes, id: '2' },
+        props: { path: '/about', routes, id: 'jbj3h4b' },
     });
 
-    const link = getByTestId('2');
+    const link = getByTestId('jbj3h4b');
 
     await fireEvent.click(link);
 
@@ -72,11 +72,11 @@ test('SLink - Changes route with query, params and meta, defaults to first child
             query: { test: 'test' },
             meta: { test: 'test' },
             routes,
-            id: '3',
+            id: '3g4fa',
         },
     });
 
-    const link = getByTestId('3');
+    const link = getByTestId('3g4fa');
 
     await fireEvent.click(link);
 
@@ -88,27 +88,44 @@ test('SLink - Changes route with query, params and meta, defaults to first child
 
 test('SLink - Changes route using window.history.replaceState', async () => {
     const { getByTestId } = render(SLink, {
-        props: { path: '/about', replace: true, routes, id: '4' },
+        props: {
+            path: '/',
+            routes,
+            id: 'jh454',
+            meta: { replaceTest: true },
+            replace: true,
+        },
+    });
+    render(SLink, {
+        props: { path: '/about', routes, id: 'enrfjk' },
     });
 
-    const link = getByTestId('4');
+    const homeLink = getByTestId('jh454');
+    const aboutLink = getByTestId('enrfjk');
 
-    await fireEvent.click(link);
+    afterEach((to, from) => {
+        if (!to.meta) return;
+        if (to.meta.replaceTest) {
+            expect(from).not.toMatchObject(aboutRoute);
+        }
+    });
 
-    cleanupChildren(route);
-    expect(route).toMatchObject(aboutRoute);
+    await fireEvent.click(aboutLink);
+    await fireEvent.click(homeLink);
+
+    expect(route).toMatchObject(homeRoute);
 });
 
 test('SLink - Applies router-active class', async () => {
     const { getByTestId } = render(SLink, {
-        props: { path: '/', routes, id: '4' },
+        props: { path: '/', routes, id: 's0d9' },
     });
     render(SLink, {
-        props: { path: '/about', routes, id: '5' },
+        props: { path: '/about', routes, id: '23lk4' },
     });
 
-    const homeLink = getByTestId('4');
-    const aboutLink = getByTestId('5');
+    const homeLink = getByTestId('s0d9');
+    const aboutLink = getByTestId('23lk4');
 
     await fireEvent.click(homeLink);
 

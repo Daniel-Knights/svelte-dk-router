@@ -1,5 +1,13 @@
-import { setRoutes, route, push, replace, setQuery } from '../router';
-import { routes, setParams } from '../router/logic';
+import {
+    setRoutes,
+    route,
+    push,
+    replace,
+    setQuery,
+    setParams,
+    beforeEach,
+} from '../router';
+import { routes } from '../router/logic';
 import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import userRoutes from '../routes';
@@ -42,6 +50,13 @@ test('push - Use window.history.pushState to change route', async () => {
 });
 
 test('replace - Use window.history.replaceState to change route', async () => {
+    beforeEach((to, from) => {
+        if (!to.meta) return;
+        if (to.meta.replaceTest) {
+            expect(from).not.toMatchObject(aboutRoute);
+        }
+    });
+
     await replace('/about');
 
     cleanupChildren(route);
@@ -51,6 +66,7 @@ test('replace - Use window.history.replaceState to change route', async () => {
         name: 'Blog',
         params: { id: '1', name: 'dan' },
         query: { test: 'test' },
+        meta: { replaceTest: true },
     });
 
     cleanupChildren(route);

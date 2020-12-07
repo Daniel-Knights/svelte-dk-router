@@ -9,10 +9,6 @@ beforeEach(async (to, from) => {
     // console.log('before', from, to, pathname);
     // console.log(to, ' - before to');
     // console.log(from, ' - before from');
-    // if (!userAuthenticated && to.path === '/about') {
-    //     await replace('/');
-    //     console.log(1);
-    // }
 });
 afterEach(async (to, from) => {
     // console.log(hash, host, hostname, origin, pathname, href, protocol, search);
