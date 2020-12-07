@@ -1,4 +1,4 @@
-import type { PassedRoute, FormattedRoute } from './types';
+import type { PassedRoute, FormattedRoute, Route } from './types';
 import { updateLocationData } from '../logic/properties';
 
 const error = (msg: string): void => {
@@ -48,6 +48,52 @@ const paramState = (path: string, route: FormattedRoute): void => {
 
             route.params[param.split(':')[1]] = path.split('/')[i];
         }
+    });
+};
+
+const flattenRoutes = (passedRoutes: Route[] | FormattedRoute[]): FormattedRoute[] => {
+    let flattened = [];
+
+    const flatten = routesToFlatten => {
+        routesToFlatten.forEach(route => {
+            flattened = [...flattened, route];
+
+            if (route.children) {
+                flatten(route.children);
+            }
+        });
+    };
+
+    flatten(passedRoutes);
+
+    return flattened;
+};
+
+const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void => {
+    const flattened = flattenRoutes(passedRoutes);
+    const validKeys = [
+        'name',
+        'title',
+        'path',
+        'component',
+        'meta',
+        'children',
+        'regex',
+        'fullRegex',
+        'fullPath',
+        'rootPath',
+        'parent',
+        'rootParent',
+        'trace',
+        'depth',
+    ];
+
+    flattened.forEach(flattenedRoute => {
+        Object.keys(flattenedRoute).forEach(key => {
+            if (!validKeys.includes(key)) {
+                delete flattenedRoute[key];
+            }
+        });
     });
 };
 
@@ -171,6 +217,8 @@ export {
     setUrl,
     queryState,
     paramState,
+    flattenRoutes,
+    stripInvalidProperties,
     formatPaths,
     formatRegex,
     formatQuery,

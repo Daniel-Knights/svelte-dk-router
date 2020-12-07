@@ -6,14 +6,19 @@ import userRoutes from '../routes';
 
 beforeAll(() => setRoutes(userRoutes));
 
-test('Set routes', () => expect(routes).toEqual(userRoutes));
+test('setRoutes', () => expect(routes).toEqual(userRoutes));
 
-test('Push - Use window.history.pushState to change route', async () => {
+test('setRoutes - Strip invalid properties', () => {
+    // @ts-ignore
+    expect(routes[0].test).toBeUndefined();
+});
+
+test('push - Use window.history.pushState to change route', async () => {
     expect(route).toMatchObject(homeRoute);
 
     await push('/about');
 
-    cleanupChildren();
+    cleanupChildren(route);
     expect(route).toMatchObject(aboutRoute);
     expect(window.location.pathname).toBe('/about');
 
@@ -28,7 +33,7 @@ test('Push - Use window.history.pushState to change route', async () => {
         query: { test: 'test' },
     });
 
-    cleanupChildren();
+    cleanupChildren(route);
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
@@ -36,10 +41,10 @@ test('Push - Use window.history.pushState to change route', async () => {
     expect(window.location.search).toBe('?test=test');
 });
 
-test('Replace - Use window.history.replaceState to change route', async () => {
+test('replace - Use window.history.replaceState to change route', async () => {
     await replace('/about');
 
-    cleanupChildren();
+    cleanupChildren(route);
     expect(route).toMatchObject(aboutRoute);
 
     await replace({
@@ -48,7 +53,7 @@ test('Replace - Use window.history.replaceState to change route', async () => {
         query: { test: 'test' },
     });
 
-    cleanupChildren();
+    cleanupChildren(route);
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });

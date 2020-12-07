@@ -1,20 +1,8 @@
-import type { Route } from './types';
-import { error, warn } from './utils';
+import type { Route, FormattedRoute } from './types';
+import { error, warn, flattenRoutes } from './utils';
 
-const validateRoutes = (routes: Route[]): void => {
-    let flattened = [];
-
-    const flattenRoutes = passedRoutes => {
-        passedRoutes.forEach(route => {
-            flattened = [...flattened, route];
-
-            if (route.children) {
-                flattenRoutes(route.children);
-            }
-        });
-    };
-
-    flattenRoutes(routes);
+const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
+    const flattened = flattenRoutes(routes);
 
     flattened.forEach((routeOne, indexOne) => {
         flattened.forEach((routeTwo, indexTwo) => {

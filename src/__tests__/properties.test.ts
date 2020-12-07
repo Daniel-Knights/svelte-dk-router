@@ -12,9 +12,9 @@ import {
     push,
     setQuery,
 } from '../router';
-import routes from '../routes';
 import { homeRoute, aboutRoute } from './static/routes';
 import { cleanupChildren } from './utils';
+import routes from '../routes';
 
 beforeAll(() => setRoutes(routes));
 
@@ -23,7 +23,7 @@ test('Valid route', async () => {
 
     await push('/about');
 
-    cleanupChildren();
+    cleanupChildren(route);
     expect(route).toMatchObject(aboutRoute);
 });
 

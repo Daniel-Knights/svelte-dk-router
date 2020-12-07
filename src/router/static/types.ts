@@ -30,5 +30,8 @@ export interface PassedRoute {
 }
 
 export interface Guard {
-    (to?: Route, from?: Route): void | boolean | Promise<void | boolean>;
+    (to?: FormattedRoute, from?: FormattedRoute):
+        | void
+        | boolean
+        | Promise<void | boolean>;
 }

@@ -1,5 +1,7 @@
 import { render, fireEvent } from '@testing-library/svelte';
 import { setRoutes, route, push } from '../router';
+import { aboutRoute, blogDefaultChildRoute } from './static/routes';
+import { cleanupChildren } from './utils';
 import SLink from './static/SLink.svelte';
 import SView from './static/SView.svelte';
 import routes from '../routes';
@@ -45,7 +47,8 @@ test('SLink - Changes route by name', async () => {
 
     await fireEvent.click(link);
 
-    expect(route.name).toBe('About');
+    cleanupChildren(route);
+    expect(route).toMatchObject(aboutRoute);
 });
 
 test('SLink - Changes route by path', async () => {
@@ -57,7 +60,8 @@ test('SLink - Changes route by path', async () => {
 
     await fireEvent.click(link);
 
-    expect(route.name).toBe('About');
+    cleanupChildren(route);
+    expect(route).toMatchObject(aboutRoute);
 });
 
 test('SLink - Changes route with query, params and meta, defaults to first child', async () => {
@@ -76,7 +80,7 @@ test('SLink - Changes route with query, params and meta, defaults to first child
 
     await fireEvent.click(link);
 
-    expect(route.name).toBe('Future');
+    expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
     expect(route.meta).toMatchObject({ test: 'test' });
@@ -91,7 +95,8 @@ test('SLink - Changes route using window.history.replaceState', async () => {
 
     await fireEvent.click(link);
 
-    expect(route.name).toBe('About');
+    cleanupChildren(route);
+    expect(route).toMatchObject(aboutRoute);
 });
 
 test('SLink - Applies router-active class', async () => {

@@ -8,6 +8,7 @@ import {
     formatPaths,
     formatRegex,
     validateRoutes,
+    stripInvalidProperties,
 } from '../static';
 import { afterCallback, beforeCallback } from './guard';
 import { chartState } from './nested';
@@ -76,6 +77,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
     };
 
     formatRoutes(userRoutes, null);
+    stripInvalidProperties(userRoutes);
     validateRoutes(userRoutes);
 
     routes = userRoutes as FormattedRoute[];

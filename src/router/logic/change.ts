@@ -1,4 +1,4 @@
-import type { Route, PassedRoute, FormattedRoute } from '../static';
+import type { PassedRoute, FormattedRoute } from '../static';
 import {
     error,
     setUrl,
