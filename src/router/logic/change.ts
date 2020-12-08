@@ -22,7 +22,8 @@ writableRoute.subscribe(newRoute => (route = { ...newRoute }));
 
 const changeRoute = async (
     passedRoute: PassedRoute,
-    replace?: boolean
+    replace?: boolean,
+    passedPath?: string
 ): Promise<void> => {
     const { name, path, query, params, meta } = passedRoute;
 
@@ -43,6 +44,7 @@ const changeRoute = async (
         newPath = routeData.fullPath;
         newRoute = routeData;
 
+        // Check for default child
         if (newRoute.children) {
             newRoute.children.forEach(child => {
                 if (child.path === '' || child.path === '/#') {
@@ -118,6 +120,8 @@ const changeRoute = async (
     if (newTitle && title) {
         title.innerHTML = newTitle;
     }
+
+    if (passedPath) newPath = passedPath;
 
     // Update URL/state
     setUrl(replace, newPath);

@@ -21,7 +21,7 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
             const { name, regex, fullRegex } = route;
 
             if (typeof identifier === 'string') {
-                const isPath = identifier.match(/\//);
+                const isPath = identifier.match(/^\//);
 
                 if (isPath && hashHistory) identifier = '/#' + identifier;
 
@@ -46,6 +46,10 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
                 }
             }
 
+            if (!filteredRoute && route.path === '(*)') {
+                filteredRoute = route;
+            }
+
             if (route.children && !filteredRoute) {
                 filterRoutes(route.children);
             }
@@ -57,8 +61,10 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
     if (!filteredRoute) return error('Unknown route');
 
     //  Cleanup
-    delete filteredRoute.query;
-    delete filteredRoute.params;
+    if (filteredRoute) {
+        delete filteredRoute.query;
+        delete filteredRoute.params;
+    }
 
     // Set route object properties
     if (typeof identifier === 'object') {
@@ -72,13 +78,28 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
     return filteredRoute;
 };
 
+// Return original path if route is invalid
+const invalidIdentifier = (passedRoute, passedIdentifier) => {
+    if (passedRoute.path !== '(*)') return;
+
+    if (typeof passedIdentifier === 'string' && passedIdentifier.match(/^\//)) {
+        return passedIdentifier;
+    } else if (typeof passedIdentifier === 'object' && passedIdentifier.path) {
+        return passedIdentifier.path;
+    } else {
+        return '/';
+    }
+};
+
 // Push to the current history entry
 const push = async (identifier: string | PassedRoute): Promise<void> => {
     const filteredRoute = processIdentifier(identifier);
 
     if (!filteredRoute) return;
 
-    await changeRoute(filteredRoute);
+    const invalidPath = invalidIdentifier(filteredRoute, identifier);
+
+    await changeRoute(filteredRoute, false, invalidPath);
 };
 
 // Replace the current history entry
@@ -87,7 +108,9 @@ const replace = async (identifier: string | PassedRoute): Promise<void> => {
 
     if (!filteredRoute) return;
 
-    await changeRoute(filteredRoute, true);
+    const invalidPath = invalidIdentifier(filteredRoute, identifier);
+
+    await changeRoute(filteredRoute, true, invalidPath);
 };
 
 // Set or update query params

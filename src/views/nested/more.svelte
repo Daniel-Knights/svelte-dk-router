@@ -5,5 +5,5 @@
 </script>
 
 <main id="more-view-rendered" data-testid={id}>MORE</main>
-<SLink name={'More'}>EVEN MORE</SLink>
+<SLink name={'hello'}>EVEN MORE</SLink>
 <SView />
