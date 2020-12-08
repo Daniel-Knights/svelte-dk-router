@@ -10,7 +10,7 @@ import {
 import { changeRoute, route as currentRoute } from './change';
 import { hashHistory, routes, writableRoute } from './state';
 
-const processIdentifier = (identifier: string | PassedRoute): FormattedRoute => {
+const processIdentifier = (identifier: string | PassedRoute): void | FormattedRoute => {
     let filteredRoute;
 
     // Filter route using identifier
@@ -54,7 +54,7 @@ const processIdentifier = (identifier: string | PassedRoute): FormattedRoute => 
 
     filterRoutes(routes);
 
-    if (!filteredRoute) error('Invalid route');
+    if (!filteredRoute) return error('Unknown route');
 
     //  Cleanup
     delete filteredRoute.query;

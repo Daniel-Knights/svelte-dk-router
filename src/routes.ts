@@ -83,12 +83,12 @@ const routes = [
             },
         ],
     },
-    {
-        name: 'Fallback',
-        title: '404',
-        path: '(*)',
-        component: fallback,
-    },
+    // {
+    //     name: 'Fallback',
+    //     title: '404',
+    //     path: '(*)',
+    //     component: fallback,
+    // },
 ];
 
 export default routes;

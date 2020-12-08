@@ -22,7 +22,7 @@
         </SLink>
         <SLink path={'/sadcasdc'}>Unknown Route</SLink>
         <div on:click={async () => await push('/')}>Push</div>
-        <div on:click={async () => await push('/about/future')}>Push Future</div>
+        <div on:click={async () => await push('/about/kjkjn')}>Push Future</div>
         <div
             on:click={async () => {
                 await replace({

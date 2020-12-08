@@ -135,6 +135,8 @@ const loadState = async (): Promise<void> => {
         });
     }
 
+    if (!currentRoute) return error('Unknown route');
+
     if (beforeCallback) await beforeCallback(currentRoute, null);
     await writableRoute.set(currentRoute);
     await chartState(currentRoute);
