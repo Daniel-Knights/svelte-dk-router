@@ -175,7 +175,7 @@ Navigation guard to run _after_ each route. Optionally asynchronous.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
-#### `setQuery(query: object [, update: boolean [, replace: boolean]]): current route`
+#### `setQuery(query: object | string [, update: boolean [, replace: boolean]]): current route`
 
 Programmatically set query params. If `update` is set to `true`, replaces/adds to existing query.
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
