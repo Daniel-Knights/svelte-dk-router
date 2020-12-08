@@ -2,7 +2,7 @@ import type { PassedRoute, FormattedRoute } from '../static';
 import {
     error,
     setUrl,
-    formatQuery,
+    formatQueryFromObject,
     validatePassedParams,
     formatPathFromParams,
 } from '../static';
@@ -26,10 +26,6 @@ const changeRoute = async (
     passedPath?: string
 ): Promise<void> => {
     const { name, path, query, params, meta } = passedRoute;
-
-    if (!name && !path) {
-        return error('Name or path required');
-    }
 
     let routeExists = false;
 
@@ -92,7 +88,7 @@ const changeRoute = async (
     // Query handling
     if (query) {
         newRoute['query'] = query;
-        newPath += '?' + formatQuery(query);
+        newPath += '?' + formatQueryFromObject(query);
     }
 
     // Named-params handling

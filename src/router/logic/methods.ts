@@ -1,11 +1,11 @@
+import type { PassedRoute, FormattedRoute } from '../static';
 import {
     error,
     setUrl,
-    formatQuery,
+    formatQueryFromObject,
     currentPath,
-    PassedRoute,
-    FormattedRoute,
     validatePassedParams,
+    invalidIdentifier,
 } from '../static';
 import { changeRoute, route as currentRoute } from './change';
 import { hashHistory, routes, writableRoute } from './state';
@@ -78,19 +78,6 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
     return filteredRoute;
 };
 
-// Return original path if route is invalid
-const invalidIdentifier = (passedRoute, passedIdentifier) => {
-    if (passedRoute.path !== '(*)') return;
-
-    if (typeof passedIdentifier === 'string' && passedIdentifier.match(/^\//)) {
-        return passedIdentifier;
-    } else if (typeof passedIdentifier === 'object' && passedIdentifier.path) {
-        return passedIdentifier.path;
-    } else {
-        return '/';
-    }
-};
-
 // Push to the current history entry
 const push = async (identifier: string | PassedRoute): Promise<void> => {
     const filteredRoute = processIdentifier(identifier);
@@ -115,26 +102,39 @@ const replace = async (identifier: string | PassedRoute): Promise<void> => {
 
 // Set or update query params
 const setQuery = (
-    query: Record<string, string>,
+    query: Record<string, string> | string,
     update = false,
     replace = true
 ): FormattedRoute | void => {
     if (!query) return error('A query argument is required');
-    if (typeof query !== 'object') {
-        return error('Query argument must be an object');
+    if (typeof query !== 'object' && typeof query !== 'string') {
+        return error('Query argument must be of type object or string');
+    }
+
+    let formattedQuery = {};
+
+    if (typeof query === 'string') {
+        query
+            .slice(0)
+            .split('&')
+            .forEach(pair => {
+                formattedQuery[pair.split('=')[0]] = pair.split('=')[1];
+            });
+    } else if (typeof query === 'object') {
+        formattedQuery = { ...query };
     }
 
     if (update)
-        query = {
+        formattedQuery = {
             ...currentRoute.query,
-            ...query,
+            ...formattedQuery,
         };
 
     writableRoute.update(routeValue => {
-        return { ...routeValue, query };
+        return { ...routeValue, query: formattedQuery };
     });
 
-    const path = currentPath(hashHistory) + '?' + formatQuery(query);
+    const path = currentPath(hashHistory) + '?' + formatQueryFromObject(formattedQuery);
 
     setUrl(replace, path);
 

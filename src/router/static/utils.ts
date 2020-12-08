@@ -23,34 +23,6 @@ const setUrl = (replace: boolean, path: string): void => {
     updateLocationData();
 };
 
-// Set query params to route object on page-load
-const queryState = (query: URLSearchParams, route: FormattedRoute): void => {
-    if (!query) return;
-
-    query.forEach((value, key) => {
-        if (!route.query) route['query'] = {};
-
-        route.query[key] = value;
-    });
-};
-
-// Set named params to route object on page-load
-const paramState = (path: string, route: FormattedRoute): void => {
-    if (!route.fullPath) return;
-
-    route.fullPath.split('/').forEach((param, i) => {
-        if (param.split('')[0] === ':') {
-            // Validate
-            if (!path.split('/')[i])
-                return error('Missing required param: "' + param.slice(1) + '"');
-
-            if (!route.params) route.params = {};
-
-            route.params[param.split(':')[1]] = path.split('/')[i];
-        }
-    });
-};
-
 const flattenRoutes = (passedRoutes: Route[] | FormattedRoute[]): FormattedRoute[] => {
     let flattened = [];
 
@@ -91,13 +63,61 @@ const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void 
     flattened.forEach(flattenedRoute => {
         Object.keys(flattenedRoute).forEach(key => {
             if (!validKeys.includes(key)) {
+                warn(`Invalid property on route "${flattenedRoute.fullPath}": ${key}`);
                 delete flattenedRoute[key];
             }
         });
     });
 };
 
-const formatPaths = (
+// Return original path if route is invalid
+const invalidIdentifier = (
+    passedRoute: FormattedRoute,
+    passedIdentifier: string | PassedRoute
+): string => {
+    if (passedRoute.path !== '(*)') return;
+
+    if (typeof passedIdentifier === 'string' && passedIdentifier.match(/^\//)) {
+        return passedIdentifier;
+    } else if (typeof passedIdentifier === 'object' && passedIdentifier.path) {
+        return passedIdentifier.path;
+    } else {
+        return '/';
+    }
+};
+
+// Set query params to route object on page-load
+const formatRouteQueryFromString = (
+    query: string | URLSearchParams,
+    route: FormattedRoute
+): void => {
+    query = new URLSearchParams(query);
+
+    query.forEach((value, key) => {
+        if (!route.query) route['query'] = {};
+
+        route.query[key] = value;
+    });
+};
+
+// Set named params to route object on page-load
+const formatParamsFromPath = (path: string, route: FormattedRoute): void => {
+    if (!route.fullPath) return;
+
+    route.fullPath.split('/').forEach((param, i) => {
+        if (param.split('')[0] === ':') {
+            // Validate
+            if (!path.split('/')[i])
+                return error('Missing required param: "' + param.slice(1) + '"');
+
+            if (!route.params) route.params = {};
+
+            route.params[param.split(':')[1]] = path.split('/')[i];
+        }
+    });
+};
+
+const formatPathProperties = (
     passedRoute: FormattedRoute,
     path: string,
     hashMode: boolean
@@ -118,8 +138,12 @@ const formatPaths = (
     }
 };
 
-const formatRegex = (passedRoute: FormattedRoute): void => {
-    let regex = passedRoute.path
+const formatRouteRegex = (passedRoute: FormattedRoute): void => {
+    const { path, fullPath } = passedRoute;
+
+    if (path === '(*)') return;
+
+    let regex = path
         .split('/')
         .map((section, i) => {
             if (section.split('')[0] === ':') return '';
@@ -127,7 +151,7 @@ const formatRegex = (passedRoute: FormattedRoute): void => {
         })
         .join('');
 
-    let fullRegex = passedRoute.fullPath
+    let fullRegex = fullPath
         .split('/')
         .map((section, i) => {
             if (section.split('')[0] === ':') {
@@ -138,19 +162,17 @@ const formatRegex = (passedRoute: FormattedRoute): void => {
         .join('');
 
     // Handle base-path
-    if (passedRoute.path === '/') regex = '';
-    else if (passedRoute.path === '/#/') regex = '\\/#';
+    if (path === '/') regex = '';
+    else if (path === '/#/') regex = '\\/#';
 
-    if (passedRoute.fullPath === '/') fullRegex = '';
-    else if (passedRoute.fullPath === '/#/') fullRegex = '\\/#';
+    if (fullPath === '/') fullRegex = '';
+    else if (fullPath === '/#/') fullRegex = '\\/#';
 
-    if (passedRoute.path !== '(*)') {
-        passedRoute['regex'] = new RegExp('^' + regex + '\\/?$', 'i');
-        passedRoute['fullRegex'] = new RegExp('^' + fullRegex + '\\/?$', 'i');
-    }
+    passedRoute['regex'] = new RegExp('^' + regex + '\\/?$', 'i');
+    passedRoute['fullRegex'] = new RegExp('^' + fullRegex + '\\/?$', 'i');
 };
 
-const formatQuery = (query: Record<string, string>): string => {
+const formatQueryFromObject = (query: Record<string, string>): string => {
     const formattedQuery = Object.entries(query)
         .map(([key, value], i, arr) => {
             if (i !== arr.length - 1) {
@@ -215,13 +237,14 @@ export {
     warn,
     currentPath,
     setUrl,
-    queryState,
-    paramState,
     flattenRoutes,
     stripInvalidProperties,
-    formatPaths,
-    formatRegex,
-    formatQuery,
+    invalidIdentifier,
+    formatRouteQueryFromString,
+    formatParamsFromPath,
+    formatPathProperties,
+    formatRouteRegex,
+    formatQueryFromObject,
     formatPathFromParams,
     compareRoutes,
 };

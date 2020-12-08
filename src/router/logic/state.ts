@@ -3,10 +3,10 @@ import type { Route, FormattedRoute } from '../static';
 import {
     error,
     currentPath,
-    queryState,
-    paramState,
-    formatPaths,
-    formatRegex,
+    formatRouteQueryFromString,
+    formatParamsFromPath,
+    formatPathProperties,
+    formatRouteRegex,
     validateRoutes,
     stripInvalidProperties,
 } from '../static';
@@ -64,10 +64,10 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             }
 
             // Set path properties
-            formatPaths(userRoute, path, hashMode);
+            formatPathProperties(userRoute, path, hashMode);
 
             // Generate dynamic regex for each route
-            formatRegex(userRoute);
+            formatRouteRegex(userRoute);
 
             if (userRoute.children) {
                 // Recursively format children
@@ -88,10 +88,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 // Determine the current route and update route data on page-load
 const loadState = async (): Promise<void> => {
     const path = currentPath(hashHistory);
-    const query = new URLSearchParams(
-        window.location.search || window.location.hash.split('?')[1]
-    );
-
+    const query = window.location.search || window.location.hash.split('?')[1];
     let currentRoute: FormattedRoute;
 
     if (!routes) return;
@@ -104,8 +101,8 @@ const loadState = async (): Promise<void> => {
 
                 // Compare route path against URL path
                 if (path && path.match(fullRegex)) {
-                    queryState(query, singleRoute);
-                    paramState(path, singleRoute);
+                    formatRouteQueryFromString(query, singleRoute);
+                    formatParamsFromPath(path, singleRoute);
 
                     currentRoute = singleRoute;
                 } else if (children) {

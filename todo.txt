@@ -1,3 +1,5 @@
 Tests
     hash
-    error-handling
+    components error-handling
+
+Prevent same route with different named-params having 'router-active' applied - dynamic link regex
