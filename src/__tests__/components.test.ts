@@ -19,6 +19,11 @@ test('Instantiates components', () => {
 });
 
 test('SView - Renders correct routes', async () => {
+    // Silence faulty unknown path error
+    console.error = () => {
+        ('');
+    };
+
     const { getByTestId } = render(SView, {
         props: { id: 'sview-depth-one' },
     });

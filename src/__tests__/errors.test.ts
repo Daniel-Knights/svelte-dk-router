@@ -1,4 +1,6 @@
+import { render } from '@testing-library/svelte';
 import { push, replace, setQuery, setParams, setRoutes } from '../router';
+import SLink from './static/SLink.svelte';
 import userRoutes from '../routes';
 
 beforeAll(() => {
@@ -200,5 +202,54 @@ test('setParams - Logs warning when invalid named-param is passed', async () => 
 
     setParams({ invalid: 'invalid' });
 
+    expect(console.warn).toHaveBeenCalledTimes(1);
+});
+
+test('SLink - Logs error when unknown name is passed', async () => {
+    render(SLink, {
+        props: { path: 'Unknown', routes: userRoutes },
+    });
+
+    expect(console.error).toHaveBeenCalledTimes(1);
+});
+
+test('SLink - Logs error when unknown path is passed', async () => {
+    render(SLink, {
+        props: { path: '/unknown', routes: userRoutes },
+    });
+
+    expect(console.error).toHaveBeenCalledTimes(1);
+});
+
+test('SLink - Logs error on missing named-params', async () => {
+    render(SLink, {
+        props: { path: '/blog', routes: userRoutes },
+    });
+
+    expect(console.error).toHaveBeenCalledTimes(2);
+});
+
+test('SLink - Logs warning on invalid named-params', async () => {
+    render(SLink, {
+        props: {
+            path: '/blog',
+            params: { id: '1', name: 'dan', invalid: 'invalid' },
+            routes: userRoutes,
+        },
+    });
+
+    expect(console.warn).toHaveBeenCalledTimes(1);
+});
+
+test('SLink - Logs error and warning on missing and invalid named-params', async () => {
+    render(SLink, {
+        props: {
+            path: '/blog',
+            params: { id: '1', invalid: 'invalid' },
+            routes: userRoutes,
+        },
+    });
+
+    expect(console.error).toHaveBeenCalledTimes(1);
     expect(console.warn).toHaveBeenCalledTimes(1);
 });

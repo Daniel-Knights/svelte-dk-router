@@ -212,7 +212,6 @@ const compareRoutes = (
             const { regex, fullRegex } = compare;
 
             if (compare.path === '(*)') fallbackRoute = compare;
-
             if (path && (fullRegex || regex))
                 if (path.match(fullRegex) || path.match(regex)) {
                     return (matchedRoute = compare);

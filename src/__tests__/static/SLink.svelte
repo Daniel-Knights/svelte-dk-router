@@ -1,6 +1,7 @@
 <script>
     import { hashHistory, changeRoute, writableDepthChart } from '../../router/logic';
     import {
+        error,
         formatPathFromParams,
         compareRoutes,
         validatePassedParams,
@@ -23,9 +24,15 @@
     const route = compareRoutes(routes, { name, path, params });
 
     if (route) {
+        if (route.path === '(*)') {
+            error(`Unknown route "${name || path}"`);
+        }
+
         name = route.name;
         path = route.path !== '(*)' ? route.fullPath : path;
     }
+
+    if (!route) error(`Unknown route "${name || path}"`);
 
     // Handle named-params
     if (validatePassedParams(path, params) && params) {
