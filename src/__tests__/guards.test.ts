@@ -5,7 +5,7 @@ import routes from '../routes';
 
 beforeAll(() => setRoutes(routes));
 
-test('beforeEach guard functions correctly', async () => {
+test('beforeEach() - triggers with correct to/from routes', async () => {
     beforeEach(async (to, from) => {
         cleanupChildren(to);
         cleanupChildren(from);
@@ -41,7 +41,7 @@ test('beforeEach guard functions correctly', async () => {
     push({ name: 'About', query: { stage: '2' } });
 });
 
-test('afterEach guard functions correctly', async () => {
+test('afterEach() - triggers with correct to/from routes', async () => {
     afterEach(async (to, from) => {
         cleanupChildren(to);
         cleanupChildren(from);

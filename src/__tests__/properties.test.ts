@@ -12,19 +12,28 @@ import {
     push,
     setQuery,
 } from '../router';
-import { homeRoute, aboutRoute } from './static/routes';
+import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import routes from '../routes';
 
 beforeAll(() => setRoutes(routes));
 
-test('Valid route', async () => {
+test('route - Correct data', async () => {
     expect(route).toMatchObject(homeRoute);
 
-    await push('/about');
+    await push({ path: '/about', meta: { test: 'test' } });
 
     cleanupChildren(route);
     expect(route).toMatchObject(aboutRoute);
+    expect(route.meta).toMatchObject({ test: 'test' });
+
+    setQuery({ test: 'test' });
+    expect(route.query).toMatchObject({ test: 'test' });
+
+    await push({ path: '/blog', params: { id: '1', name: 'Dan' } });
+
+    expect(route).toMatchObject(blogDefaultChildRoute);
+    expect(route.params).toMatchObject({ id: '1', name: 'Dan' });
 });
 
 test('Correct window.location properties', async () => {

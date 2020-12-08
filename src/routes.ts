@@ -18,7 +18,6 @@ const routes = [
         title: 'Home',
         path: '/',
         component: home,
-        test: 'test',
         meta: {
             name: 'hello',
         },

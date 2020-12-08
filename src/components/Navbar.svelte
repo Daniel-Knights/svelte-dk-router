@@ -23,6 +23,18 @@
         <SLink path={'/sadcasdc'}>Unknown Route</SLink>
         <div on:click={async () => await push('/')}>Push</div>
         <div on:click={async () => await push('/about/future')}>Push Future</div>
+        <div on:click={async () => await push('/sdvdvczcxv')}>
+            Push Unkown Route by path
+        </div>
+        <div on:click={async () => await push({ path: '/sdvdvczcxv' })}>
+            Push Unkown Route by path
+        </div>
+        <div on:click={async () => await push('sdvdvczcxv')}>
+            Push Unkown Route by name
+        </div>
+        <div on:click={async () => await push({ name: 'sdvdvczcxv' })}>
+            Push Unkown Route by name
+        </div>
         <div
             on:click={async () => {
                 await replace({

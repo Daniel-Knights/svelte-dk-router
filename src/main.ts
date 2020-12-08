@@ -19,7 +19,7 @@ afterEach(async (to, from) => {
     //     await push({ path: '/blog', params: { id: 'name', name: 'id' } });
     //     console.log(2);
     // }
-    // if (to.path === '/') replace('/about');
+    // if (to.path === '/') replace({ meta: { t: '/about' } });
     // console.log(from, ' - after from');
 });
 
