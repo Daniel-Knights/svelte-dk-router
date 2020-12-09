@@ -6,6 +6,9 @@ import {
     setQuery,
     setParams,
     beforeEach,
+    hash,
+    pathname,
+    search,
 } from '../router';
 import { routes } from '../router/logic';
 import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
@@ -36,12 +39,24 @@ test('push() - Use window.history.pushState to change route', async () => {
 
     cleanupChildren(route);
     expect(route).toMatchObject(aboutRoute);
-    expect(window.location.pathname).toBe('/about');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(pathname).toBe('/about');
+    } else {
+        expect(hash).toBe('#/about');
+    }
 
     await push('Home');
 
     expect(route).toMatchObject(homeRoute);
-    expect(window.location.pathname).toBe('/');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(pathname).toBe('/');
+    } else {
+        expect(hash).toBe('#/');
+    }
 
     await push({
         path: '/blog',
@@ -53,8 +68,14 @@ test('push() - Use window.history.pushState to change route', async () => {
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
-    expect(window.location.pathname).toBe('/blog/1/dan');
-    expect(window.location.search).toBe('?test=test');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(pathname).toBe('/blog/1/dan');
+        expect(search).toBe('?test=test');
+    } else {
+        expect(hash).toBe('#/blog/1/dan?test=test');
+    }
 });
 
 test('replace() - Use window.history.replaceState to change route', async () => {
@@ -81,45 +102,91 @@ test('replace() - Use window.history.replaceState to change route', async () => 
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
-    expect(window.location.pathname).toBe('/blog/1/dan');
-    expect(window.location.search).toBe('?test=test');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(pathname).toBe('/blog/1/dan');
+        expect(search).toBe('?test=test');
+    } else {
+        expect(hash).toBe('#/blog/1/dan?test=test');
+    }
 });
 
 test('setQuery() - Set the current query', () => {
     setQuery({ test: 'test' });
 
     expect(route.query).toMatchObject({ test: 'test' });
-    expect(window.location.search).toBe('?test=test');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?test=test');
+    } else {
+        expect(hash.split('?')[1]).toBe('test=test');
+    }
 
     setQuery('test=string-test');
 
     expect(route.query).toMatchObject({ test: 'string-test' });
-    expect(window.location.search).toBe('?test=string-test');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?test=string-test');
+    } else {
+        expect(hash.split('?')[1]).toBe('test=string-test');
+    }
 });
 
 test('setQuery() - Update the current query', () => {
     setQuery({ test: 'test', updated: 'not-updated' });
 
-    expect(window.location.search).toBe('?test=test&updated=not-updated');
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?test=test&updated=not-updated');
+    } else {
+        expect(hash.split('?')[1]).toBe('test=test&updated=not-updated');
+    }
 
     setQuery({ updated: 'updated' }, true);
 
     expect(route.query).toMatchObject({ test: 'test', updated: 'updated' });
-    expect(window.location.search).toBe('?test=test&updated=updated');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?test=test&updated=updated');
+    } else {
+        expect(hash.split('?')[1]).toBe('test=test&updated=updated');
+    }
 
     setQuery('updated=string-updated', true);
 
     expect(route.query).toMatchObject({ test: 'test', updated: 'string-updated' });
-    expect(window.location.search).toBe('?test=test&updated=string-updated');
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?test=test&updated=string-updated');
+    } else {
+        expect(hash.split('?')[1]).toBe('test=test&updated=string-updated');
+    }
 });
 
 test('setParams() - Set named-params', async () => {
     await push({ path: '/blog', params: { id: '1', name: 'dan' } });
 
-    expect(window.location.pathname).toBe('/blog/1/dan');
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(pathname).toBe('/blog/1/dan');
+    } else {
+        expect(hash).toBe('#/blog/1/dan');
+    }
 
     setParams({ id: '2', name: 'John' });
 
-    expect(window.location.pathname).toBe('/blog/2/John');
     expect(route.params).toMatchObject({ id: '2', name: 'John' });
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(pathname).toBe('/blog/2/John');
+    } else {
+        expect(hash).toBe('#/blog/2/John');
+    }
 });

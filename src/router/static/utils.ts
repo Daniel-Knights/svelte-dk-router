@@ -13,7 +13,9 @@ const currentPath = (hash: boolean): string => {
     return hash ? '/' + window.location.hash.split('?')[0] : window.location.pathname;
 };
 
-const setUrl = (replace: boolean, path: string): void => {
+const setUrl = (path: string, replace: boolean, hash: boolean): void => {
+    if (hash && path[1] !== '#') path = '/#' + path;
+
     if (replace) {
         window.history.replaceState(null, '', path);
     } else {
@@ -117,20 +119,12 @@ const formatParamsFromPath = (path: string, route: FormattedRoute): void => {
     });
 };
 
-const formatPathProperties = (
-    passedRoute: FormattedRoute,
-    path: string,
-    hashMode: boolean
-): void => {
+const formatPathProperties = (passedRoute: FormattedRoute, path: string): void => {
     const { parent } = passedRoute;
     // Set path properties
     passedRoute['fullPath'] = path;
 
-    if (hashMode && path !== '(*)') {
-        passedRoute.path = '/#' + path;
-        passedRoute['fullPath'] = parent ? parent.fullPath + path : passedRoute.path;
-        passedRoute['rootPath'] = parent ? parent.rootPath : '/#/' + path.split('/')[1];
-    } else if (parent) {
+    if (parent) {
         passedRoute['fullPath'] = parent.fullPath + path;
         passedRoute['rootPath'] = parent.rootPath;
     } else if (path.split('/')[1]) {
@@ -163,10 +157,8 @@ const formatRouteRegex = (passedRoute: FormattedRoute): void => {
 
     // Handle base-path
     if (path === '/') regex = '';
-    else if (path === '/#/') regex = '\\/#';
 
     if (fullPath === '/') fullRegex = '';
-    else if (fullPath === '/#/') fullRegex = '\\/#';
 
     passedRoute['regex'] = new RegExp('^' + regex + '\\/?$', 'i');
     passedRoute['fullRegex'] = new RegExp('^' + fullRegex + '\\/?$', 'i');

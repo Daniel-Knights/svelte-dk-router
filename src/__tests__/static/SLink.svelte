@@ -1,5 +1,5 @@
 <script>
-    import { hashHistory, changeRoute, writableDepthChart } from '../../router/logic';
+    import { changeRoute, writableDepthChart } from '../../router/logic';
     import {
         error,
         formatPathFromParams,
@@ -17,8 +17,6 @@
         id = undefined;
 
     let routerActive;
-
-    if (hashHistory) path = '/#' + path;
 
     // Match identifier to set routes
     const route = compareRoutes(routes, { name, path, params });

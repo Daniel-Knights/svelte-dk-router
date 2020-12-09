@@ -21,12 +21,6 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
             const { name, regex, fullRegex } = route;
 
             if (typeof identifier === 'string') {
-                const isPath = identifier.match(/^\//);
-
-                if (isPath && hashHistory && identifier[1] !== '#') {
-                    identifier = '/#' + identifier;
-                }
-
                 if (identifier.match(fullRegex)) {
                     filteredRoute = route;
                 } else if (name === identifier) {
@@ -35,9 +29,7 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
                     filteredRoute = route;
                 }
             } else if (typeof identifier === 'object') {
-                let { path } = identifier;
-
-                if (hashHistory) path = '/#' + path;
+                const { path } = identifier;
 
                 if (path && path.match(fullRegex)) {
                     filteredRoute = route;
@@ -66,6 +58,11 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
     if (filteredRoute) {
         delete filteredRoute.query;
         delete filteredRoute.params;
+
+        if (filteredRoute.children && !filteredRoute.children.path) {
+            delete filteredRoute.children[0].query;
+            delete filteredRoute.children[0].params;
+        }
     }
 
     // Set route object properties
@@ -138,7 +135,7 @@ const setQuery = (
 
     const path = currentPath(hashHistory) + '?' + formatQueryFromObject(formattedQuery);
 
-    setUrl(replace, path);
+    setUrl(path, replace, hashHistory);
 
     return currentRoute;
 };
@@ -166,9 +163,11 @@ const setParams = (
     });
 
     // Include existing params
-    Object.entries(currentRoute.params).forEach(([key, value]) => {
-        if (!params[key]) params[key] = value;
-    });
+    if (currentRoute.params) {
+        Object.entries(currentRoute.params).forEach(([key, value]) => {
+            if (!params[key]) params[key] = value;
+        });
+    }
 
     writableRoute.update(routeValue => {
         return { ...routeValue, params };
@@ -179,6 +178,8 @@ const setParams = (
     currentRoute.fullPath.split('/').forEach((section, i) => {
         if (section[0] !== ':') return;
         if (!params[section.split(':')[1]]) return;
+
+        if (hashHistory) i++;
 
         pathSections[i] = params[section.split(':')[1]];
     });
@@ -191,7 +192,7 @@ const setParams = (
 
     const path = pathSections.join('/') + query;
 
-    setUrl(replace, path);
+    setUrl(path, replace, hashHistory);
 
     return currentRoute;
 };

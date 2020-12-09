@@ -1,5 +1,1 @@
-Tests
-    hash
-
-Rethink hash-mode
 Prevent same route with different named-params having 'router-active' applied - dynamic link regex

@@ -64,7 +64,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
             }
 
             // Set path properties
-            formatPathProperties(userRoute, path, hashMode);
+            formatPathProperties(userRoute, path);
 
             // Generate dynamic regex for each route
             formatRouteRegex(userRoute);
@@ -87,9 +87,11 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 
 // Determine the current route and update route data on page-load
 const loadState = async (): Promise<void> => {
-    const path = currentPath(hashHistory);
     const query = window.location.search || window.location.hash.split('?')[1];
+    let path = currentPath(hashHistory);
     let currentRoute: FormattedRoute;
+
+    if (path[1] === '#') path = path.slice(2);
 
     if (!routes) return;
     else {
@@ -118,7 +120,7 @@ const loadState = async (): Promise<void> => {
     // Determine if route has nested base-path
     if (currentRoute && currentRoute.children) {
         currentRoute.children.forEach(child => {
-            if (child.path === '' || child.path === '/#') {
+            if (child.path === '') {
                 if (currentRoute.params) {
                     child['params'] = currentRoute.params;
                 }

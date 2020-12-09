@@ -6,7 +6,7 @@ import {
     validatePassedParams,
     formatPathFromParams,
 } from '../static';
-import { routes, writableRoute } from './state';
+import { hashHistory, routes, writableRoute } from './state';
 import { beforeCallback, afterCallback } from './guard';
 import { chartState } from './nested';
 
@@ -33,8 +33,20 @@ const changeRoute = async (
         if (routeData.title) newTitle = routeData.title;
 
         // Cleanup
-        if (routeData.query) delete routeData.query;
-        if (routeData.params) delete routeData.params;
+        if (routeData.query) {
+            delete routeData.query;
+
+            if (routeData.children && !routeData.children[0].path) {
+                delete routeData.children[0].query;
+            }
+        }
+        if (routeData.params) {
+            delete routeData.params;
+
+            if (routeData.children && !routeData.children[0].path) {
+                delete routeData.children[0].params;
+            }
+        }
 
         routeExists = true;
         newPath = routeData.fullPath;
@@ -43,7 +55,7 @@ const changeRoute = async (
         // Check for default child
         if (newRoute.children) {
             newRoute.children.forEach(child => {
-                if (child.path === '' || child.path === '/#') {
+                if (child.path === '') {
                     newRoute = child;
                 }
             });
@@ -120,7 +132,7 @@ const changeRoute = async (
     if (passedPath) newPath = passedPath;
 
     // Update URL/state
-    setUrl(replace, newPath);
+    setUrl(newPath, replace, hashHistory);
 
     // After route change navigation guard
     if (afterCallback) await afterCallback(route, fromRoute);
