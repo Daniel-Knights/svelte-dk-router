@@ -23,7 +23,9 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
             if (typeof identifier === 'string') {
                 const isPath = identifier.match(/^\//);
 
-                if (isPath && hashHistory) identifier = '/#' + identifier;
+                if (isPath && hashHistory && identifier[1] !== '#') {
+                    identifier = '/#' + identifier;
+                }
 
                 if (identifier.match(fullRegex)) {
                     filteredRoute = route;
@@ -175,7 +177,7 @@ const setParams = (
     const pathSections = currentPath(hashHistory).split('/');
 
     currentRoute.fullPath.split('/').forEach((section, i) => {
-        if (section.split('')[0] !== ':') return;
+        if (section[0] !== ':') return;
         if (!params[section.split(':')[1]]) return;
 
         pathSections[i] = params[section.split(':')[1]];

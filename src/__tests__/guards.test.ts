@@ -3,7 +3,8 @@ import { aboutRoute, blogDefaultChildRoute, homeRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import routes from '../routes';
 
-beforeAll(() => setRoutes(routes));
+// @ts-ignore
+beforeAll(() => setRoutes(routes, process.env.HASH_MODE));
 
 test('beforeEach() - triggers with correct to/from routes', async () => {
     beforeEach(async (to, from) => {

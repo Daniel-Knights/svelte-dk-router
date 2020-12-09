@@ -14,7 +14,7 @@ test('setRoutes() - Logs warning when passed invalid properties', () => {
     userRoutes[0]['invalidProperty'] = 'invalidProperty';
 
     // @ts-ignore
-    setRoutes(userRoutes);
+    setRoutes(userRoutes, process.env.HASH_MODE);
 
     expect(console.warn).toHaveBeenCalledTimes(1);
 });
@@ -25,7 +25,7 @@ test('setRoutes() - Logs error on missing properties', () => {
     delete userRoutes[0].component;
 
     // @ts-ignore
-    setRoutes(userRoutes);
+    setRoutes(userRoutes, process.env.HASH_MODE);
 
     expect(console.error).toHaveBeenCalledTimes(1);
 
@@ -40,7 +40,7 @@ test('setRoutes() - Logs error on missing children properties', () => {
     delete userRoutes[2].children[1].component;
 
     // @ts-ignore
-    setRoutes(userRoutes);
+    setRoutes(userRoutes, process.env.HASH_MODE);
 
     expect(console.error).toHaveBeenCalledTimes(2);
 
@@ -56,7 +56,7 @@ test('setRoutes() - Logs error on duplicate properties', () => {
     userRoutes[1].path = 'Duplicate';
 
     // @ts-ignore
-    setRoutes(userRoutes);
+    setRoutes(userRoutes, process.env.HASH_MODE);
 
     expect(console.error).toHaveBeenCalledTimes(2);
 
@@ -72,7 +72,7 @@ test('setRoutes() - Logs error on duplicate children properties', () => {
     userRoutes[2].children[0].name = 'Duplicate';
 
     // @ts-ignore
-    setRoutes(userRoutes);
+    setRoutes(userRoutes, process.env.HASH_MODE);
 
     expect(console.error).toHaveBeenCalledTimes(2);
 

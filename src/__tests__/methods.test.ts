@@ -12,7 +12,8 @@ import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import userRoutes from '../routes';
 
-beforeAll(() => setRoutes(userRoutes));
+// @ts-ignore
+beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE));
 
 test('setRoutes()', () => expect(routes).toEqual(userRoutes));
 
@@ -21,7 +22,8 @@ test('setRoutes() - Strip invalid properties', () => {
 
     console.warn = jest.fn();
 
-    setRoutes(userRoutes);
+    // @ts-ignore
+    setRoutes(userRoutes, process.env.HASH_MODE);
 
     // @ts-ignore
     expect(routes[0].invalidProperty).toBeUndefined();

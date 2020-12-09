@@ -23,7 +23,7 @@ afterEach(async (to, from) => {
     // console.log(from, ' - after from');
 });
 
-setRoutes(routes);
+setRoutes(routes, true);
 
 const app = new App({ target: document.body });
 

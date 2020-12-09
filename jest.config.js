@@ -1,7 +1,6 @@
 module.exports = {
     preset: 'ts-jest',
     clearMocks: true,
-    coverageDirectory: 'coverage',
     transform: {
         '^.+\\.svelte$': [
             'svelte-jester',

@@ -6,7 +6,8 @@ import SLink from './static/SLink.svelte';
 import SView from './static/SView.svelte';
 import routes from '../routes';
 
-beforeAll(() => setRoutes(routes));
+// @ts-ignore
+beforeAll(() => setRoutes(routes, process.env.HASH_MODE));
 
 test('Instantiates components', () => {
     expect(() =>
@@ -20,9 +21,7 @@ test('Instantiates components', () => {
 
 test('SView - Renders correct routes', async () => {
     // Silence faulty unknown path error
-    console.error = () => {
-        ('');
-    };
+    console.error = () => '';
 
     const { getByTestId } = render(SView, {
         props: { id: 'sview-depth-one' },

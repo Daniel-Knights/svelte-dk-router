@@ -41,7 +41,7 @@ const validatePassedParams = (
     // Validate required params
     if (path && !silentError) {
         path.split('/').forEach((section, i) => {
-            if (i === 0 || section.split('')[0] !== ':') return;
+            if (i === 0 || section[0] !== ':') return;
 
             section = section.split(':')[1];
 

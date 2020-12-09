@@ -16,7 +16,8 @@ import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import routes from '../routes';
 
-beforeAll(() => setRoutes(routes));
+// @ts-ignore
+beforeAll(() => setRoutes(routes, process.env.HASH_MODE));
 
 test('route - Correct data', async () => {
     expect(route).toMatchObject(homeRoute);

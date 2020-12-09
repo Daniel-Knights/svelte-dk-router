@@ -105,7 +105,7 @@ const formatParamsFromPath = (path: string, route: FormattedRoute): void => {
     if (!route.fullPath) return;
 
     route.fullPath.split('/').forEach((param, i) => {
-        if (param.split('')[0] === ':') {
+        if (param[0] === ':') {
             // Validate
             if (!path.split('/')[i])
                 return error('Missing required param: "' + param.slice(1) + '"');
@@ -146,7 +146,7 @@ const formatRouteRegex = (passedRoute: FormattedRoute): void => {
     let regex = path
         .split('/')
         .map((section, i) => {
-            if (section.split('')[0] === ':') return '';
+            if (section[0] === ':') return '';
             else if (i !== 0) return '\\/' + section;
         })
         .join('');
@@ -154,7 +154,7 @@ const formatRouteRegex = (passedRoute: FormattedRoute): void => {
     let fullRegex = fullPath
         .split('/')
         .map((section, i) => {
-            if (section.split('')[0] === ':') {
+            if (section[0] === ':') {
                 // Named-params
                 return '\\/(?:[^\\/]+?)';
             } else if (i !== 0) return '\\/' + section;
