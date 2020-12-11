@@ -1,5 +1,6 @@
 <script>
-    import { changeRoute, writableDepthChart } from '../../router/logic';
+    import { createEventDispatcher } from 'svelte';
+    import { changeRoute, writableDepthChart, setProps } from '../../router/logic';
     import {
         error,
         formatPathFromParams,
@@ -11,10 +12,12 @@
         path = undefined,
         query = undefined,
         params = undefined,
-        meta = undefined,
+        props = undefined,
         replace = undefined,
         routes = undefined,
         id = undefined;
+
+    const dispatch = createEventDispatcher();
 
     let routerActive;
 
@@ -39,27 +42,29 @@
 
     // Router-active class matching
     writableDepthChart.subscribe(chart => {
-        let matches;
+        if (!route) return;
 
-        Object.values(chart).forEach(routeValue => {
-            if (!routeValue || routeValue.path === '(*)') return;
+        const chartRoute = chart[route.depth];
 
-            const pathMatch = path && path.match(routeValue.fullRegex);
-            const nameMatch = name && name === routeValue.name;
+        if (!chartRoute || chartRoute.path === '(*)') {
+            return (routerActive = false);
+        }
 
-            if (pathMatch || nameMatch) {
-                matches = true;
-            }
-        });
+        const paramMatch = JSON.stringify(params) === JSON.stringify(chartRoute.params);
 
-        routerActive = matches ? true : false;
+        if (chartRoute.name === name && paramMatch) {
+            routerActive = true;
+        } else routerActive = false;
     });
 </script>
 
 <a
     href={path}
-    on:click|preventDefault={() => {
-        changeRoute({ name, path, query, params, meta }, replace);
+    on:click|preventDefault={async () => {
+        setProps(props);
+        const result = await changeRoute({ name, path, query, params }, replace);
+
+        dispatch('navigation', result);
     }}
     class={routerActive ? 'router-active' : ''}
     data-testid={id}>

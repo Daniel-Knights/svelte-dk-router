@@ -1,6 +1,10 @@
 export { SLink, SView } from './components';
 export {
     route,
+    routeChart,
+    routeProps,
+    routeStore,
+    routeChartStore,
     push,
     replace,
     beforeEach,
@@ -8,6 +12,7 @@ export {
     setQuery,
     setParams,
     setRoutes,
+    setProps,
     hash,
     host,
     hostname,

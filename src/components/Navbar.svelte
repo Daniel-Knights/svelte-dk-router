@@ -1,23 +1,30 @@
 <script lang="ts">
-    import { push, replace, SLink, setQuery, setParams, route } from '../router';
+    import { push, replace, SLink, setQuery, setParams } from '../router';
 
     let query: Record<string, string> = { id: '1', name: 'dan' },
         params: Record<string, string> = { id: '1', name: 'dan' },
         paramsTwo: Record<string, string> = { id: '1' },
         paramsThree: Record<string, string> = { id: '1', name: 'dan', test: 'kajsdkajd' },
         paramsFour: Record<string, string> = { id: '1', test: 'heeloas' },
-        meta: Record<string, string> = { test: 'uowjkdwjndlkwjned' };
+        props: Record<string, string> = { random: 'uowjkdwjndlkwjned' };
 </script>
 
 <header>
     <h1>Svelte Blog</h1>
     <nav>
-        <SLink name={'Home'} {query} {meta} replace={true}>Home</SLink>
+        <SLink
+            name={'Home'}
+            {query}
+            {props}
+            replace={true}
+            on:navigation={result => console.log(result)}>
+            Home
+        </SLink>
         <SLink name={'About'}>About</SLink>
-        <SLink path={'/blog'} {params} {meta}>Blog</SLink>
-        <SLink path={'/blog'} params={paramsTwo} {meta}>Blog - Missing Params</SLink>
-        <SLink path={'/blog'} params={paramsThree} {meta}>Blog - Invalid Params</SLink>
-        <SLink path={'/blog'} params={paramsFour} {meta}>
+        <SLink name={'Future'} {params} {props}>Blog</SLink>
+        <SLink path={'/blog'} params={paramsTwo} {props}>Blog - Missing Params</SLink>
+        <SLink path={'/blog'} params={paramsThree} {props}>Blog - Invalid Params</SLink>
+        <SLink path={'/blog'} params={paramsFour} {props}>
             Blog - Missing + Invalid Params
         </SLink>
         <SLink path={'/sadcasdc'}>Unknown Route</SLink>
@@ -40,7 +47,7 @@
                 await replace({
                     path: '/blog',
                     params: { id: 'hello', name: 'knsckjsndc' },
-                    meta: { whaddup: 'its ya boi' },
+                    props: { whaddup: 'its ya boi' },
                 });
             }}>
             Replace
@@ -71,7 +78,7 @@
         </div>
         <div
             on:click={() => {
-                setQuery({ it: 'definitely works' });
+                const route = setQuery({ it: 'definitely works' });
                 console.log(route);
             }}>
             Set Query
@@ -80,14 +87,18 @@
         <div on:click={() => setQuery({ definitely: 'works' }, true)}>Update Query</div>
         <div
             on:click={() => {
-                setParams({ id: 'steve', name: 'iwjndkjwend' });
+                const route = setParams({ id: 'steve', name: 'iwjndkjwend' });
                 console.log(route);
             }}>
             Set Params
         </div>
         <div
             on:click={() => {
-                setParams({ id: 'steve', name: 'iwjndkjwend', test: 'asdasd' });
+                const route = setParams({
+                    id: 'steve',
+                    name: 'iwjndkjwend',
+                    test: 'asdasd',
+                });
                 console.log(route);
             }}>
             Set Params - Invalid params

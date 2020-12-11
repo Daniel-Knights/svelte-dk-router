@@ -58,7 +58,7 @@ const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void 
         'rootPath',
         'parent',
         'rootParent',
-        'trace',
+        'crumbs',
         'depth',
     ];
 
@@ -129,6 +129,8 @@ const formatPathProperties = (passedRoute: FormattedRoute, path: string): void =
         passedRoute['rootPath'] = parent.rootPath;
     } else if (path.split('/')[1]) {
         passedRoute['rootPath'] = '/' + path.split('/')[1];
+    } else {
+        passedRoute['rootPath'] = '/';
     }
 };
 

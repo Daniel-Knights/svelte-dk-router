@@ -77,7 +77,7 @@ const routes = [
             {
                 name: 'blog origins',
                 title: 'Origins | Blog',
-                path: '/origins',
+                path: '/origins/:test',
                 component: origins,
             },
         ],

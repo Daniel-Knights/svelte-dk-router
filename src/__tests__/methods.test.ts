@@ -1,6 +1,6 @@
 import {
     setRoutes,
-    route,
+    routeStore,
     push,
     replace,
     setQuery,
@@ -10,10 +10,13 @@ import {
     pathname,
     search,
 } from '../router';
-import { routes } from '../router/logic';
+import { routeProps, routes } from '../router/logic';
 import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import userRoutes from '../routes';
+
+let route;
+routeStore.subscribe(newRoute => (route = newRoute));
 
 // @ts-ignore
 beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE));
@@ -80,8 +83,8 @@ test('push() - Use window.history.pushState to change route', async () => {
 
 test('replace() - Use window.history.replaceState to change route', async () => {
     beforeEach((to, from) => {
-        if (!to.meta) return;
-        if (to.meta.replaceTest) {
+        if (!routeProps) return;
+        if (routeProps.replaceTest) {
             expect(from).not.toMatchObject(aboutRoute);
         }
     });
@@ -95,7 +98,7 @@ test('replace() - Use window.history.replaceState to change route', async () => 
         name: 'Blog',
         params: { id: '1', name: 'dan' },
         query: { test: 'test' },
-        meta: { replaceTest: true },
+        props: { replaceTest: true },
     });
 
     cleanupChildren(route);

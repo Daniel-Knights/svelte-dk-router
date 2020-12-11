@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, readable } from 'svelte/store';
 import type { Route, FormattedRoute } from '../static';
 import {
     error,
@@ -15,6 +15,13 @@ import { chartState } from './nested';
 
 // Reactive route data
 const writableRoute = writable(null);
+
+// Readable route-store
+const routeStore = readable({}, set => {
+    writableRoute.subscribe(routeValue => {
+        set(routeValue);
+    });
+});
 
 // Provided routes
 let routes: FormattedRoute[];
@@ -51,9 +58,9 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 
             // Array of route names to trace origins
             if (!userRoute.parent) {
-                userRoute['trace'] = [userRoute.name];
+                userRoute['crumbs'] = [userRoute.name];
             } else {
-                userRoute['trace'] = [...userRoute.parent.trace, userRoute.name];
+                userRoute['crumbs'] = [...userRoute.parent.crumbs, userRoute.name];
             }
 
             // Set depth of route/nested-route
@@ -86,7 +93,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 };
 
 // Determine the current route and update route data on page-load
-const loadState = async (): Promise<void> => {
+const loadState = async (): Promise<void | FormattedRoute> => {
     const query = window.location.search || window.location.hash.split('?')[1];
     let path = currentPath(hashHistory);
     let currentRoute: FormattedRoute;
@@ -136,10 +143,14 @@ const loadState = async (): Promise<void> => {
 
     if (!currentRoute) return error('Unknown route');
 
-    if (beforeCallback) await beforeCallback(currentRoute, null);
-    await writableRoute.set(currentRoute);
-    await chartState(currentRoute);
-    if (afterCallback) await afterCallback(currentRoute, null);
+    if (beforeCallback) {
+        const beforeResult = await beforeCallback(currentRoute, null);
+
+        if (beforeResult === false) return;
+    }
+
+    writableRoute.set(currentRoute);
+    chartState(currentRoute);
 
     // Update title
     const title = document.getElementsByTagName('title')[0];
@@ -147,8 +158,14 @@ const loadState = async (): Promise<void> => {
     if (currentRoute && currentRoute.title && title) {
         title.innerHTML = currentRoute.title;
     }
+
+    if (afterCallback) {
+        await afterCallback(currentRoute, null);
+    }
+
+    return currentRoute;
 };
 
 window.addEventListener('popstate', loadState);
 
-export { routes, writableRoute, hashHistory, setRoutes };
+export { routes, writableRoute, routeStore, hashHistory, setRoutes };

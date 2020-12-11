@@ -8,7 +8,10 @@ import {
     invalidIdentifier,
 } from '../static';
 import { changeRoute, route as currentRoute } from './change';
+import { writableDepthChart } from './nested';
 import { hashHistory, routes, writableRoute } from './state';
+
+let routeProps;
 
 const processIdentifier = (identifier: string | PassedRoute): void | FormattedRoute => {
     let filteredRoute;
@@ -67,36 +70,42 @@ const processIdentifier = (identifier: string | PassedRoute): void | FormattedRo
 
     // Set route object properties
     if (typeof identifier === 'object') {
-        const { query, params, meta } = identifier;
+        const { query, params, props } = identifier;
 
         if (query) filteredRoute['query'] = query;
         if (params) filteredRoute['params'] = params;
-        if (meta) filteredRoute['meta'] = meta;
+        if (props) setProps(props);
     }
 
     return filteredRoute;
 };
 
 // Push to the current history entry
-const push = async (identifier: string | PassedRoute): Promise<void> => {
+const push = async (identifier: string | PassedRoute): Promise<void | FormattedRoute> => {
     const filteredRoute = processIdentifier(identifier);
 
     if (!filteredRoute) return;
 
     const invalidPath = invalidIdentifier(filteredRoute, identifier);
 
-    await changeRoute(filteredRoute, false, invalidPath);
+    const result = await changeRoute(filteredRoute, false, invalidPath);
+
+    return result;
 };
 
 // Replace the current history entry
-const replace = async (identifier: string | PassedRoute): Promise<void> => {
+const replace = async (
+    identifier: string | PassedRoute
+): Promise<void | FormattedRoute> => {
     const filteredRoute = processIdentifier(identifier);
 
     if (!filteredRoute) return;
 
     const invalidPath = invalidIdentifier(filteredRoute, identifier);
 
-    await changeRoute(filteredRoute, true, invalidPath);
+    const result = await changeRoute(filteredRoute, true, invalidPath);
+
+    return result;
 };
 
 // Set or update query params
@@ -131,6 +140,13 @@ const setQuery = (
 
     writableRoute.update(routeValue => {
         return { ...routeValue, query: formattedQuery };
+    });
+    writableDepthChart.update((chart: Record<string, FormattedRoute>) => {
+        Object.entries(chart).forEach(([key, routeValue]) => {
+            chart[key] = { ...routeValue, query: formattedQuery };
+        });
+
+        return chart;
     });
 
     const path = currentPath(hashHistory) + '?' + formatQueryFromObject(formattedQuery);
@@ -173,6 +189,14 @@ const setParams = (
         return { ...routeValue, params };
     });
 
+    writableDepthChart.update((chart: Record<string, FormattedRoute>) => {
+        Object.entries(chart).forEach(([key, routeValue]) => {
+            chart[key] = { ...routeValue, params };
+        });
+
+        return chart;
+    });
+
     const pathSections = currentPath(hashHistory).split('/');
 
     currentRoute.fullPath.split('/').forEach((section, i) => {
@@ -197,4 +221,9 @@ const setParams = (
     return currentRoute;
 };
 
-export { push, replace, setQuery, setParams };
+// eslint-disable-next-line
+const setProps = (props: any): void => {
+    routeProps = props;
+};
+
+export { push, replace, setQuery, setParams, routeProps, setProps };

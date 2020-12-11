@@ -3,8 +3,25 @@ import { error, warn, flattenRoutes } from './utils';
 
 const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
     const flattened = flattenRoutes(routes);
+    let namedParams = {};
 
     flattened.forEach((routeOne, indexOne) => {
+        routeOne.fullPath.split('/').forEach(section => {
+            if (section[0] === ':') {
+                if (namedParams[section.slice(1)]) {
+                    error(
+                        'Named-params must be unique within a given routes full-path. Duplicates detected: "' +
+                            section +
+                            '"'
+                    );
+                } else {
+                    namedParams[section.slice(1)] = true;
+                }
+            }
+        });
+
+        namedParams = {};
+
         flattened.forEach((routeTwo, indexTwo) => {
             if (indexOne === indexTwo) return;
 

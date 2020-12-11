@@ -18,32 +18,36 @@ let fromRoute: FormattedRoute = null;
 let newPath: string, newTitle: string, newRoute: FormattedRoute;
 
 // Update route each time writableRoute is updated
-writableRoute.subscribe(newRoute => (route = { ...newRoute }));
+writableRoute.subscribe(newRoute => {
+    route = { ...newRoute };
+});
 
 const changeRoute = async (
     passedRoute: PassedRoute,
     replace?: boolean,
     passedPath?: string
-): Promise<void> => {
-    const { name, path, query, params, meta } = passedRoute;
+): Promise<void | FormattedRoute> => {
+    const { name, path, query, params } = passedRoute;
 
     let routeExists = false;
 
     const setNewRouteData = routeData => {
+        const hasDefaultChild = routeData.children && !routeData.children[0].path;
+
         if (routeData.title) newTitle = routeData.title;
 
         // Cleanup
         if (routeData.query) {
             delete routeData.query;
 
-            if (routeData.children && !routeData.children[0].path) {
+            if (hasDefaultChild) {
                 delete routeData.children[0].query;
             }
         }
         if (routeData.params) {
             delete routeData.params;
 
-            if (routeData.children && !routeData.children[0].path) {
+            if (hasDefaultChild) {
                 delete routeData.children[0].params;
             }
         }
@@ -59,10 +63,6 @@ const changeRoute = async (
                     newRoute = child;
                 }
             });
-        }
-
-        if (meta) {
-            newRoute['meta'] = { ...routeData.meta, ...meta };
         }
     };
 
@@ -119,8 +119,8 @@ const changeRoute = async (
         if (beforeResult === false) return;
     }
 
-    await writableRoute.set(newRoute);
-    await chartState(newRoute);
+    writableRoute.set(newRoute);
+    chartState(newRoute);
 
     // Update page title
     const title = document.getElementsByTagName('title')[0];
@@ -135,7 +135,11 @@ const changeRoute = async (
     setUrl(newPath, replace, hashHistory);
 
     // After route change navigation guard
-    if (afterCallback) await afterCallback(route, fromRoute);
+    if (afterCallback) {
+        await afterCallback(route, fromRoute);
+    }
+
+    return route;
 };
 
 export { route, fromRoute, changeRoute };

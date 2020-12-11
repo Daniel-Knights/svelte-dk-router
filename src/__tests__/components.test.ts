@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/svelte';
-import { setRoutes, route, push, afterEach } from '../router';
+import { setRoutes, route, push, afterEach, routeProps } from '../router';
 import { aboutRoute, blogDefaultChildRoute, homeRoute } from './static/routes';
 import { cleanupChildren } from './utils';
 import SLink from './static/SLink.svelte';
@@ -68,13 +68,13 @@ test('SLink - Changes route by path', async () => {
     expect(route).toMatchObject(aboutRoute);
 });
 
-test('SLink - Changes route with query, params and meta, defaults to first child', async () => {
+test('SLink - Changes route with query, params and props, defaults to first child', async () => {
     const { getByTestId } = render(SLink, {
         props: {
             path: '/blog',
             params: { id: '1', name: 'dan' },
             query: { test: 'test' },
-            meta: { test: 'test' },
+            props: { test: 'test' },
             routes,
             id: '3g4fa',
         },
@@ -87,7 +87,7 @@ test('SLink - Changes route with query, params and meta, defaults to first child
     expect(route).toMatchObject(blogDefaultChildRoute);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
-    expect(route.meta).toMatchObject({ test: 'test' });
+    expect(routeProps).toMatchObject({ test: 'test' });
 });
 
 test('SLink - Changes route using window.history.replaceState', async () => {
@@ -96,7 +96,7 @@ test('SLink - Changes route using window.history.replaceState', async () => {
             path: '/',
             routes,
             id: 'jh454',
-            meta: { replaceTest: true },
+            props: { replaceTest: true },
             replace: true,
         },
     });
@@ -108,8 +108,8 @@ test('SLink - Changes route using window.history.replaceState', async () => {
     const aboutLink = getByTestId('enrfjk');
 
     afterEach((to, from) => {
-        if (!to.meta) return;
-        if (to.meta.replaceTest) {
+        if (!routeProps) return;
+        if (routeProps.replaceTest) {
             expect(from).not.toMatchObject(aboutRoute);
         }
     });

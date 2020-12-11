@@ -15,7 +15,7 @@ export interface FormattedRoute extends Route {
     regex: RegExp;
     fullRegex: RegExp;
     depth: number;
-    trace: string[];
+    crumbs: string[];
     children?: FormattedRoute[];
     parent?: FormattedRoute;
     rootParent?: FormattedRoute;
@@ -26,7 +26,7 @@ export interface PassedRoute {
     path?: string;
     query?: Record<string, string>;
     params?: Record<string, string>;
-    meta?: Record<string, unknown>;
+    props?: Record<string, unknown>;
 }
 
 export interface Guard {
