@@ -1,9 +1,7 @@
 Tests
-    routeStore - properties
-    routeChartStore - properties
     routeProps - properties
     setProps - methods
-    duplicate params warning - errors
     async SLink event - components
+    fallback
 
 Update README

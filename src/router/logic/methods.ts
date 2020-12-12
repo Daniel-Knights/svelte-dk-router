@@ -1,4 +1,4 @@
-import type { PassedRoute, FormattedRoute } from '../static';
+import { PassedRoute, FormattedRoute, compareRoutes } from '../static';
 import {
     error,
     setUrl,
@@ -13,84 +13,40 @@ import { hashHistory, routes, writableRoute } from './state';
 
 let routeProps;
 
-const processIdentifier = (identifier: string | PassedRoute): void | FormattedRoute => {
-    let filteredRoute;
+const processIdentifier = (identifier: string | PassedRoute): void | PassedRoute => {
+    if (!identifier) return error('Path or name argument required');
 
-    // Filter route using identifier
-    const filterRoutes = passedRoutes => {
-        passedRoutes.forEach(route => {
-            if (filteredRoute) return;
-
-            const { name, regex, fullRegex } = route;
-
-            if (typeof identifier === 'string') {
-                if (identifier.match(fullRegex)) {
-                    filteredRoute = route;
-                } else if (name === identifier) {
-                    filteredRoute = route;
-                } else if (identifier.match(regex)) {
-                    filteredRoute = route;
-                }
-            } else if (typeof identifier === 'object') {
-                const { path } = identifier;
-
-                if (path && path.match(fullRegex)) {
-                    filteredRoute = route;
-                } else if (identifier.name === name) {
-                    filteredRoute = route;
-                } else if (path && path.match(regex)) {
-                    filteredRoute = route;
-                }
-            }
-
-            if (!filteredRoute && route.path === '(*)') {
-                filteredRoute = route;
-            }
-
-            if (route.children && !filteredRoute) {
-                filterRoutes(route.children);
-            }
-        });
-    };
-
-    filterRoutes(routes);
-
-    if (!filteredRoute) return error('Unknown route');
-
-    //  Cleanup
-    if (filteredRoute) {
-        delete filteredRoute.query;
-        delete filteredRoute.params;
-
-        if (filteredRoute.children && !filteredRoute.children.path) {
-            delete filteredRoute.children[0].query;
-            delete filteredRoute.children[0].params;
+    if (typeof identifier === 'string') {
+        if (identifier[0] === '/') {
+            identifier = { path: identifier };
+        } else {
+            identifier = { name: identifier };
         }
     }
 
-    // Set route object properties
     if (typeof identifier === 'object') {
-        const { query, params, props } = identifier;
+        const { props } = identifier;
 
-        if (query) filteredRoute['query'] = query;
-        if (params) filteredRoute['params'] = params;
         if (props) setProps(props);
     }
 
-    return filteredRoute;
+    const filteredRoute = compareRoutes(routes, identifier);
+    const { name, path, params, query } = identifier;
+
+    if (!filteredRoute || (filteredRoute && filteredRoute.path === '(*)')) {
+        return error(`Unknown route: "${name || path}"`);
+    }
+
+    return { ...filteredRoute, params, query };
 };
 
 // Push to the current history entry
 const push = async (identifier: string | PassedRoute): Promise<void | FormattedRoute> => {
     const filteredRoute = processIdentifier(identifier);
 
-    if (!filteredRoute) return;
+    if (!filteredRoute) return Promise.reject();
 
-    const invalidPath = invalidIdentifier(filteredRoute, identifier);
-
-    const result = await changeRoute(filteredRoute, false, invalidPath);
-
-    return result;
+    return await changeRoute(filteredRoute, false);
 };
 
 // Replace the current history entry
@@ -99,13 +55,9 @@ const replace = async (
 ): Promise<void | FormattedRoute> => {
     const filteredRoute = processIdentifier(identifier);
 
-    if (!filteredRoute) return;
+    if (!filteredRoute) return Promise.reject();
 
-    const invalidPath = invalidIdentifier(filteredRoute, identifier);
-
-    const result = await changeRoute(filteredRoute, true, invalidPath);
-
-    return result;
+    return await changeRoute(filteredRoute, true);
 };
 
 // Set or update query params

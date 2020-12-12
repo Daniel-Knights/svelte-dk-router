@@ -13,9 +13,12 @@ import {
     push,
     setQuery,
     routeChart,
+    routeStore,
+    routeChartStore,
+    setProps,
+    routeProps,
 } from '../router';
-import { homeRoute, aboutRoute, blogDefaultChildRoute } from './static/routes';
-import { cleanupChildren } from './utils';
+import { testRoutes } from './static/routes';
 import routes from '../routes';
 
 const formattedProperties = [
@@ -30,14 +33,14 @@ const formattedProperties = [
     'crumbs',
     'depth',
 ];
-const testObj = { test: 'test' };
-const params = { id: '1', name: 'Dan' };
+const testObjOne = { test: 'test' };
+const testObjTwo = { id: '1', name: 'Dan' };
 
 // @ts-ignore
 beforeAll(() => setRoutes(routes, process.env.HASH_MODE));
 
 test('route - Correct data', async () => {
-    expect(route).toMatchObject(homeRoute);
+    expect(route).toMatchObject(testRoutes[0]);
 
     formattedProperties.forEach(property => {
         expect(route[property]).not.toBeUndefined();
@@ -46,20 +49,19 @@ test('route - Correct data', async () => {
 
     await push('/about');
 
-    cleanupChildren(route);
-    expect(route).toMatchObject(aboutRoute);
+    expect(route).toMatchObject(testRoutes[1]);
 
-    setQuery(testObj);
-    expect(route.query).toMatchObject(testObj);
+    setQuery(testObjOne);
+    expect(route.query).toMatchObject(testObjOne);
 
-    await push({ path: '/blog', params });
+    await push({ path: '/blog', params: testObjTwo });
 
-    expect(route).toMatchObject(blogDefaultChildRoute);
-    expect(route.params).toMatchObject(params);
+    expect(route).toMatchObject(testRoutes[2].children[0]);
+    expect(route.params).toMatchObject(testObjTwo);
 });
 
 test('routeChart - Correct data', async () => {
-    expect(routeChart[2]).toMatchObject(blogDefaultChildRoute);
+    expect(routeChart[2]).toMatchObject(testRoutes[2].children[0]);
 
     Object.values(routeChart).forEach(route => {
         formattedProperties.forEach(property => {
@@ -70,25 +72,65 @@ test('routeChart - Correct data', async () => {
 
     await push('/about');
 
-    Object.values(routeChart).forEach((route: FormattedRoute) => {
-        cleanupChildren(route);
-    });
+    expect(routeChart[1]).toMatchObject(testRoutes[1]);
 
-    expect(routeChart[1]).toMatchObject(aboutRoute);
-
-    setQuery(testObj);
+    setQuery(testObjOne);
 
     Object.values(routeChart).forEach((route: FormattedRoute) => {
-        expect(route.query).toMatchObject(testObj);
+        expect(route.query).toMatchObject(testObjOne);
     });
 
-    await push({ path: '/blog', params });
+    await push({ path: '/blog', params: testObjTwo });
 
-    expect(routeChart[2]).toMatchObject(blogDefaultChildRoute);
+    expect(routeChart[2]).toMatchObject(testRoutes[2].children[0]);
 
     Object.values(routeChart).forEach((route: FormattedRoute) => {
-        expect(route.params).toMatchObject(params);
+        expect(route.params).toMatchObject(testObjTwo);
     });
+});
+
+test('routeStore - Correct data', async () => {
+    let currentRoute;
+
+    routeStore.subscribe((newRoute: FormattedRoute) => {
+        currentRoute = newRoute;
+    });
+
+    await push('/');
+
+    expect(currentRoute).toMatchObject(testRoutes[0]);
+
+    await push('/about');
+
+    expect(currentRoute).toMatchObject(testRoutes[1]);
+});
+
+test('routeChartStore - Correct data', async () => {
+    let currentChart;
+
+    routeChartStore.subscribe((newChart: Record<string, FormattedRoute>) => {
+        currentChart = newChart;
+    });
+
+    await push('/');
+
+    expect(currentChart[1]).toMatchObject(testRoutes[0]);
+
+    await push('/about/origins/more');
+
+    expect(currentChart[1]).toMatchObject(testRoutes[1]);
+    expect(currentChart[2]).toMatchObject(testRoutes[1].children[1]);
+    expect(currentChart[3]).toMatchObject(testRoutes[1].children[1].children[0]);
+});
+
+test('routeProps - Correct data', () => {
+    setProps(testObjOne);
+
+    expect(routeProps).toMatchObject(testObjOne);
+
+    setProps(testObjTwo);
+
+    expect(routeProps).toMatchObject(testObjTwo);
 });
 
 test('Correct window.location properties', async () => {

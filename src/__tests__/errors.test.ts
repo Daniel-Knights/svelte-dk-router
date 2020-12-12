@@ -6,6 +6,7 @@ import userRoutes from '../routes';
 beforeAll(() => {
     console.error = jest.fn();
     console.warn = jest.fn();
+    Promise.reject = jest.fn();
 });
 
 afterEach(() => jest.resetAllMocks());
@@ -48,6 +49,19 @@ test('setRoutes() - Logs error on missing children properties', () => {
     userRoutes[2].children[1]['component'] = memoComponent;
 });
 
+test('setRoutes() - Logs error on duplicate named-params within a given full-path', () => {
+    const memoPathOne = userRoutes[2].children[0].children[0].path;
+
+    userRoutes[2].children[0].children[0].path = '/more:hey/:id';
+
+    // @ts-ignore
+    setRoutes(userRoutes);
+
+    expect(console.error).toHaveBeenCalledTimes(1);
+
+    userRoutes[2].children[0].children[0].path = memoPathOne;
+});
+
 test('setRoutes() - Logs error on duplicate properties', () => {
     const memoPathOne = userRoutes[0].path;
     const memoPathTwo = userRoutes[1].path;
@@ -84,10 +98,12 @@ test('push() - Logs error on unknown route', async () => {
     await push('/unknown');
 
     expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Promise.reject).toHaveBeenCalledTimes(1);
 
     await push({ name: 'unknown' });
 
     expect(console.error).toHaveBeenCalledTimes(2);
+    expect(Promise.reject).toHaveBeenCalledTimes(2);
 });
 
 test('push() - Logs error on missing named-params', async () => {
@@ -126,10 +142,12 @@ test('replace() - Logs error on unknown route', async () => {
     await replace('/unknown');
 
     expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Promise.reject).toHaveBeenCalledTimes(1);
 
     await replace({ name: 'unknown' });
 
     expect(console.error).toHaveBeenCalledTimes(2);
+    expect(Promise.reject).toHaveBeenCalledTimes(2);
 });
 
 test('replace() - Logs error on missing named-params', async () => {

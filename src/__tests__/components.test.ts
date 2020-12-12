@@ -1,7 +1,6 @@
 import { render, fireEvent } from '@testing-library/svelte';
 import { setRoutes, route, push, afterEach, routeProps } from '../router';
-import { aboutRoute, blogDefaultChildRoute, homeRoute } from './static/routes';
-import { cleanupChildren } from './utils';
+import { testRoutes } from './static/routes';
 import SLink from './static/SLink.svelte';
 import SView from './static/SView.svelte';
 import routes from '../routes';
@@ -51,8 +50,7 @@ test('SLink - Changes route by name', async () => {
 
     await fireEvent.click(link);
 
-    cleanupChildren(route);
-    expect(route).toMatchObject(aboutRoute);
+    expect(route).toMatchObject(testRoutes[1]);
 });
 
 test('SLink - Changes route by path', async () => {
@@ -64,8 +62,7 @@ test('SLink - Changes route by path', async () => {
 
     await fireEvent.click(link);
 
-    cleanupChildren(route);
-    expect(route).toMatchObject(aboutRoute);
+    expect(route).toMatchObject(testRoutes[1]);
 });
 
 test('SLink - Changes route with query, params and props, defaults to first child', async () => {
@@ -84,7 +81,7 @@ test('SLink - Changes route with query, params and props, defaults to first chil
 
     await fireEvent.click(link);
 
-    expect(route).toMatchObject(blogDefaultChildRoute);
+    expect(route).toMatchObject(testRoutes[2].children[0]);
     expect(route.params).toMatchObject({ id: '1', name: 'dan' });
     expect(route.query).toMatchObject({ test: 'test' });
     expect(routeProps).toMatchObject({ test: 'test' });
@@ -110,14 +107,14 @@ test('SLink - Changes route using window.history.replaceState', async () => {
     afterEach((to, from) => {
         if (!routeProps) return;
         if (routeProps.replaceTest) {
-            expect(from).not.toMatchObject(aboutRoute);
+            expect(from).not.toMatchObject(testRoutes[1]);
         }
     });
 
     await fireEvent.click(aboutLink);
     await fireEvent.click(homeLink);
 
-    expect(route).toMatchObject(homeRoute);
+    expect(route).toMatchObject(testRoutes[0]);
 });
 
 test('SLink - Applies router-active class', async () => {

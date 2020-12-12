@@ -12,38 +12,14 @@ import {
 
 const userAuthenticated = false;
 
-beforeEach(async (to, from) => {
-    // console.log('before', from, to, pathname);
-    // console.log(from, ' - before from');
-    // console.log(routeChart);
-    // console.log(route);
-    // console.log(routeChart);
-
-    if (to.name === 'About') {
-        // console.log(1);
-        // console.log(2);
-        // const promise = new Promise((resolve, reject) => {
-        //     setTimeout(() => resolve('done!'), 1000);
-        // });
-        // const result = await promise;
-        // push('/');
-        // console.log(4);
-        // console.log(5);
-    }
-});
+// beforeEach(async (to, from) => {
+// });
 afterEach(async (to, from) => {
-    // console.log(hash, host, hostname, origin, pathname, href, protocol, search);
-    // console.log('after', from, to, pathname);
-    // if (to.path === '/about') {
-    //     console.log(1);
-    //     await push({ path: '/blog', params: { id: 'name', name: 'id' } });
-    //     console.log(2);
-    // }
-    // if (to.path === '/') replace({ props: { t: '/about' } });
-    // console.log(from, ' - after from');
-    // console.log(route);
-    // console.log(routeChart);
-    console.log(routeProps);
+    if (to.name === 'About') {
+        await push('/about/origins/mojre')
+            .then(res => console.log('weewd', res))
+            .catch(err => console.log('error', err));
+    }
 });
 
 setRoutes(routes);

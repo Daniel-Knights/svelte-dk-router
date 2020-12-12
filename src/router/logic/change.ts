@@ -23,11 +23,16 @@ writableRoute.subscribe(newRoute => {
 });
 
 const changeRoute = async (
-    passedRoute: PassedRoute,
+    passedRoute: PassedRoute | FormattedRoute,
     replace?: boolean,
     passedPath?: string
 ): Promise<void | FormattedRoute> => {
     const { name, path, query, params } = passedRoute;
+    let fullPath;
+
+    if (passedRoute['fullPath']) {
+        fullPath = passedRoute['fullPath'];
+    }
 
     let routeExists = false;
 
@@ -73,15 +78,19 @@ const changeRoute = async (
             if (name && routeData.name === name) {
                 // If route changed by name
                 setNewRouteData(routeData);
-            } else if (
-                path &&
-                (path.match(routeData.fullRegex) || path.match(routeData.regex))
-            ) {
+            } else if (fullPath && fullPath.match(routeData.fullRegex)) {
                 // If route changed by path
                 setNewRouteData(routeData);
             } else if (routeData.children) {
                 // Recursively filter child routes
                 matchRoute(routeData.children);
+            }
+
+            if (!newRoute) {
+                if (path && path.match(routeData.regex)) {
+                    // If route changed by path
+                    setNewRouteData(routeData);
+                }
             }
         });
     };
