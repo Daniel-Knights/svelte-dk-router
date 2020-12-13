@@ -1,8 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-
     import { route, SView, SLink } from '../router';
-
     import Post from '../components/Post.svelte';
 
     export let id = undefined;

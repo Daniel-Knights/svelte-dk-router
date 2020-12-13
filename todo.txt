@@ -1,7 +1,3 @@
-Tests
-    routeProps - properties
-    setProps - methods
-    async SLink event - components
-    fallback
+Silence errors function
 
 Update README

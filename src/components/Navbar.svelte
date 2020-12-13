@@ -1,12 +1,14 @@
-<script lang="ts">
-    import { push, replace, SLink, setQuery, setParams } from '../router';
+<script>
+    import { push, replace, SLink, setQuery, setParams, routeStore } from '../router';
 
-    let query: Record<string, string> = { id: '1', name: 'dan' },
-        params: Record<string, string> = { id: '1', name: 'dan' },
-        paramsTwo: Record<string, string> = { id: '1' },
-        paramsThree: Record<string, string> = { id: '1', name: 'dan', test: 'kajsdkajd' },
-        paramsFour: Record<string, string> = { id: '1', test: 'heeloas' },
-        props: Record<string, string> = { random: 'uowjkdwjndlkwjned' };
+    // routeStore.subscribe(r => console.log(r));
+
+    let query = { id: '1', name: 'dan' },
+        params = { id: '1', name: 'dan' },
+        paramsTwo = { id: '1' },
+        paramsThree = { id: '1', name: 'dan', test: 'kajsdkajd' },
+        paramsFour = { id: '1', test: 'heeloas' },
+        props = { random: 'uowjkdwjndlkwjned' };
 </script>
 
 <header>

@@ -161,6 +161,10 @@ const testRoutes = [
         title: '404',
         path: '(*)',
         component: fallback,
+        crumbs: ['Fallback'],
+        depth: 1,
+        fullPath: '(*)',
+        rootPath: '/',
     },
 ];
 

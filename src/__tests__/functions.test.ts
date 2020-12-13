@@ -194,7 +194,11 @@ test('setProps - Set route-props', () => {
 
     expect(routeProps).toMatchObject(testObjOne);
 
-    setProps(testObjTwo);
+    setProps('testObjTwo');
 
-    expect(routeProps).toMatchObject(testObjTwo);
+    expect(routeProps).toBe('testObjTwo');
+
+    setProps(true);
+
+    expect(routeProps).toBe(true);
 });

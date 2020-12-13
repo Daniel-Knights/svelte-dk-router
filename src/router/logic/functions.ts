@@ -13,10 +13,17 @@ import { hashHistory, routes, writableRoute } from './state';
 
 let routeProps;
 
-const processIdentifier = (identifier: string | PassedRoute): void | PassedRoute => {
+const pushOrReplace = async (
+    identifier: string | PassedRoute,
+    replace: boolean
+): Promise<void | FormattedRoute> => {
     if (!identifier) return error('Path or name argument required');
 
+    let errorString;
+
     if (typeof identifier === 'string') {
+        errorString = identifier;
+
         if (identifier[0] === '/') {
             identifier = { path: identifier };
         } else {
@@ -25,39 +32,45 @@ const processIdentifier = (identifier: string | PassedRoute): void | PassedRoute
     }
 
     if (typeof identifier === 'object') {
-        const { props } = identifier;
+        const { path, name, props } = identifier;
+
+        errorString = path || name;
 
         if (props) setProps(props);
     }
 
     const filteredRoute = compareRoutes(routes, identifier);
-    const { name, path, params, query } = identifier;
+    const { params, query } = identifier;
 
-    if (!filteredRoute || (filteredRoute && filteredRoute.path === '(*)')) {
-        return error(`Unknown route: "${name || path}"`);
+    if (!filteredRoute) {
+        error(`Unknown route: "${errorString}"`);
+        throw new Error(`Unknown route: "${errorString}"`);
     }
 
-    return { ...filteredRoute, params, query };
+    const returnedRoute = await changeRoute(
+        { ...filteredRoute, params, query },
+        replace,
+        invalidIdentifier(filteredRoute, identifier)
+    );
+
+    if (filteredRoute.path === '(*)') {
+        error(`Unknown route: "${errorString}"`);
+        throw new Error(`Unknown route: "${errorString}"`);
+    }
+
+    return returnedRoute;
 };
 
 // Push to the current history entry
 const push = async (identifier: string | PassedRoute): Promise<void | FormattedRoute> => {
-    const filteredRoute = processIdentifier(identifier);
-
-    if (!filteredRoute) return Promise.reject();
-
-    return await changeRoute(filteredRoute, false);
+    return await pushOrReplace(identifier, false);
 };
 
 // Replace the current history entry
 const replace = async (
     identifier: string | PassedRoute
 ): Promise<void | FormattedRoute> => {
-    const filteredRoute = processIdentifier(identifier);
-
-    if (!filteredRoute) return Promise.reject();
-
-    return await changeRoute(filteredRoute, true);
+    return await pushOrReplace(identifier, true);
 };
 
 // Set or update query params

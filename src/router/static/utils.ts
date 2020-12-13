@@ -74,7 +74,7 @@ const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void 
 
 // Return original path if route is invalid
 const invalidIdentifier = (
-    passedRoute: FormattedRoute,
+    passedRoute: PassedRoute,
     passedIdentifier: string | PassedRoute
 ): string => {
     if (passedRoute.path !== '(*)') return;

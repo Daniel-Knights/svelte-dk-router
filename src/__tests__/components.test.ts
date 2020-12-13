@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/svelte';
+import { render, fireEvent, createEvent } from '@testing-library/svelte';
 import { setRoutes, route, push, afterEach, routeProps } from '../router';
 import { testRoutes } from './static/routes';
 import SLink from './static/SLink.svelte';
@@ -115,6 +115,25 @@ test('SLink - Changes route using window.history.replaceState', async () => {
     await fireEvent.click(homeLink);
 
     expect(route).toMatchObject(testRoutes[0]);
+});
+
+test('SLink - Emits correct "navigation" event', async () => {
+    const { getByTestId, component } = render(SLink, {
+        props: { name: 'About', routes, id: 'oinkjn' },
+    });
+
+    const link = getByTestId('oinkjn');
+
+    let fired;
+
+    component.$on('navigation', e => {
+        expect(e.detail).toMatchObject(testRoutes[1]);
+        fired = true;
+    });
+
+    await fireEvent.click(link);
+
+    expect(fired).toBeTruthy();
 });
 
 test('SLink - Applies router-active class', async () => {

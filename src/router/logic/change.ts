@@ -97,11 +97,10 @@ const changeRoute = async (
 
     matchRoute(routes);
 
-    if (!routeExists) return error('Unknown route');
+    if (!routeExists) return;
 
     if (newPath === '(*)') {
         newPath = path;
-        error('Unknown route');
     }
 
     if (!validatePassedParams(newRoute.fullPath, params)) return;
