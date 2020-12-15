@@ -1,4 +1,4 @@
-import { render, fireEvent, createEvent } from '@testing-library/svelte';
+import { render, fireEvent } from '@testing-library/svelte';
 import { setRoutes, route, push, afterEach, routeProps } from '../router';
 import { testRoutes } from './static/routes';
 import SLink from './static/SLink.svelte';
@@ -156,4 +156,20 @@ test('SLink - Applies router-active class', async () => {
 
     expect(homeLink.className).toBe('');
     expect(aboutLink.className).toBe('router-active');
+});
+
+test('SLink - Sets correct href', () => {
+    const { getByTestId } = render(SLink, {
+        props: {
+            path: '/blog',
+            params: { id: '1', name: 'dan' },
+            query: { test: 'test' },
+            routes,
+            id: 'e2d2ed',
+        },
+    });
+
+    const blogLink = getByTestId('e2d2ed');
+
+    expect(blogLink.getAttribute('href')).toBe('/blog/1/dan?test=test');
 });

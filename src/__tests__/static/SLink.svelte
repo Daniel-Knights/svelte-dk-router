@@ -1,11 +1,12 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { changeRoute, writableDepthChart, setProps } from '../../router/logic';
+    import { changeRoute, writableDepthChart } from '../../router/logic';
     import {
         error,
         formatPathFromParams,
         compareRoutes,
         validatePassedParams,
+        formatQueryFromObject,
     } from '../../router/static';
 
     export let name = undefined,
@@ -40,6 +41,10 @@
         path = formatPathFromParams(path, params);
     }
 
+    if (query) {
+        path += '?' + formatQueryFromObject(query);
+    }
+
     // Router-active class matching
     writableDepthChart.subscribe(chart => {
         if (!route) return;
@@ -61,8 +66,7 @@
 <a
     href={path}
     on:click|preventDefault={async () => {
-        setProps(props);
-        const result = await changeRoute({ name, path, query, params }, replace);
+        const result = await changeRoute({ name, path, params, query, props }, replace);
 
         dispatch('navigation', result);
     }}

@@ -1,6 +1,5 @@
 import type { PassedRoute, FormattedRoute } from '../static';
 import {
-    error,
     setUrl,
     formatQueryFromObject,
     validatePassedParams,
@@ -17,17 +16,23 @@ let fromRoute: FormattedRoute = null;
 // New route data
 let newPath: string, newTitle: string, newRoute: FormattedRoute;
 
+let routeProps;
+
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => {
     route = { ...newRoute };
 });
 
+const setProps = (props: Record<string, unknown>): void => {
+    routeProps = props;
+};
+
 const changeRoute = async (
-    passedRoute: PassedRoute | FormattedRoute,
+    passedRoute: PassedRoute,
     replace?: boolean,
     passedPath?: string
 ): Promise<void | FormattedRoute> => {
-    const { name, path, query, params } = passedRoute;
+    const { name, path, query, params, props } = passedRoute;
     let fullPath;
 
     if (passedRoute['fullPath']) {
@@ -117,6 +122,8 @@ const changeRoute = async (
         newPath = formatPathFromParams(newPath, params);
     }
 
+    if (props) setProps(props);
+
     // Set fromRoute before route is updated
     if (!replace) fromRoute = route;
 
@@ -150,4 +157,4 @@ const changeRoute = async (
     return route;
 };
 
-export { route, fromRoute, changeRoute };
+export { route, fromRoute, routeProps, changeRoute };

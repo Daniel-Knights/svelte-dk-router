@@ -1,7 +1,5 @@
 <script>
-    import { push, replace, SLink, setQuery, setParams, routeStore } from '../router';
-
-    // routeStore.subscribe(r => console.log(r));
+    import { push, replace, SLink, setQuery, setParams, routeProps } from '../router';
 
     let query = { id: '1', name: 'dan' },
         params = { id: '1', name: 'dan' },
@@ -19,7 +17,10 @@
             {query}
             {props}
             replace={true}
-            on:navigation={result => console.log(result)}>
+            on:navigation={result => {
+                console.log(result);
+                console.log(routeProps);
+            }}>
             Home
         </SLink>
         <SLink name={'About'}>About</SLink>

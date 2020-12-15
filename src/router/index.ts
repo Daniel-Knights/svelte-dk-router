@@ -12,7 +12,6 @@ export {
     setQuery,
     setParams,
     setRoutes,
-    setProps,
     hash,
     host,
     hostname,

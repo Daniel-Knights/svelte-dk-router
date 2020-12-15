@@ -15,6 +15,7 @@ const userAuthenticated = false;
 // beforeEach(async (to, from) => {
 // });
 afterEach(async (to, from) => {
+    console.log(routeChart);
     if (to.name === 'About') {
         await push('/about/origins/mojre')
             .then(res => console.log('weewd', res))

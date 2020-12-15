@@ -189,32 +189,38 @@ test('replace() - Logs error and warning on missing and invalid named-params', a
     expect(console.warn).toHaveBeenCalledTimes(1);
 });
 
-test('setQuery - Logs error when no argument passed', () => {
+test('setQuery() - Logs error when no argument passed', () => {
     // @ts-ignore
     setQuery();
 
     expect(console.error).toHaveBeenCalledTimes(1);
 });
 
-test('setQuery - Logs error when anything not an object or string is passed', () => {
+test('setQuery() - Logs error when anything not an object is passed', () => {
+    // @ts-ignore
+    setQuery('string');
     // @ts-ignore
     setQuery(2);
     // @ts-ignore
     setQuery(() => '');
     // @ts-ignore
     setQuery(true);
+    // @ts-ignore
+    setQuery(null);
+    // @ts-ignore
+    setQuery(undefined);
 
-    expect(console.error).toHaveBeenCalledTimes(3);
+    expect(console.error).toHaveBeenCalledTimes(6);
 });
 
-test('setParams - Logs error when no argument passed', () => {
+test('setParams() - Logs error when no argument passed', () => {
     // @ts-ignore
     setParams();
 
     expect(console.error).toHaveBeenCalledTimes(1);
 });
 
-test('setParams - Logs error when route has no defined params', async () => {
+test('setParams() - Logs error when route has no defined params', async () => {
     await push('/');
 
     setParams({ invalid: 'invalid' });
@@ -222,7 +228,7 @@ test('setParams - Logs error when route has no defined params', async () => {
     expect(console.error).toHaveBeenCalledTimes(1);
 });
 
-test('setParams - Logs warning when invalid named-param is passed', async () => {
+test('setParams() - Logs warning when invalid named-param is passed', async () => {
     await push({ path: '/blog', params: { id: '1', name: 'Dan' } });
 
     setParams({ invalid: 'invalid' });
@@ -282,7 +288,7 @@ test('SLink - Logs error and warning on missing and invalid named-params', async
 test('fallback - Renders when no other routes match', async () => {
     const { getByTestId } = render(SLink, {
         props: {
-            path: '/jhbkjhb',
+            path: '/unknown',
             routes: userRoutes,
             id: 'fdcgfc',
         },
@@ -298,7 +304,7 @@ test('fallback - Renders when no other routes match', async () => {
 
     expect(route).toMatchObject(testRoutes[0]);
 
-    await push('/jnsadksdjn').catch(() => {
+    await push('/unknown').catch(() => {
         expect(route).toMatchObject(testRoutes[3]);
     });
 });

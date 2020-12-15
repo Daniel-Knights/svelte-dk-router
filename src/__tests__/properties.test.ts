@@ -15,7 +15,6 @@ import {
     routeChart,
     routeStore,
     routeChartStore,
-    setProps,
     routeProps,
 } from '../router';
 import { testRoutes } from './static/routes';
@@ -123,12 +122,12 @@ test('routeChartStore - Correct data', async () => {
     expect(currentChart[3]).toMatchObject(testRoutes[1].children[1].children[0]);
 });
 
-test('routeProps - Correct data', () => {
-    setProps(testObjOne);
+test('routeProps - Correct data', async () => {
+    await push({ path: '/', props: testObjOne });
 
     expect(routeProps).toMatchObject(testObjOne);
 
-    setProps(testObjTwo);
+    await push({ path: '/about', props: testObjTwo });
 
     expect(routeProps).toMatchObject(testObjTwo);
 });

@@ -1,13 +1,7 @@
-<script lang="ts">
-    import { onMount } from 'svelte';
-
-    import { route, SView, SLink } from '../router';
+<script>
+    import { SView, SLink } from '../router';
 
     export let id = undefined;
-
-    // onMount(() => {
-    //     console.log(route);
-    // });
 </script>
 
 <main id="about-view-rendered" data-testid={id}>

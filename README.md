@@ -28,6 +28,7 @@ import fallback from './views/fallback.svelte';
 const routes = [
     {
         name: 'Home',
+        // Update page title
         title: 'Home',
         path: '/',
         component: home,
@@ -37,7 +38,7 @@ const routes = [
     },
     {
         // If no name passed,
-        // Defaults to components' name
+        // defaults to components' name
         title: 'About',
         path: '/about',
         component: about,
@@ -78,6 +79,8 @@ const routes = [
         path: '/blog/:id/:name',
         component: blog,
     },
+    // Define your fallback last,
+    // must have a path of '(*)'
     {
         name: 'Fallback',
         title: '404',
@@ -109,12 +112,12 @@ Links to navigate:
 
     let params = { id: '1', name: 'dan' },
         query = { id: '1', name: 'dan' },
-        meta = { some: 'extra information' };
+        props = { some: 'extra information' };
 </script>
 
 <SLink name={'Home'}>Home</SLink>
-// Using meta allows you to pass any data to the next page
-<SLink path={'/about'} {query} {meta}>About</SLink>
+// Using props allows you to pass any data to the next page
+<SLink path={'/about'} {query} {props}>About</SLink>
 <SLink path={'/blog'} {params} replace={true}>Blog</SLink>
 // Navigate to a nested route
 <SLink name={'More About'}>More Info</SLink>
@@ -133,44 +136,135 @@ and don't forget to set your rollup config to handle SPA's with `-s`:
 
 ## API
 
-**NOTE:** All navigations are asynchronous, keep this in mind and use `await` if you encounter inconsistencies with data being defined.
+**NOTE:** All navigations are asynchronous.
 
 #### `setRoutes(routes: array[object(s)] [, hashMode: boolean])`
 
 Set your routes and optionally set to `hashMode` (prepends all routes with `/#`).
 
-If no `name` is set for a route, an all-lowercase name is generated based off the root path.
+If no `name` is set for a route, the components' name is used instead.
 
 #### `<SView />`
 
 The main view for your routes.
 
-#### `<SLink name={string} path={string} {query} {params} {meta} replace={boolean}>Slot</SLink>`
+You can nest any number of views within your set components.
 
-Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined), `meta` and `replace`. `replace` defaults to `false`, meaning `pushState` is used instead of `replaceState`.
+#### `<SLink />`
+
+Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined), `props` and `replace`.
+
+Dispatches a `navigation` event which returns the route being navigated to.
+
+`replace` defaults to `false`, meaning `pushState` is used instead of `replaceState`.
+
+**Example:**
+
+```js
+<SLink
+    name={string}
+    path={string}
+    {query}
+    {params}
+    {props}
+    replace={boolean}
+    on:navigation={result => {
+        console.log(result);
+    }}
+>
+    Slot
+</SLink>
+```
 
 #### `route`
 
 An object containing all information on the current route.
 
-#### `push(identifier: string | object)`
+**Example:**
+
+```js
+{
+    component: class Home,
+    // An array of route-names matching the current path
+    crumbs: ["Home"],
+    // Current route-depth
+    depth: 1,
+    fullPath: "/",
+    fullRegex: /^\/?$/i,
+    meta: { name: "dan" },
+    name: "Home",
+    path: "/",
+    query: { test: "definitely works" },
+    regex: /^\/?$/i,
+    rootPath: "/",
+    title: "Home"
+}
+```
+
+#### `routeStore`
+
+A readable Svelte store which, through the `.subscribe` method, returns the current route whenever it's updated.
+
+#### `routeChart`
+
+An object containing a chart of all routes from the parent-route, down to the current route.
+
+**Example:**
+
+```bash
+// Navigating to '/blog/1/dan' displays the default child route
+1: {title: "Blog", path: "/blog/:id/:name", children: Array(2), name: "Blog", component: ƒ, …}
+2: {title: "Future | Blog", path: "", children: Array(1), name: "Future", component: ƒ, …}
+```
+
+#### `routeChartStore`
+
+A readable Svelte store which, through the `.subscribe` method, returns the current route-chart whenever it's updated.
+
+#### `routeProps`
+
+A variable containing any data set through navigation props.
+
+#### `push(identifier: string | object): current route`
 
 Programmatically changes the route using `window.history.pushState()`.
 
-#### `replace(identifier: string | object)`
+Returns a promise which can be chained:
 
-Programmatically changes the route using `window.history.replaceState()`.
+```js
+await push('/')
+    .then(newRoute => console.log(newRoute))
+    .catch(err => console.error(err));
+```
+
+Available fields:
+
+```js
+await push({
+    name: 'Blog'
+    path: '/blog',
+    params: { id: '1', name: 'dan' },
+    query: { postTitle: 'how-to-use-svelte-dk-router' },
+    props: { post: blogPost },
+})
+```
+
+#### `replace(identifier: string | object): current route`
+
+The same as `push()`, except, uses `window.history.replaceState()` instead.
 
 #### `beforeEach((to, from) => {})`
 
-Navigation guard to run _before_ each route. Optionally asynchronous.
+Navigation guard to run _before_ each route.
+\
 `to` contains all data for the route navigating to, `from` all data of the current route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
 #### `afterEach((to, from) => {})`
 
-Navigation guard to run _after_ each route. Optionally asynchronous.
+Navigation guard to run _after_ each route.
+
 `to` contains all data for the route navigated to, `from` all data of the previous route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
@@ -178,6 +272,22 @@ Navigation guard to run _after_ each route. Optionally asynchronous.
 #### `setQuery(query: object | string [, update: boolean [, replace: boolean]]): current route`
 
 Programmatically set query params. If `update` is set to `true`, replaces/adds to existing query.
+
+Supports passing any **valid** query string. Valid, in this sense, includes any of the following:
+
+```
+?valid=valid
+valid=valid
+?valid=valid&another=valid
+valid=valid&another=valid
+
+invalid = invalid
+&invalid=invalid
+invalid=invalid()
+```
+
+Though, it is recommended you stick to using objects.
+
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
 
 Returns the updated route data.
@@ -185,6 +295,7 @@ Returns the updated route data.
 #### `setParams(params: object [, replace: boolean]): current route`
 
 Programmatically update named-params. Params must be correctly defined for the current route.
+
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
 
 Returns the updated route data.

@@ -169,6 +169,16 @@ const formatRouteRegex = (passedRoute: FormattedRoute): void => {
 const formatQueryFromObject = (query: Record<string, string>): string => {
     const formattedQuery = Object.entries(query)
         .map(([key, value], i, arr) => {
+            // Handle camel-case keys
+            key = key
+                .split('')
+                .map((char, i) => {
+                    if (char === char.toUpperCase() && i !== 0) {
+                        return '-' + char.toLowerCase();
+                    } else return char;
+                })
+                .join('');
+
             if (i !== arr.length - 1) {
                 return key + '=' + value + '&';
             } else return key + '=' + value;
@@ -206,10 +216,12 @@ const compareRoutes = (
             const { regex, fullRegex } = compare;
 
             if (compare.path === '(*)') fallbackRoute = compare;
-            if (path && (fullRegex || regex))
+
+            if (path && (fullRegex || regex)) {
                 if (path.match(fullRegex) || path.match(regex)) {
                     return (matchedRoute = compare);
                 }
+            }
 
             if (name === compare.name) {
                 return (matchedRoute = compare);

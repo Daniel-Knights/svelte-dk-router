@@ -11,8 +11,6 @@ import { changeRoute, route as currentRoute } from './change';
 import { writableDepthChart } from './nested';
 import { hashHistory, routes, writableRoute } from './state';
 
-let routeProps;
-
 const pushOrReplace = async (
     identifier: string | PassedRoute,
     replace: boolean
@@ -32,15 +30,17 @@ const pushOrReplace = async (
     }
 
     if (typeof identifier === 'object') {
-        const { path, name, props } = identifier;
+        const { path, name } = identifier;
+
+        if (!name && !path) {
+            return error('Path or name argument required');
+        }
 
         errorString = path || name;
-
-        if (props) setProps(props);
     }
 
     const filteredRoute = compareRoutes(routes, identifier);
-    const { params, query } = identifier;
+    const { params, query, props } = identifier;
 
     if (!filteredRoute) {
         error(`Unknown route: "${errorString}"`);
@@ -48,7 +48,7 @@ const pushOrReplace = async (
     }
 
     const returnedRoute = await changeRoute(
-        { ...filteredRoute, params, query },
+        { ...filteredRoute, params, query, props },
         replace,
         invalidIdentifier(filteredRoute, identifier)
     );
@@ -75,33 +75,23 @@ const replace = async (
 
 // Set or update query params
 const setQuery = (
-    query: Record<string, string> | string,
+    query: Record<string, string>,
     update = false,
     replace = true
 ): FormattedRoute | void => {
     if (!query) return error('A query argument is required');
-    if (typeof query !== 'object' && typeof query !== 'string') {
-        return error('Query argument must be of type object or string');
+    if (typeof query !== 'object') {
+        return error('Query argument must be of type object');
     }
 
-    let formattedQuery = {};
+    let formattedQuery = { ...query };
 
-    if (typeof query === 'string') {
-        query
-            .slice(0)
-            .split('&')
-            .forEach(pair => {
-                formattedQuery[pair.split('=')[0]] = pair.split('=')[1];
-            });
-    } else if (typeof query === 'object') {
-        formattedQuery = { ...query };
-    }
-
-    if (update)
+    if (update) {
         formattedQuery = {
             ...currentRoute.query,
             ...formattedQuery,
         };
+    }
 
     writableRoute.update(routeValue => {
         return { ...routeValue, query: formattedQuery };
@@ -186,9 +176,4 @@ const setParams = (
     return currentRoute;
 };
 
-// eslint-disable-next-line
-const setProps = (props: any): void => {
-    routeProps = props;
-};
-
-export { push, replace, setQuery, setParams, routeProps, setProps };
+export { push, replace, setQuery, setParams };

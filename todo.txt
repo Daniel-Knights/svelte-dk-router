@@ -1,3 +1,7 @@
-Silence errors function
+tests
+    setQuery - replace/push
+    setParams - replace/push
 
-Update README
+aria-current="page"
+Add router-active description to README
+should query prepend question mark in hash-mode?

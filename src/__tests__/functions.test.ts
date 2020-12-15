@@ -10,7 +10,7 @@ import {
     pathname,
     search,
 } from '../router';
-import { routeProps, routes, setProps } from '../router/logic';
+import { routeProps, routes } from '../router/logic';
 import { testRoutes } from './static/routes';
 import userRoutes from '../routes';
 
@@ -78,6 +78,16 @@ test('push() - Use window.history.pushState to change route', async () => {
     }
 });
 
+test('push() - Returns correct route', async () => {
+    await push('/').then(newRoute => {
+        expect(newRoute).toMatchObject(testRoutes[0]);
+    });
+
+    const newRoute = await push('/about');
+
+    expect(newRoute).toMatchObject(testRoutes[1]);
+});
+
 test('replace() - Use window.history.replaceState to change route', async () => {
     beforeEach((to, from) => {
         if (!routeProps) return;
@@ -110,6 +120,16 @@ test('replace() - Use window.history.replaceState to change route', async () => 
     }
 });
 
+test('replace() - Returns correct route', async () => {
+    await replace('future').then(newRoute => {
+        expect(newRoute).toMatchObject(testRoutes[1].children[0]);
+    });
+
+    const newRoute = await replace('/');
+
+    expect(newRoute).toMatchObject(testRoutes[0]);
+});
+
 test('setQuery() - Set the current query', () => {
     setQuery(testObjOne);
 
@@ -119,18 +139,18 @@ test('setQuery() - Set the current query', () => {
     if (!process.env.HASH_MODE) {
         expect(search).toBe('?test=test');
     } else {
-        expect(hash.split('?')[1]).toBe('test=test');
+        expect(hash).toBe('#/?test=test');
     }
 
-    setQuery('test=string-test');
+    setQuery({ test: 'different' });
 
-    expect(route.query).toMatchObject({ test: 'string-test' });
+    expect(route.query).toMatchObject({ test: 'different' });
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=string-test');
+        expect(search).toBe('?test=different');
     } else {
-        expect(hash.split('?')[1]).toBe('test=string-test');
+        expect(hash).toBe('#/?test=different');
     }
 });
 
@@ -141,7 +161,7 @@ test('setQuery() - Update the current query', () => {
     if (!process.env.HASH_MODE) {
         expect(search).toBe('?test=test&updated=not-updated');
     } else {
-        expect(hash.split('?')[1]).toBe('test=test&updated=not-updated');
+        expect(hash).toBe('#/?test=test&updated=not-updated');
     }
 
     setQuery({ updated: 'updated' }, true);
@@ -152,18 +172,33 @@ test('setQuery() - Update the current query', () => {
     if (!process.env.HASH_MODE) {
         expect(search).toBe('?test=test&updated=updated');
     } else {
-        expect(hash.split('?')[1]).toBe('test=test&updated=updated');
+        expect(hash).toBe('#/?test=test&updated=updated');
     }
 
-    setQuery('updated=string-updated', true);
+    setQuery({ test: 'test-updated', another: 'one' }, true);
 
-    expect(route.query).toMatchObject({ test: 'test', updated: 'string-updated' });
+    expect(route.query).toMatchObject({
+        test: 'test-updated',
+        another: 'one',
+        updated: 'updated',
+    });
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=test&updated=string-updated');
+        expect(search).toBe('?test=test-updated&updated=updated&another=one');
     } else {
-        expect(hash.split('?')[1]).toBe('test=test&updated=string-updated');
+        expect(hash).toBe('#/?test=test-updated&updated=updated&another=one');
+    }
+});
+
+test('setQuery() - Converts camelCase keys to kebab-case', () => {
+    setQuery({ camelCase: 'test' });
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?camel-case=test');
+    } else {
+        expect(hash).toBe('#/?camel-case=test');
     }
 });
 
@@ -187,18 +222,4 @@ test('setParams() - Set named-params', async () => {
     } else {
         expect(hash).toBe('#/blog/2/John');
     }
-});
-
-test('setProps - Set route-props', () => {
-    setProps(testObjOne);
-
-    expect(routeProps).toMatchObject(testObjOne);
-
-    setProps('testObjTwo');
-
-    expect(routeProps).toBe('testObjTwo');
-
-    setProps(true);
-
-    expect(routeProps).toBe(true);
 });

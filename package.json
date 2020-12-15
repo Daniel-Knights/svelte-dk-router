@@ -14,6 +14,8 @@
         "build": "rollup -c",
         "lib": "rm -r dist && tsc -b src/router && grunt && cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
         "pub": "npm run lib && npm version patch && npm publish",
+        "pub-minor": "npm run lib && npm version minor && npm publish",
+        "pub-major": "npm run lib && npm version major && npm publish",
         "dev": "rollup -c -w",
         "start": "sirv public -s",
         "check": "svelte-check",
@@ -28,7 +30,7 @@
         "@testing-library/jest-dom": "^5.11.6",
         "@testing-library/svelte": "^3.0.0",
         "@tsconfig/svelte": "^1.0.10",
-        "@types/jest": "^26.0.18",
+        "@types/jest": "^26.0.19",
         "@typescript-eslint/eslint-plugin": "^4.9.1",
         "@typescript-eslint/parser": "^4.9.1",
         "eslint": "^7.15.0",
@@ -44,12 +46,12 @@
         "sass": "^1.30.0",
         "sirv-cli": "^1.0.10",
         "svelte": "^3.31.0",
-        "svelte-check": "^1.1.20",
-        "svelte-jester": "^1.1.5",
+        "svelte-check": "^1.1.22",
+        "svelte-jester": "^1.3.0",
         "svelte-preprocess": "^4.6.1",
         "ts-jest": "^26.4.4",
         "tslib": "^2.0.3",
-        "typescript": "^4.1.2"
+        "typescript": "^4.1.3"
     },
     "peerDependencies": {
         "svelte": "^3.31.0"
@@ -64,6 +66,7 @@
         "route",
         "routes",
         "typescript",
-        "javascript"
+        "javascript",
+        "library"
     ]
 }
