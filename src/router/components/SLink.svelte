@@ -68,6 +68,7 @@
 
         dispatch('navigation', result);
     }}
-    class={routerActive ? 'router-active' : ''}>
+    class={routerActive ? 'router-active' : ''}
+    aria-current={routerActive ? 'page' : null}>
     <slot />
 </a>
