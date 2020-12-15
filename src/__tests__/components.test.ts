@@ -136,7 +136,7 @@ test('SLink - Emits correct "navigation" event', async () => {
     expect(fired).toBeTruthy();
 });
 
-test('SLink - Applies router-active class', async () => {
+test('SLink - Applies router-active class and aria-current attribute', async () => {
     const { getByTestId } = render(SLink, {
         props: { path: '/', routes, id: 's0d9' },
     });
@@ -150,12 +150,16 @@ test('SLink - Applies router-active class', async () => {
     await fireEvent.click(homeLink);
 
     expect(homeLink.className).toBe('router-active');
+    expect(homeLink.getAttribute('aria-current')).toBe('page');
     expect(aboutLink.className).toBe('');
+    expect(aboutLink.getAttribute('aria-current')).toBeNull();
 
     await fireEvent.click(aboutLink);
 
     expect(homeLink.className).toBe('');
+    expect(homeLink.getAttribute('aria-current')).toBeNull();
     expect(aboutLink.className).toBe('router-active');
+    expect(aboutLink.getAttribute('aria-current')).toBe('page');
 });
 
 test('SLink - Sets correct href', () => {

@@ -191,17 +191,6 @@ test('setQuery() - Update the current query', () => {
     }
 });
 
-test('setQuery() - Converts camelCase keys to kebab-case', () => {
-    setQuery({ camelCase: 'test' });
-
-    // @ts-ignore
-    if (!process.env.HASH_MODE) {
-        expect(search).toBe('?camel-case=test');
-    } else {
-        expect(hash).toBe('#/?camel-case=test');
-    }
-});
-
 test('setParams() - Set named-params', async () => {
     await push({ path: '/blog', params: testObjTwo });
 
