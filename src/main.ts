@@ -12,16 +12,24 @@ import {
 
 const userAuthenticated = false;
 
-// beforeEach(async (to, from) => {
-// });
 afterEach(async (to, from) => {
-    console.log(routeChart);
-    if (to.name === 'About') {
-        await push('/about/origins/mojre')
-            .then(res => console.log('weewd', res))
-            .catch(err => console.log('error', err));
-    }
+    console.log(routeProps);
 });
+// afterEach(async (to, from) => {
+//     console.log(routeChart);
+
+//     if (to) console.log('to after - ', to.name);
+//     if (from) console.log('from after - ', from.name);
+
+//     if (to.name === 'Future') {
+//         await push('/').then(
+//             async () =>
+//                 await push('/about').then(
+//                     async () => await replace('/about').then(async () => replace('/'))
+//                 )
+//         );
+//     }
+// });
 
 setRoutes(routes);
 

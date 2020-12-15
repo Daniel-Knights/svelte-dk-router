@@ -16,7 +16,8 @@ let fromRoute: FormattedRoute = null;
 // New route data
 let newPath: string, newTitle: string, newRoute: FormattedRoute;
 
-let routeProps;
+let routeProps,
+    propsPageCount = 0;
 
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => {
@@ -24,6 +25,7 @@ writableRoute.subscribe(newRoute => {
 });
 
 const setProps = (props: Record<string, unknown>): void => {
+    propsPageCount = 0;
     routeProps = props;
 };
 
@@ -34,6 +36,10 @@ const changeRoute = async (
 ): Promise<void | FormattedRoute> => {
     const { name, path, query, params, props } = passedRoute;
     let fullPath;
+
+    // Clear route-props
+    propsPageCount += 1;
+    if (propsPageCount > 0) routeProps = null;
 
     if (passedRoute['fullPath']) {
         fullPath = passedRoute['fullPath'];

@@ -2,6 +2,8 @@ tests
     setQuery - replace/push
     setParams - replace/push
 
-aria-current="page"
-Add router-active description to README
-should query prepend question mark in hash-mode?
+README
+    router-active/aria-current description
+    Remove note
+
+clearProps()
