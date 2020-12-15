@@ -1,3 +1,5 @@
+**NOTE:** This README is for version 3 which is unreleased. Follow the NPM link for version 2.
+
 # svelte-dk-router
 
 [![npm](https://img.shields.io/npm/v/svelte-dk-router.svg)](https://www.npmjs.com/package/svelte-dk-router)
