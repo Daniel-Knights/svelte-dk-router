@@ -1,9 +1,3 @@
 tests
     setQuery - replace/push
     setParams - replace/push
-
-README
-    router-active/aria-current description
-    Remove note
-
-clearProps()

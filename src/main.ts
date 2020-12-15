@@ -12,9 +12,9 @@ import {
 
 const userAuthenticated = false;
 
-afterEach(async (to, from) => {
-    console.log(routeProps);
-});
+// afterEach(async (to, from) => {
+//     console.log(routeProps);
+// });
 // afterEach(async (to, from) => {
 //     console.log(routeChart);
 

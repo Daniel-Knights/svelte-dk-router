@@ -1,5 +1,3 @@
-**NOTE:** This README is for version 3 which is unreleased. Follow the NPM link for version 2.
-
 # svelte-dk-router
 
 [![npm](https://img.shields.io/npm/v/svelte-dk-router.svg)](https://www.npmjs.com/package/svelte-dk-router)
@@ -13,7 +11,7 @@
 npm i svelte-dk-router
 ```
 
-## Usage
+## Quick Start
 
 First set your routes:
 
@@ -81,8 +79,8 @@ const routes = [
         path: '/blog/:id/:name',
         component: blog,
     },
-    // Define your fallback last,
-    // must have a path of '(*)'
+    // Define your fallback last
+    // Must have a path of '(*)'
     {
         name: 'Fallback',
         title: '404',
@@ -166,9 +164,9 @@ Dispatches a `navigation` event which returns the route being navigated to.
 <SLink
     name={string}
     path={string}
-    {query}
-    {params}
-    {props}
+    query={object}
+    params={object}
+    props={object}
     replace={boolean}
     on:navigation={result => {
         console.log(result);
@@ -196,7 +194,7 @@ An object containing all information on the current route.
     meta: { name: "dan" },
     name: "Home",
     path: "/",
-    query: { test: "definitely works" },
+    query: { id: "1" },
     regex: /^\/?$/i,
     rootPath: "/",
     title: "Home"
@@ -225,7 +223,9 @@ A readable Svelte store which, through the `.subscribe` method, returns the curr
 
 #### `routeProps`
 
-A variable containing any data set through navigation props.
+A variable containing any data passed as props through `<SLink />`, `push()` or `replace()`.
+
+Resets to `null` on route change.
 
 #### `push(identifier: string | object): current route`
 
@@ -239,7 +239,7 @@ await push('/')
     .catch(err => console.error(err));
 ```
 
-Available fields:
+Available properties you can pass:
 
 ```js
 await push({
@@ -258,7 +258,7 @@ The same as `push()`, except, uses `window.history.replaceState()` instead.
 #### `beforeEach((to, from) => {})`
 
 Navigation guard to run _before_ each route.
-\
+
 `to` contains all data for the route navigating to, `from` all data of the current route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
@@ -271,30 +271,15 @@ Navigation guard to run _after_ each route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
-#### `setQuery(query: object | string [, update: boolean [, replace: boolean]]): current route`
+#### `setQuery(query: object, update?: boolean, replace?: boolean): current route`
 
 Programmatically set query params. If `update` is set to `true`, replaces/adds to existing query.
-
-Supports passing any **valid** query string. Valid, in this sense, includes any of the following:
-
-```
-?valid=valid
-valid=valid
-?valid=valid&another=valid
-valid=valid&another=valid
-
-invalid = invalid
-&invalid=invalid
-invalid=invalid()
-```
-
-Though, it is recommended you stick to using objects.
 
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
 
 Returns the updated route data.
 
-#### `setParams(params: object [, replace: boolean]): current route`
+#### `setParams(params: object, replace?: boolean): current route`
 
 Programmatically update named-params. Params must be correctly defined for the current route.
 
@@ -320,6 +305,12 @@ import {
 ```
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.
+
+### `router-active` class
+
+Any `<SLink />` which matches the current-route/exists in the current-route heirarchy, has the class `router-active` applied.
+
+In the spirit of a11y, the attribute `aria-current="page"` is also set.
 
 ---
 
