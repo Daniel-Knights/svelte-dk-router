@@ -1,20 +1,14 @@
 import { PassedRoute, FormattedRoute, compareRoutes } from '../static';
-import {
-    error,
-    setUrl,
-    formatQueryFromObject,
-    currentPath,
-    validatePassedParams,
-    invalidIdentifier,
-} from '../static';
+import { error, invalidIdentifier } from '../static';
 import { changeRoute, route as currentRoute } from './change';
-import { writableDepthChart } from './nested';
-import { hashHistory, routes, writableRoute } from './state';
+import { routes } from './state';
 
 const pushOrReplace = async (
-    identifier: string | PassedRoute,
+    routeData: PassedRoute,
     replace: boolean
 ): Promise<void | FormattedRoute> => {
+    const { identifier } = routeData;
+
     if (!identifier) return error('Path or name argument required');
 
     let errorString;
@@ -23,9 +17,9 @@ const pushOrReplace = async (
         errorString = identifier;
 
         if (identifier[0] === '/') {
-            identifier = { path: identifier };
+            routeData.path = identifier;
         } else {
-            identifier = { name: identifier };
+            routeData.name = identifier;
         }
     }
 
@@ -39,8 +33,8 @@ const pushOrReplace = async (
         errorString = path || name;
     }
 
-    const filteredRoute = compareRoutes(routes, identifier);
-    const { params, query, props } = identifier;
+    const filteredRoute = compareRoutes(routes, routeData);
+    const { params, query, props } = routeData;
 
     if (!filteredRoute) {
         error(`Unknown route: "${errorString}"`);
@@ -62,26 +56,34 @@ const pushOrReplace = async (
 };
 
 // Push to the current history entry
-const push = async (identifier: string | PassedRoute): Promise<void | FormattedRoute> => {
-    return await pushOrReplace(identifier, false);
+const push = async (
+    identifier: string,
+    routeData?: PassedRoute
+): Promise<void | FormattedRoute> => {
+    return await pushOrReplace({ identifier, ...routeData }, false);
 };
 
 // Replace the current history entry
 const replace = async (
-    identifier: string | PassedRoute
+    identifier: string,
+    routeData?: PassedRoute
 ): Promise<void | FormattedRoute> => {
-    return await pushOrReplace(identifier, true);
+    return await pushOrReplace({ identifier, ...routeData }, true);
 };
 
 // Set or update query params
-const setQuery = (
+const setQuery = async (
     query: Record<string, string>,
     update = false,
     replace = true
-): FormattedRoute | void => {
-    if (!query) return error('A query argument is required');
+): Promise<FormattedRoute | void> => {
+    if (!query) {
+        error('A query argument is required');
+        throw new Error('A query argument is required');
+    }
     if (typeof query !== 'object') {
-        return error('Query argument must be of type object');
+        error('Query argument must be of type object');
+        throw new Error('Query argument must be of type object');
     }
 
     let formattedQuery = { ...query };
@@ -93,87 +95,23 @@ const setQuery = (
         };
     }
 
-    writableRoute.update(routeValue => {
-        return { ...routeValue, query: formattedQuery };
-    });
-    writableDepthChart.update((chart: Record<string, FormattedRoute>) => {
-        Object.entries(chart).forEach(([key, routeValue]) => {
-            chart[key] = { ...routeValue, query: formattedQuery };
-        });
-
-        return chart;
-    });
-
-    const path = currentPath(hashHistory) + '?' + formatQueryFromObject(formattedQuery);
-
-    setUrl(path, replace, hashHistory);
-
-    return currentRoute;
+    return await changeRoute({ ...currentRoute, query: formattedQuery }, replace);
 };
 
 // Update named-params
-const setParams = (
+const setParams = async (
     params: Record<string, string>,
     replace = true
-): FormattedRoute | void => {
+): Promise<FormattedRoute | void> => {
     if (!params) {
-        return error('Params are required');
+        error('Params are required');
+        throw new Error('Params are required');
     } else if (!currentRoute.fullPath.includes('/:')) {
-        return error('Current route has no defined params');
+        error('Current route has no defined params');
+        throw new Error('Current route has no defined params');
     }
 
-    let query = '';
-
-    validatePassedParams(currentRoute.fullPath, params, true);
-
-    // Remove invalid params
-    Object.keys(params).forEach(param => {
-        if (currentRoute.params && !currentRoute.params[param]) {
-            delete params[param];
-        }
-    });
-
-    // Include existing params
-    if (currentRoute.params) {
-        Object.entries(currentRoute.params).forEach(([key, value]) => {
-            if (!params[key]) params[key] = value;
-        });
-    }
-
-    writableRoute.update(routeValue => {
-        return { ...routeValue, params };
-    });
-
-    writableDepthChart.update((chart: Record<string, FormattedRoute>) => {
-        Object.entries(chart).forEach(([key, routeValue]) => {
-            chart[key] = { ...routeValue, params };
-        });
-
-        return chart;
-    });
-
-    const pathSections = currentPath(hashHistory).split('/');
-
-    currentRoute.fullPath.split('/').forEach((section, i) => {
-        if (section[0] !== ':') return;
-        if (!params[section.split(':')[1]]) return;
-
-        if (hashHistory) i++;
-
-        pathSections[i] = params[section.split(':')[1]];
-    });
-
-    if (currentRoute.query) {
-        query = hashHistory
-            ? '?' + window.location.hash.split('?')[1]
-            : window.location.search;
-    }
-
-    const path = pathSections.join('/') + query;
-
-    setUrl(path, replace, hashHistory);
-
-    return currentRoute;
+    return await changeRoute({ ...currentRoute, params }, replace);
 };
 
 export { push, replace, setQuery, setParams };

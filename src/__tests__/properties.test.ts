@@ -53,7 +53,7 @@ test('route - Correct data', async () => {
     setQuery(testObjOne);
     expect(route.query).toMatchObject(testObjOne);
 
-    await push({ path: '/blog', params: testObjTwo });
+    await push('/blog', { params: testObjTwo });
 
     expect(route).toMatchObject(testRoutes[2].children[0]);
     expect(route.params).toMatchObject(testObjTwo);
@@ -79,7 +79,7 @@ test('routeChart - Correct data', async () => {
         expect(route.query).toMatchObject(testObjOne);
     });
 
-    await push({ path: '/blog', params: testObjTwo });
+    await push('/blog', { params: testObjTwo });
 
     expect(routeChart[2]).toMatchObject(testRoutes[2].children[0]);
 
@@ -123,11 +123,11 @@ test('routeChartStore - Correct data', async () => {
 });
 
 test('routeProps - Correct data', async () => {
-    await push({ path: '/', props: testObjOne });
+    await push('/', { props: testObjOne });
 
     expect(routeProps).toMatchObject(testObjOne);
 
-    await push({ path: '/about', props: testObjTwo });
+    await push('/about', { props: testObjTwo });
 
     expect(routeProps).toMatchObject(testObjTwo);
 });

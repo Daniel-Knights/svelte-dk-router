@@ -26,16 +26,15 @@ test('beforeEach() - triggers with correct to/from routes', async () => {
         }
 
         if (to.name === 'About') {
-            await push({ path: '/', query: { stage: '3' } });
+            await push('/', { query: { stage: '3' } });
         }
     });
 
-    await push({
-        name: 'Blog',
+    await push('Blog', {
         params: { id: '1', name: 'dan' },
         query: { stage: '1' },
     });
-    push({ name: 'About', query: { stage: '2' } });
+    push('About', { query: { stage: '2' } });
 });
 
 test('afterEach() - triggers with correct to/from routes', async () => {
@@ -59,14 +58,13 @@ test('afterEach() - triggers with correct to/from routes', async () => {
         }
 
         if (to.name === 'About') {
-            await push({ path: '/', query: { stage: '3' } });
+            await push('/', { query: { stage: '3' } });
         }
     });
 
-    await push({
-        name: 'Blog',
+    await push('Blog', {
         params: { id: '1', name: 'dan' },
         query: { stage: '1' },
     });
-    push({ name: 'About', query: { stage: '2' } });
+    push('About', { query: { stage: '2' } });
 });

@@ -1,5 +1,5 @@
 import { writable, readable } from 'svelte/store';
-import type { Route, FormattedRoute } from '../static';
+import { Route, FormattedRoute, warn } from '../static';
 import {
     error,
     currentPath,
@@ -40,6 +40,12 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 
             if (path === undefined || !component) {
                 return error('"path" and "component" are required properties');
+            }
+
+            if (name && name.includes('/')) {
+                warn(
+                    `Route-names which include "/" could interfere with route-matching: ${name}`
+                );
             }
 
             // Set component name as route name if none supplied

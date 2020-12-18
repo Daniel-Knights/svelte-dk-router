@@ -48,15 +48,11 @@ const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
     });
 };
 
-const validatePassedParams = (
-    path: string,
-    params: Record<string, string>,
-    silentError = false
-): boolean => {
+const validatePassedParams = (path: string, params: Record<string, string>): boolean => {
     let valid = true;
 
     // Validate required params
-    if (path && !silentError) {
+    if (path) {
         path.split('/').forEach((section, i) => {
             if (i === 0 || section[0] !== ':') return;
 

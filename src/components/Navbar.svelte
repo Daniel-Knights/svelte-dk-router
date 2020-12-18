@@ -36,19 +36,18 @@
         <div on:click={async () => await push('/sdvdvczcxv')}>
             Push Unkown Route by path
         </div>
-        <div on:click={async () => await push({ path: '/sdvdvczcxv' })}>
+        <div on:click={async () => await push('/sdvdvczcxv')}>
             Push Unkown Route by path
         </div>
         <div on:click={async () => await push('sdvdvczcxv')}>
             Push Unkown Route by name
         </div>
-        <div on:click={async () => await push({ name: 'sdvdvczcxv' })}>
+        <div on:click={async () => await push('sdvdvczcxv')}>
             Push Unkown Route by name
         </div>
         <div
             on:click={async () => {
-                await replace({
-                    path: '/blog',
+                await replace('/blog/hello/dan', {
                     params: { id: 'hello', name: 'knsckjsndc' },
                     props: { whaddup: 'its ya boi' },
                 });
@@ -57,14 +56,13 @@
         </div>
         <div
             on:click={async () => {
-                await replace({ path: '/blog', params: { id: 'hello' } });
+                await replace('/blog', { params: { id: 'hello' } });
             }}>
             Replace - Missing Params
         </div>
         <div
             on:click={async () => {
-                await replace({
-                    path: '/blog',
+                await replace('/blog', {
                     params: { id: 'hello', name: 'john', test: 'sa' },
                 });
             }}>
@@ -72,21 +70,18 @@
         </div>
         <div
             on:click={async () => {
-                await replace({
-                    path: '/blog',
-                    params: { id: 'hello', test: 'heasasd' },
-                });
+                await replace('/blog', { params: { id: 'hello', test: 'heasasd' } });
             }}>
             Replace - Missing + Invalid Params
         </div>
         <div
-            on:click={() => {
-                const route = setQuery({ it: 'definitely works' });
+            on:click={async () => {
+                const route = await setQuery({ it: 'definitely works' }, false, false);
                 console.log(route);
             }}>
             Set Query
         </div>
-        <div on:click={() => setQuery({ it: 'works' }, true)}>Update Query</div>
+        <div on:click={() => setQuery(54, true)}>Invalid query</div>
         <div on:click={() => setQuery({ definitely: 'works' }, true)}>Update Query</div>
         <div
             on:click={() => {

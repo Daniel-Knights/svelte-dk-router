@@ -22,6 +22,7 @@ export interface FormattedRoute extends Route {
 }
 
 export interface PassedRoute {
+    identifier?: string;
     name?: string;
     path?: string;
     query?: Record<string, string>;

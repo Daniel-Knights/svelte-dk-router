@@ -40,6 +40,15 @@ test('setRoutes() - Logs error on missing properties', () => {
     userRoutes[0]['component'] = memoComponent;
 });
 
+test('setRoutes() - Logs warning when name includes "/"', () => {
+    userRoutes[1].name = '/about';
+
+    // @ts-ignore
+    setRoutes(userRoutes);
+
+    expect(console.warn).toHaveBeenCalledTimes(1);
+});
+
 test('setRoutes() - Logs error on missing children properties', () => {
     const memoPath = userRoutes[1].children[0].children[0].path;
     const memoComponent = userRoutes[2].children[1].component;
@@ -102,15 +111,15 @@ test('setRoutes() - Logs error on duplicate children properties', () => {
 });
 
 test('push() - Logs error on unknown route', async () => {
-    await push('/unknown').catch(() => {
-        expect(console.error).toHaveBeenCalledTimes(1);
-        expect(Error).toHaveBeenCalledTimes(1);
-    });
+    await push('/unknown').catch(() => '');
 
-    await push({ name: 'unknown' }).catch(() => {
-        expect(console.error).toHaveBeenCalledTimes(2);
-        expect(Error).toHaveBeenCalledTimes(2);
-    });
+    expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Error).toHaveBeenCalledTimes(1);
+
+    await push('unknown').catch(() => '');
+
+    expect(console.error).toHaveBeenCalledTimes(2);
+    expect(Error).toHaveBeenCalledTimes(2);
 });
 
 test('push() - Logs error on missing named-params', async () => {
@@ -120,8 +129,7 @@ test('push() - Logs error on missing named-params', async () => {
 });
 
 test('push() - Logs warning on invalid named-params', async () => {
-    await push({
-        path: '/blog',
+    await push('/blog', {
         params: {
             id: '1',
             name: 'Dan',
@@ -133,8 +141,7 @@ test('push() - Logs warning on invalid named-params', async () => {
 });
 
 test('push() - Logs error and warning on missing and invalid named-params', async () => {
-    await push({
-        path: '/blog',
+    await push('/blog', {
         params: {
             id: '1',
             invalid: 'invalid',
@@ -146,15 +153,15 @@ test('push() - Logs error and warning on missing and invalid named-params', asyn
 });
 
 test('replace() - Logs error on unknown route', async () => {
-    await replace('/unknown').catch(() => {
-        expect(console.error).toHaveBeenCalledTimes(1);
-        expect(Error).toHaveBeenCalledTimes(1);
-    });
+    await replace('/unknown').catch(() => '');
 
-    await replace({ name: 'unknown' }).catch(() => {
-        expect(console.error).toHaveBeenCalledTimes(2);
-        expect(Error).toHaveBeenCalledTimes(2);
-    });
+    expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Error).toHaveBeenCalledTimes(1);
+
+    await replace('unknown').catch(() => '');
+
+    expect(console.error).toHaveBeenCalledTimes(2);
+    expect(Error).toHaveBeenCalledTimes(2);
 });
 
 test('replace() - Logs error on missing named-params', async () => {
@@ -164,8 +171,7 @@ test('replace() - Logs error on missing named-params', async () => {
 });
 
 test('replace() - Logs error on invalid named-params', async () => {
-    await replace({
-        path: '/blog',
+    await replace('/blog', {
         params: {
             id: '1',
             name: 'Dan',
@@ -177,8 +183,7 @@ test('replace() - Logs error on invalid named-params', async () => {
 });
 
 test('replace() - Logs error and warning on missing and invalid named-params', async () => {
-    await replace({
-        path: '/blog',
+    await replace('/blog', {
         params: {
             id: '1',
             invalid: 'invalid',
@@ -189,49 +194,53 @@ test('replace() - Logs error and warning on missing and invalid named-params', a
     expect(console.warn).toHaveBeenCalledTimes(1);
 });
 
-test('setQuery() - Logs error when no argument passed', () => {
+test('setQuery() - Throws error when no argument passed', async () => {
     // @ts-ignore
-    setQuery();
+    await setQuery().catch(() => '');
 
     expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Error).toHaveBeenCalledTimes(1);
 });
 
-test('setQuery() - Logs error when anything not an object is passed', () => {
+test('setQuery() - Throws error when anything not an object is passed', async () => {
     // @ts-ignore
-    setQuery('string');
+    await setQuery('string').catch(() => '');
     // @ts-ignore
-    setQuery(2);
+    await setQuery(2).catch(() => '');
     // @ts-ignore
-    setQuery(() => '');
+    await setQuery(() => '').catch(() => '');
     // @ts-ignore
-    setQuery(true);
+    await setQuery(true).catch(() => '');
     // @ts-ignore
-    setQuery(null);
+    await setQuery(null).catch(() => '');
     // @ts-ignore
-    setQuery(undefined);
+    await setQuery(undefined).catch(() => '');
 
     expect(console.error).toHaveBeenCalledTimes(6);
+    expect(Error).toHaveBeenCalledTimes(6);
 });
 
-test('setParams() - Logs error when no argument passed', () => {
+test('setParams() - Throws error when no argument passed', async () => {
     // @ts-ignore
-    setParams();
+    await setParams().catch(() => '');
 
     expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Error).toHaveBeenCalledTimes(1);
 });
 
-test('setParams() - Logs error when route has no defined params', async () => {
+test('setParams() - Throws error when route has no defined params', async () => {
     await push('/');
 
-    setParams({ invalid: 'invalid' });
+    await setParams({ invalid: 'invalid' }).catch(() => '');
 
     expect(console.error).toHaveBeenCalledTimes(1);
+    expect(Error).toHaveBeenCalledTimes(1);
 });
 
 test('setParams() - Logs warning when invalid named-param is passed', async () => {
-    await push({ path: '/blog', params: { id: '1', name: 'Dan' } });
+    await push('/blog', { params: { id: '1', name: 'Dan' } });
 
-    setParams({ invalid: 'invalid' });
+    await setParams({ invalid: 'invalid' });
 
     expect(console.warn).toHaveBeenCalledTimes(1);
 });

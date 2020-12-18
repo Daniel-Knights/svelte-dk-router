@@ -59,8 +59,7 @@ test('push() - Use window.history.pushState to change route', async () => {
         expect(hash).toBe('#/');
     }
 
-    await push({
-        path: '/blog',
+    await push('/blog', {
         params: testObjTwo,
         query: testObjOne,
     });
@@ -100,8 +99,7 @@ test('replace() - Use window.history.replaceState to change route', async () => 
 
     expect(route).toMatchObject(testRoutes[1]);
 
-    await replace({
-        name: 'Blog',
+    await replace('Blog', {
         params: testObjTwo,
         query: testObjOne,
         props: { replaceTest: true },
@@ -130,8 +128,8 @@ test('replace() - Returns correct route', async () => {
     expect(newRoute).toMatchObject(testRoutes[0]);
 });
 
-test('setQuery() - Set the current query', () => {
-    setQuery(testObjOne);
+test('setQuery() - Set the current query', async () => {
+    await setQuery(testObjOne);
 
     expect(route.query).toMatchObject(testObjOne);
 
@@ -142,7 +140,7 @@ test('setQuery() - Set the current query', () => {
         expect(hash).toBe('#/?test=test');
     }
 
-    setQuery({ test: 'different' });
+    await setQuery({ test: 'different' });
 
     expect(route.query).toMatchObject({ test: 'different' });
 
@@ -154,8 +152,8 @@ test('setQuery() - Set the current query', () => {
     }
 });
 
-test('setQuery() - Update the current query', () => {
-    setQuery({ test: 'test', updated: 'not-updated' });
+test('setQuery() - Update the current query', async () => {
+    await setQuery({ test: 'test', updated: 'not-updated' });
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
@@ -164,7 +162,7 @@ test('setQuery() - Update the current query', () => {
         expect(hash).toBe('#/?test=test&updated=not-updated');
     }
 
-    setQuery({ updated: 'updated' }, true);
+    await setQuery({ updated: 'updated' }, true);
 
     expect(route.query).toMatchObject({ test: 'test', updated: 'updated' });
 
@@ -175,7 +173,7 @@ test('setQuery() - Update the current query', () => {
         expect(hash).toBe('#/?test=test&updated=updated');
     }
 
-    setQuery({ test: 'test-updated', another: 'one' }, true);
+    await setQuery({ test: 'test-updated', another: 'one' }, true);
 
     expect(route.query).toMatchObject({
         test: 'test-updated',
@@ -191,8 +189,34 @@ test('setQuery() - Update the current query', () => {
     }
 });
 
+test('setQuery() - Returns correct route', async () => {
+    await push('About');
+
+    const updatedRoute = await setQuery(testObjOne);
+
+    expect(updatedRoute).toMatchObject({
+        ...testRoutes[1],
+        query: testObjOne,
+    });
+});
+
+test('setQuery() - Push/replace', async () => {
+    expect(route).not.toMatchObject(testRoutes[0]);
+
+    await push('/');
+
+    beforeEach((to, from) => {
+        if (to.query && to.query.test === 'setQuery test') {
+            expect(from).toMatchObject(testRoutes[0]);
+        }
+    });
+
+    await setQuery({ test: 'setQuery test' }, false, false);
+    await setQuery({ test: 'setQuery test' });
+});
+
 test('setParams() - Set named-params', async () => {
-    await push({ path: '/blog', params: testObjTwo });
+    await push('/blog', { params: testObjTwo });
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
@@ -201,7 +225,7 @@ test('setParams() - Set named-params', async () => {
         expect(hash).toBe('#/blog/1/dan');
     }
 
-    setParams({ id: '2', name: 'John' });
+    await setParams({ id: '2', name: 'John' });
 
     expect(route.params).toMatchObject({ id: '2', name: 'John' });
 
@@ -211,4 +235,32 @@ test('setParams() - Set named-params', async () => {
     } else {
         expect(hash).toBe('#/blog/2/John');
     }
+});
+
+test('setParams() - Returns correct route', async () => {
+    await push('/blog', { params: testObjTwo });
+
+    const updatedRoute = await setParams({ id: '2', name: 'dan' });
+
+    expect(updatedRoute).toMatchObject({
+        ...testRoutes[2].children[0],
+        params: { id: '2', name: 'dan' },
+    });
+});
+
+test('setParams() - Push/replace', async () => {
+    await push('/');
+
+    expect(route).not.toMatchObject(testRoutes[2].children[0]);
+
+    await push('/blog', { params: { id: '1', name: 'dan' } });
+
+    beforeEach((to, from) => {
+        if (to.params && to.params.name === 'set-params-test') {
+            expect(from).toMatchObject(testRoutes[2].children[0]);
+        }
+    });
+
+    await setParams({ id: '1', name: 'set-params-test' }, false);
+    await setParams({ id: '1', name: 'set-params-test' });
 });
