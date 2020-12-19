@@ -67,6 +67,9 @@
         "routes",
         "typescript",
         "javascript",
-        "library"
+        "library",
+        "navigation",
+        "navigation-guard",
+        "asynchronous"
     ]
 }

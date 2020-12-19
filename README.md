@@ -261,6 +261,8 @@ Navigation guard to run _before_ each route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
+**Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
+
 #### `afterEach((to, from) => {})`
 
 Navigation guard to run _after_ each route.
@@ -268,6 +270,8 @@ Navigation guard to run _after_ each route.
 `to` contains all data for the route navigated to, `from` all data of the previous route.
 
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
+
+**Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
 
 #### `setQuery(query: object, update?: boolean, replace?: boolean): current route`
 
