@@ -85,6 +85,10 @@ const setQuery = async (
         error('Query argument must be of type object');
         throw new Error('Query argument must be of type object');
     }
+    if (currentRoute.path === '(*)' || !currentRoute.path) {
+        error('Cannot set query of unknown route');
+        throw new Error('Cannot set query of unknown route');
+    }
 
     let formattedQuery = { ...query };
 
@@ -106,7 +110,12 @@ const setParams = async (
     if (!params) {
         error('Params are required');
         throw new Error('Params are required');
-    } else if (!currentRoute.fullPath.includes('/:')) {
+    }
+    if (currentRoute.path === '(*)' || !currentRoute.fullPath) {
+        error('Cannot set params of unknown route');
+        throw new Error('Cannot set params of unknown route');
+    }
+    if (!currentRoute.fullPath.includes('/:')) {
         error('Current route has no defined params');
         throw new Error('Current route has no defined params');
     }

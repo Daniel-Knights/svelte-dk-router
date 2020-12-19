@@ -220,12 +220,32 @@ test('setQuery() - Throws error when anything not an object is passed', async ()
     expect(Error).toHaveBeenCalledTimes(6);
 });
 
+test('setQuery() - Throws error when current route is unknown', async () => {
+    await push('/unknown').catch(() => '');
+
+    // @ts-ignore
+    await setQuery({ test: 'test' }).catch(() => '');
+
+    expect(console.error).toHaveBeenCalledTimes(2);
+    expect(Error).toHaveBeenCalledTimes(2);
+});
+
 test('setParams() - Throws error when no argument passed', async () => {
     // @ts-ignore
     await setParams().catch(() => '');
 
     expect(console.error).toHaveBeenCalledTimes(1);
     expect(Error).toHaveBeenCalledTimes(1);
+});
+
+test('setParams() - Throws error when current route is unknown', async () => {
+    await push('/unknown').catch(() => '');
+
+    // @ts-ignore
+    await setParams({ test: 'test' }).catch(() => '');
+
+    expect(console.error).toHaveBeenCalledTimes(2);
+    expect(Error).toHaveBeenCalledTimes(2);
 });
 
 test('setParams() - Throws error when route has no defined params', async () => {

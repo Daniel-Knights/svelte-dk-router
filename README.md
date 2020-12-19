@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/svelte-dk-router.svg)](https://www.npmjs.com/package/svelte-dk-router)
 [![svelte](https://img.shields.io/badge/svelte-3.x-red)](https://svelte.dev/)
 
-> A lightweight router for Svelte
+> An efficient, easy-to-use router for Svelte
 
 ## Installation
 
@@ -75,7 +75,7 @@ const routes = [
     },
     {
         title: 'Blog',
-        // Named-params
+        // Named-params are specified with a colon
         path: '/blog/:id/:name',
         component: blog,
     },
@@ -125,7 +125,7 @@ Links to navigate:
 <SLink path={'/about/origins/more'}>More Info</SLink>
 ```
 
-and don't forget to set your rollup config to handle SPA's with `-s`:
+Lastly, don't forget to set your Rollup config to handle SPA's with `-s`:
 
 ```json
 "scripts": {
@@ -138,7 +138,7 @@ and don't forget to set your rollup config to handle SPA's with `-s`:
 
 **NOTE:** All navigations are asynchronous.
 
-#### `setRoutes(routes: array[object(s)] [, hashMode: boolean])`
+#### `setRoutes(routes: array[object], hashMode?: boolean)`
 
 Set your routes and optionally set to `hashMode` (prepends all routes with `/#`).
 
@@ -168,11 +168,9 @@ Dispatches a `navigation` event which returns the route being navigated to.
     params={object}
     props={object}
     replace={boolean}
-    on:navigation={result => {
-        console.log(result);
-    }}
+    on:navigation={newRoute => /* ... */}
 >
-    Slot
+    Slot for any link content
 </SLink>
 ```
 
@@ -227,31 +225,31 @@ A variable containing any data passed as props through `<SLink />`, `push()` or 
 
 Resets to `null` on route change.
 
-#### `push(identifier: string | object): current route`
+#### `push(identifier: string, routeData?: object): current route`
 
 Programmatically changes the route using `window.history.pushState()`.
+
+`identifier` has to be the name _or_ path of a route.
 
 Returns a promise which can be chained:
 
 ```js
 await push('/')
-    .then(newRoute => console.log(newRoute))
-    .catch(err => console.error(err));
+    .then(newRoute =>  /* Resolved */)
+    .catch(err =>  /* Rejected */);
 ```
 
 Available properties you can pass:
 
 ```js
-await push({
-    name: 'Blog'
-    path: '/blog',
+await push('Blog', {
     params: { id: '1', name: 'dan' },
     query: { postTitle: 'how-to-use-svelte-dk-router' },
     props: { post: blogPost },
-})
+});
 ```
 
-#### `replace(identifier: string | object): current route`
+#### `replace(identifier: string, routeData?: object): current route`
 
 The same as `push()`, except, uses `window.history.replaceState()` instead.
 
@@ -277,7 +275,15 @@ Programmatically set query params. If `update` is set to `true`, replaces/adds t
 
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
 
-Returns the updated route data.
+Returns a promise which resolves with the updated route data.
+
+**Example:**
+
+```js
+await setQuery({ new: 'query' })
+    .then(updatedRoute => /* Resolved */)
+    .catch(err => /* Rejected */);
+```
 
 #### `setParams(params: object, replace?: boolean): current route`
 
@@ -285,7 +291,15 @@ Programmatically update named-params. Params must be correctly defined for the c
 
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
 
-Returns the updated route data.
+Returns a promise which resolves with the updated route data.
+
+**Example:**
+
+```js
+await setParams({ id: '2' })
+    .then(updatedRoute => /* Resolved */)
+    .catch(err => /* Rejected */);
+```
 
 ### Location Data
 
@@ -310,7 +324,7 @@ These variables update on each route change, ensuring simplicity and parity thro
 
 Any `<SLink />` which matches the current-route/exists in the current-route heirarchy, has the class `router-active` applied.
 
-In the spirit of a11y, the attribute `aria-current="page"` is also set.
+In the spirit of a11y, the attribute `aria-current="page"` is also set using this method.
 
 ---
 

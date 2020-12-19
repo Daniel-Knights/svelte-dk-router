@@ -34,16 +34,16 @@
         <div on:click={async () => await push('/')}>Push</div>
         <div on:click={async () => await push('/about/future')}>Push Future</div>
         <div on:click={async () => await push('/sdvdvczcxv')}>
-            Push Unkown Route by path
+            Push Unknown Route by path
         </div>
         <div on:click={async () => await push('/sdvdvczcxv')}>
-            Push Unkown Route by path
+            Push Unknown Route by path
         </div>
         <div on:click={async () => await push('sdvdvczcxv')}>
-            Push Unkown Route by name
+            Push Unknown Route by name
         </div>
         <div on:click={async () => await push('sdvdvczcxv')}>
-            Push Unkown Route by name
+            Push Unknown Route by name
         </div>
         <div
             on:click={async () => {
@@ -84,15 +84,15 @@
         <div on:click={() => setQuery(54, true)}>Invalid query</div>
         <div on:click={() => setQuery({ definitely: 'works' }, true)}>Update Query</div>
         <div
-            on:click={() => {
-                const route = setParams({ id: 'steve', name: 'iwjndkjwend' });
+            on:click={async () => {
+                const route = await setParams({ id: 'steve', name: 'iwjndkjwend' });
                 console.log(route);
             }}>
             Set Params
         </div>
         <div
-            on:click={() => {
-                const route = setParams({
+            on:click={async () => {
+                const route = await setParams({
                     id: 'steve',
                     name: 'iwjndkjwend',
                     test: 'asdasd',
