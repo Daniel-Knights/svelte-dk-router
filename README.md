@@ -22,7 +22,7 @@
     -   [afterEach](#aftereach)
     -   [setQuery](#setquery)
     -   [setParams](#setparams)
-    -   [window.location properties](#location-data)
+    -   [location properties](#locationproperties)
     -   [router-active](#router-active)
 
 ## Installation
@@ -325,7 +325,7 @@ await setParams({ id: '2' })
     .catch(err => /* Rejected */);
 ```
 
-#### `window.location` properties
+#### `location` properties
 
 You can also import variables for each property of `window.location`:
 
