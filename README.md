@@ -158,19 +158,19 @@ Lastly, don't forget to set your Rollup config to handle SPA's with `-s`:
 
 **NOTE:** All navigations are asynchronous.
 
-### <a id="setroutes"></a>`setRoutes(routes: array[object], hashMode?: boolean)`
+#### <a id="setroutes"></a>`setRoutes(routes: array[object], hashMode?: boolean)`
 
 Set your routes and optionally set to `hashMode` (prepends all routes with `/#`).
 
 If no `name` is set for a route, the components' name is used instead.
 
-### <a id="sview"></a>`<SView />`
+#### <a id="sview"></a>`<SView />`
 
 The main view for your routes.
 
 You can nest any number of views within your set components.
 
-### <a id="slink"></a>`<SLink />`
+#### <a id="slink"></a>`<SLink />`
 
 Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined), `props` and `replace`.
 
@@ -194,7 +194,7 @@ Dispatches a `navigation` event which returns the route being navigated to.
 </SLink>
 ```
 
-### `route`
+#### `route`
 
 An object containing all information on the current route.
 
@@ -219,11 +219,11 @@ An object containing all information on the current route.
 }
 ```
 
-### `routeStore`
+#### `routeStore`
 
 A readable Svelte store which, through the `.subscribe` method, returns the current route whenever it's updated.
 
-### `routeChart`
+#### `routeChart`
 
 An object containing a chart of all routes from the parent-route, down to the current route.
 
@@ -235,17 +235,17 @@ An object containing a chart of all routes from the parent-route, down to the cu
 2: {name: "Default About", path: "", children: Array(1), parent: {…}, component: ƒ, …}
 ```
 
-### `routeChartStore`
+#### `routeChartStore`
 
 A readable Svelte store which, through the `.subscribe` method, returns the current route-chart whenever it's updated.
 
-### `routeProps`
+#### `routeProps`
 
 A variable containing any data passed as props through `<SLink />`, `push()` or `replace()`.
 
 Resets to `null` on route change.
 
-### <a id="push"></a>`push(identifier: string, routeData?: object): current route`
+#### <a id="push"></a>`push(identifier: string, routeData?: object): current route`
 
 Programmatically changes the route using `window.history.pushState()`.
 
@@ -269,11 +269,11 @@ await push('Blog', {
 });
 ```
 
-### <a id="replace"></a>`replace(identifier: string, routeData?: object): current route`
+#### <a id="replace"></a>`replace(identifier: string, routeData?: object): current route`
 
 The same as `push()`, except, uses `window.history.replaceState()` instead.
 
-### <a id="beforeeach"></a>`beforeEach((to, from) => {})`
+#### <a id="beforeeach"></a>`beforeEach((to, from) => {})`
 
 Navigation guard to run _before_ each route.
 
@@ -283,7 +283,7 @@ Navigation guard to run _before_ each route.
 
 **Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
 
-### <a id="aftereach"></a>`afterEach((to, from) => {})`
+#### <a id="aftereach"></a>`afterEach((to, from) => {})`
 
 Navigation guard to run _after_ each route.
 
@@ -293,7 +293,7 @@ Navigation guard to run _after_ each route.
 
 **Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
 
-### <a id="setquery"></a>`setQuery(query: object, update?: boolean, replace?: boolean): current route`
+#### <a id="setquery"></a>`setQuery(query: object, update?: boolean, replace?: boolean): current route`
 
 Programmatically set query params. If `update` is set to `true`, replaces/adds to existing query.
 
@@ -309,7 +309,7 @@ await setQuery({ new: 'query' })
     .catch(err => /* Rejected */);
 ```
 
-### <a id="setparams"></a>`setParams(params: object, replace?: boolean): current route`
+#### <a id="setparams"></a>`setParams(params: object, replace?: boolean): current route`
 
 Programmatically update named-params. Params must be correctly defined for the current route.
 
@@ -325,7 +325,7 @@ await setParams({ id: '2' })
     .catch(err => /* Rejected */);
 ```
 
-### Location Data
+#### Location Data
 
 You can also import variables for each property of `window.location`:
 
@@ -344,7 +344,7 @@ import {
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.
 
-### `.router-active`
+#### `.router-active`
 
 Any `<SLink />` which matches the current-route/exists in the current-route heirarchy, has the class `router-active` applied.
 
