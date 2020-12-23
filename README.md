@@ -22,7 +22,7 @@
     -   [afterEach](#aftereach)
     -   [setQuery](#setquery)
     -   [setParams](#setparams)
-    -   [location properties](#locationproperties)
+    -   [location properties](#location-properties)
     -   [router-active](#router-active)
 
 ## Installation
