@@ -158,23 +158,17 @@ Lastly, don't forget to set your Rollup config to handle SPA's with `-s`:
 
 **NOTE:** All navigations are asynchronous.
 
----
-
 #### <a id="setroutes"></a>`setRoutes(routes: array[object], hashMode?: boolean)`
 
 Set your routes and optionally set to `hashMode` (prepends all routes with `/#`).
 
 If no `name` is set for a route, the components' name is used instead.
 
----
-
 #### <a id="sview"></a>`<SView />`
 
 The main view for your routes.
 
 You can nest any number of views within your set components.
-
----
 
 #### <a id="slink"></a>`<SLink />`
 
@@ -199,8 +193,6 @@ Dispatches a `navigation` event which returns the route being navigated to.
     Slot for any link content
 </SLink>
 ```
-
----
 
 #### `route`
 
@@ -227,13 +219,9 @@ An object containing all information on the current route.
 }
 ```
 
----
-
 #### `routeStore`
 
 A readable Svelte store which, through the `.subscribe` method, returns the current route whenever it's updated.
-
----
 
 #### `routeChart`
 
@@ -247,21 +235,15 @@ An object containing a chart of all routes from the parent-route, down to the cu
 2: {name: "Default About", path: "", children: Array(1), parent: {…}, component: ƒ, …}
 ```
 
----
-
 #### `routeChartStore`
 
 A readable Svelte store which, through the `.subscribe` method, returns the current route-chart whenever it's updated.
-
----
 
 #### `routeProps`
 
 A variable containing any data passed as props through `<SLink />`, `push()` or `replace()`.
 
 Resets to `null` on route change.
-
----
 
 #### <a id="push"></a>`push(identifier: string, routeData?: object): current route`
 
@@ -287,13 +269,9 @@ await push('Blog', {
 });
 ```
 
----
-
 #### <a id="replace"></a>`replace(identifier: string, routeData?: object): current route`
 
 The same as `push()`, except, uses `window.history.replaceState()` instead.
-
----
 
 #### <a id="beforeeach"></a>`beforeEach((to, from) => {})`
 
@@ -305,8 +283,6 @@ Navigation guard to run _before_ each route.
 
 **Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
 
----
-
 #### <a id="aftereach"></a>`afterEach((to, from) => {})`
 
 Navigation guard to run _after_ each route.
@@ -316,8 +292,6 @@ Navigation guard to run _after_ each route.
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
 **Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
-
----
 
 #### <a id="setquery"></a>`setQuery(query: object, update?: boolean, replace?: boolean): current route`
 
@@ -335,8 +309,6 @@ await setQuery({ new: 'query' })
     .catch(err => /* Rejected */);
 ```
 
----
-
 #### <a id="setparams"></a>`setParams(params: object, replace?: boolean): current route`
 
 Programmatically update named-params. Params must be correctly defined for the current route.
@@ -352,8 +324,6 @@ await setParams({ id: '2' })
     .then(updatedRoute => /* Resolved */)
     .catch(err => /* Rejected */);
 ```
-
----
 
 #### Location Data
 
@@ -373,8 +343,6 @@ import {
 ```
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.
-
----
 
 #### `.router-active`
 
