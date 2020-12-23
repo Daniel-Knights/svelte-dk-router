@@ -355,8 +355,6 @@ await setParams({ id: '2' })
 
 ---
 
----
-
 #### Location Data
 
 You can also import variables for each property of `window.location`:
@@ -375,8 +373,6 @@ import {
 ```
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.
-
----
 
 ---
 
