@@ -325,7 +325,7 @@ await setParams({ id: '2' })
     .catch(err => /* Rejected */);
 ```
 
-#### Location Data
+#### `window.location` properties
 
 You can also import variables for each property of `window.location`:
 
