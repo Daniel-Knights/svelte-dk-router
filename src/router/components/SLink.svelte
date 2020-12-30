@@ -35,7 +35,7 @@
     if (!route) error(`Unknown route "${name || path}"`);
 
     // Handle named-params
-    if (validatePassedParams(path, params) && params) {
+    if (validatePassedParams(path, params).valid && params) {
         path = formatPathFromParams(path, params);
     }
 

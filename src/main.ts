@@ -10,25 +10,9 @@ import {
     routeProps,
 } from './router/logic';
 
-const userAuthenticated = false;
-
-beforeEach((to, from) => {
-    console.log(to, from, 'wedw');
-});
+// beforeEach(async (to, from) => {
+// });
 // afterEach(async (to, from) => {
-//     console.log(routeChart);
-
-//     if (to) console.log('to after - ', to.name);
-//     if (from) console.log('from after - ', from.name);
-
-//     if (to.name === 'Future') {
-//         await push('/').then(
-//             async () =>
-//                 await push('/about').then(
-//                     async () => await replace('/about').then(async () => replace('/'))
-//                 )
-//         );
-//     }
 // });
 
 setRoutes(routes);

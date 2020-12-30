@@ -31,23 +31,15 @@
             Blog - Missing + Invalid Params
         </SLink>
         <SLink path={'/sadcasdc'}>Unknown Route</SLink>
-        <div on:click={async () => await push('/')}>Push</div>
-        <div on:click={async () => await push('/about/future')}>Push Future</div>
-        <div on:click={async () => await push('/sdvdvczcxv')}>
-            Push Unknown Route by path
-        </div>
-        <div on:click={async () => await push('/sdvdvczcxv')}>
-            Push Unknown Route by path
-        </div>
-        <div on:click={async () => await push('sdvdvczcxv')}>
-            Push Unknown Route by name
-        </div>
-        <div on:click={async () => await push('sdvdvczcxv')}>
-            Push Unknown Route by name
-        </div>
+        <div on:click={() => push('/')}>Push</div>
+        <div on:click={() => push('/about/future')}>Push Future</div>
+        <div on:click={() => push('/sdvdvczcxv')}>Push Unknown Route by path</div>
+        <div on:click={() => push('/sdvdvczcxv')}>Push Unknown Route by path</div>
+        <div on:click={() => push('sdvdvczcxv')}>Push Unknown Route by name</div>
+        <div on:click={() => push('sdvdvczcxv')}>Push Unknown Route by name</div>
         <div
-            on:click={async () => {
-                await replace('/blog/hello/dan', {
+            on:click={() => {
+                replace('/blog/hello/dan', {
                     params: { id: 'hello', name: 'knsckjsndc' },
                     props: { whaddup: 'its ya boi' },
                 });
@@ -55,22 +47,20 @@
             Replace
         </div>
         <div
-            on:click={async () => {
-                await replace('/blog', { params: { id: 'hello' } });
+            on:click={() => {
+                replace('/blog', { params: { id: 'hello' } });
             }}>
             Replace - Missing Params
         </div>
         <div
-            on:click={async () => {
-                await replace('/blog', {
-                    params: { id: 'hello', name: 'john', test: 'sa' },
-                });
+            on:click={() => {
+                replace('/blog', { params: { id: 'hello', name: 'john', test: 'sa' } });
             }}>
             Replace - Invalid Params
         </div>
         <div
-            on:click={async () => {
-                await replace('/blog', { params: { id: 'hello', test: 'heasasd' } });
+            on:click={() => {
+                replace('/blog', { params: { id: 'hello', test: 'heasasd' } });
             }}>
             Replace - Missing + Invalid Params
         </div>
@@ -81,7 +71,6 @@
             }}>
             Set Query
         </div>
-        <div on:click={() => setQuery(54, true)}>Invalid query</div>
         <div on:click={() => setQuery({ definitely: 'works' }, true)}>Update Query</div>
         <div
             on:click={async () => {
@@ -89,6 +78,13 @@
                 console.log(route);
             }}>
             Set Params
+        </div>
+        <div
+            on:click={async () => {
+                const route = await setParams({ id: 'steve' });
+                console.log(route);
+            }}>
+            Set Params - Missing params
         </div>
         <div
             on:click={async () => {

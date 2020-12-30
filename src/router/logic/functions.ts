@@ -9,7 +9,10 @@ const pushOrReplace = async (
 ): Promise<void | FormattedRoute> => {
     const { identifier } = routeData;
 
-    if (!identifier) return error('Path or name argument required');
+    if (!identifier) {
+        error("'path' or 'name' argument required");
+        throw new Error("'path' or 'name' argument required");
+    }
 
     let errorString;
 
@@ -27,7 +30,8 @@ const pushOrReplace = async (
         const { path, name } = identifier;
 
         if (!name && !path) {
-            return error('Path or name argument required');
+            error("'path' or 'name' argument required");
+            throw new Error("'path' or 'name' argument required");
         }
 
         errorString = path || name;
@@ -56,19 +60,19 @@ const pushOrReplace = async (
 };
 
 // Push to the current history entry
-const push = async (
+const push = (
     identifier: string,
     routeData?: PassedRoute
 ): Promise<void | FormattedRoute> => {
-    return await pushOrReplace({ identifier, ...routeData }, false);
+    return pushOrReplace({ identifier, ...routeData }, false);
 };
 
 // Replace the current history entry
-const replace = async (
+const replace = (
     identifier: string,
     routeData?: PassedRoute
 ): Promise<void | FormattedRoute> => {
-    return await pushOrReplace({ identifier, ...routeData }, true);
+    return pushOrReplace({ identifier, ...routeData }, true);
 };
 
 // Set or update query params
@@ -77,15 +81,7 @@ const setQuery = async (
     update = false,
     replace = true
 ): Promise<FormattedRoute | void> => {
-    if (!query) {
-        error('A query argument is required');
-        throw new Error('A query argument is required');
-    }
-    if (typeof query !== 'object') {
-        error('Query argument must be of type object');
-        throw new Error('Query argument must be of type object');
-    }
-    if (currentRoute.path === '(*)' || !currentRoute.path) {
+    if (currentRoute.path === '(*)' || (!currentRoute.path && currentRoute.depth === 1)) {
         error('Cannot set query of unknown route');
         throw new Error('Cannot set query of unknown route');
     }
@@ -99,7 +95,7 @@ const setQuery = async (
         };
     }
 
-    return await changeRoute({ ...currentRoute, query: formattedQuery }, replace);
+    return changeRoute({ ...currentRoute, query: formattedQuery }, replace);
 };
 
 // Update named-params
@@ -107,10 +103,6 @@ const setParams = async (
     params: Record<string, string>,
     replace = true
 ): Promise<FormattedRoute | void> => {
-    if (!params) {
-        error('Params are required');
-        throw new Error('Params are required');
-    }
     if (currentRoute.path === '(*)' || !currentRoute.fullPath) {
         error('Cannot set params of unknown route');
         throw new Error('Cannot set params of unknown route');
@@ -120,7 +112,7 @@ const setParams = async (
         throw new Error('Current route has no defined params');
     }
 
-    return await changeRoute({ ...currentRoute, params }, replace);
+    return changeRoute({ ...currentRoute, params }, replace);
 };
 
 export { push, replace, setQuery, setParams };

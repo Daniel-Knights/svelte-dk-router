@@ -108,7 +108,13 @@ const changeRoute = async (
         newPath = path;
     }
 
-    if (!validatePassedParams(newRoute.fullPath, params)) return;
+    const paramsResult = validatePassedParams(newRoute.fullPath, params);
+
+    if (!paramsResult.valid) {
+        throw new Error(
+            ('Missing required param(s):' + paramsResult.errorString) as string
+        );
+    }
 
     // Query handling
     if (query) {
@@ -153,7 +159,7 @@ const changeRoute = async (
 
     // After route change navigation guard
     if (afterCallback) {
-        await afterCallback(route, fromRoute);
+        afterCallback(route, fromRoute);
     }
 
     return route;

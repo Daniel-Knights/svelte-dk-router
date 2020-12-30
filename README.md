@@ -279,6 +279,8 @@ Navigation guard to run _before_ each route.
 
 `to` contains all data for the route navigating to, `from` all data of the current route.
 
+If `async`/`await` is used, **Navigation will be awaited until the callback completes**.
+
 **Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
 
 **Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.

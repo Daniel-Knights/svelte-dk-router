@@ -48,8 +48,12 @@ const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
     });
 };
 
-const validatePassedParams = (path: string, params: Record<string, string>): boolean => {
-    let valid = true;
+const validatePassedParams = (
+    path: string,
+    params: Record<string, string>,
+    silenceError = false
+): Record<string, boolean | string> => {
+    let errorString = '';
 
     // Validate required params
     if (path) {
@@ -59,8 +63,7 @@ const validatePassedParams = (path: string, params: Record<string, string>): boo
             section = section.split(':')[1];
 
             if (!params || !params[section]) {
-                valid = false;
-                error('Missing required param: "' + section + '"');
+                errorString += ` "${section}"`;
             }
         });
     }
@@ -77,7 +80,13 @@ const validatePassedParams = (path: string, params: Record<string, string>): boo
         });
     }
 
-    return valid;
+    if (errorString && !silenceError) {
+        error('Missing required param(s):' + errorString);
+
+        return { errorString };
+    }
+
+    return { valid: true };
 };
 
 export { validateRoutes, validatePassedParams };
