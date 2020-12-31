@@ -1,5 +1,5 @@
-import { PassedRoute, FormattedRoute, compareRoutes } from '../static';
-import { error, invalidIdentifier } from '../static';
+import type { PassedRoute, FormattedRoute } from '../static';
+import { error, invalidIdentifier, compareRoutes } from '../static';
 import { changeRoute, route as currentRoute } from './change';
 import { routes } from './state';
 
