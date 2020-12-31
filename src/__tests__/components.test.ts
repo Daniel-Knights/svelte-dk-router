@@ -1,69 +1,69 @@
-import { render, fireEvent } from '@testing-library/svelte';
-import { setRoutes, route, push, afterEach, routeProps } from '../router';
-import { testRoutes } from './static/routes';
-import SLink from './static/SLink.svelte';
-import SView from './static/SView.svelte';
-import routes from '../routes';
+import { render, fireEvent } from '@testing-library/svelte'
+import { setRoutes, route, push, afterEach, routeProps } from '../router'
+import { testRoutes } from './static/routes'
+import SLink from './static/SLink.svelte'
+import SView from './static/SView.svelte'
+import routes from '../routes'
 
 // @ts-ignore
-beforeAll(() => setRoutes(routes, process.env.HASH_MODE));
+beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 
 test('Instantiates components', () => {
     expect(() =>
         render(SLink, {
-            props: { name: 'About', routes },
+            props: { name: 'About', routes }
         })
-    ).not.toThrow();
+    ).not.toThrow()
 
-    expect(() => render(SView)).not.toThrow();
-});
+    expect(() => render(SView)).not.toThrow()
+})
 
 test('SView - Renders correct routes', async () => {
     // Silence faulty unknown path error
-    console.error = () => '';
+    console.error = () => ''
 
     const { getByTestId } = render(SView, {
-        props: { id: 'sview-depth-one' },
-    });
-    const depthOneView = getByTestId('sview-depth-one');
+        props: { id: 'sview-depth-one' }
+    })
+    const depthOneView = getByTestId('sview-depth-one')
 
-    expect(depthOneView).not.toBeNull;
-    expect(depthOneView.id).toBe('home-view-rendered');
+    expect(depthOneView).not.toBeNull
+    expect(depthOneView.id).toBe('home-view-rendered')
 
-    await push('future');
+    await push('future')
 
-    const depthOneViewUpdated = getByTestId('sview-depth-one');
-    const depthTwoView = document.getElementById('future-view-rendered');
+    const depthOneViewUpdated = getByTestId('sview-depth-one')
+    const depthTwoView = document.getElementById('future-view-rendered')
 
     // Parent-view
-    expect(depthOneViewUpdated.id).toBe('about-view-rendered');
+    expect(depthOneViewUpdated.id).toBe('about-view-rendered')
     // Nested-view
-    expect(depthTwoView).not.toBeNull;
-});
+    expect(depthTwoView).not.toBeNull
+})
 
 test('SLink - Changes route by name', async () => {
     const { getByTestId } = render(SLink, {
-        props: { name: 'About', routes, id: 'khjb23' },
-    });
+        props: { name: 'About', routes, id: 'khjb23' }
+    })
 
-    const link = getByTestId('khjb23');
+    const link = getByTestId('khjb23')
 
-    await fireEvent.click(link);
+    await fireEvent.click(link)
 
-    expect(route).toMatchObject(testRoutes[1]);
-});
+    expect(route).toMatchObject(testRoutes[1])
+})
 
 test('SLink - Changes route by path', async () => {
     const { getByTestId } = render(SLink, {
-        props: { path: '/about', routes, id: 'jbj3h4b' },
-    });
+        props: { path: '/about', routes, id: 'jbj3h4b' }
+    })
 
-    const link = getByTestId('jbj3h4b');
+    const link = getByTestId('jbj3h4b')
 
-    await fireEvent.click(link);
+    await fireEvent.click(link)
 
-    expect(route).toMatchObject(testRoutes[1]);
-});
+    expect(route).toMatchObject(testRoutes[1])
+})
 
 test('SLink - Changes route with query, params and props, defaults to first child', async () => {
     const { getByTestId } = render(SLink, {
@@ -73,19 +73,19 @@ test('SLink - Changes route with query, params and props, defaults to first chil
             query: { test: 'test' },
             props: { test: 'test' },
             routes,
-            id: '3g4fa',
-        },
-    });
+            id: '3g4fa'
+        }
+    })
 
-    const link = getByTestId('3g4fa');
+    const link = getByTestId('3g4fa')
 
-    await fireEvent.click(link);
+    await fireEvent.click(link)
 
-    expect(route).toMatchObject(testRoutes[2].children[0]);
-    expect(route.params).toMatchObject({ id: '1', name: 'dan' });
-    expect(route.query).toMatchObject({ test: 'test' });
-    expect(routeProps).toMatchObject({ test: 'test' });
-});
+    expect(route).toMatchObject(testRoutes[2].children[0])
+    expect(route.params).toMatchObject({ id: '1', name: 'dan' })
+    expect(route.query).toMatchObject({ test: 'test' })
+    expect(routeProps).toMatchObject({ test: 'test' })
+})
 
 test('SLink - Changes route using window.history.replaceState', async () => {
     const { getByTestId } = render(SLink, {
@@ -94,73 +94,73 @@ test('SLink - Changes route using window.history.replaceState', async () => {
             routes,
             id: 'jh454',
             props: { replaceTest: true },
-            replace: true,
-        },
-    });
+            replace: true
+        }
+    })
     render(SLink, {
-        props: { path: '/about', routes, id: 'enrfjk' },
-    });
+        props: { path: '/about', routes, id: 'enrfjk' }
+    })
 
-    const homeLink = getByTestId('jh454');
-    const aboutLink = getByTestId('enrfjk');
+    const homeLink = getByTestId('jh454')
+    const aboutLink = getByTestId('enrfjk')
 
     afterEach((to, from) => {
-        if (!routeProps) return;
+        if (!routeProps) return
         if (routeProps.replaceTest) {
-            expect(from).not.toMatchObject(testRoutes[1]);
+            expect(from).not.toMatchObject(testRoutes[1])
         }
-    });
+    })
 
-    await fireEvent.click(aboutLink);
-    await fireEvent.click(homeLink);
+    await fireEvent.click(aboutLink)
+    await fireEvent.click(homeLink)
 
-    expect(route).toMatchObject(testRoutes[0]);
-});
+    expect(route).toMatchObject(testRoutes[0])
+})
 
 test('SLink - Emits correct "navigation" event', async () => {
     const { getByTestId, component } = render(SLink, {
-        props: { name: 'About', routes, id: 'oinkjn' },
-    });
+        props: { name: 'About', routes, id: 'oinkjn' }
+    })
 
-    const link = getByTestId('oinkjn');
+    const link = getByTestId('oinkjn')
 
-    let fired;
+    let fired
 
     component.$on('navigation', e => {
-        expect(e.detail).toMatchObject(testRoutes[1]);
-        fired = true;
-    });
+        expect(e.detail).toMatchObject(testRoutes[1])
+        fired = true
+    })
 
-    await fireEvent.click(link);
+    await fireEvent.click(link)
 
-    expect(fired).toBeTruthy();
-});
+    expect(fired).toBeTruthy()
+})
 
 test('SLink - Applies router-active class and aria-current attribute', async () => {
     const { getByTestId } = render(SLink, {
-        props: { path: '/', routes, id: 's0d9' },
-    });
+        props: { path: '/', routes, id: 's0d9' }
+    })
     render(SLink, {
-        props: { path: '/about', routes, id: '23lk4' },
-    });
+        props: { path: '/about', routes, id: '23lk4' }
+    })
 
-    const homeLink = getByTestId('s0d9');
-    const aboutLink = getByTestId('23lk4');
+    const homeLink = getByTestId('s0d9')
+    const aboutLink = getByTestId('23lk4')
 
-    await fireEvent.click(homeLink);
+    await fireEvent.click(homeLink)
 
-    expect(homeLink.className).toBe('router-active');
-    expect(homeLink.getAttribute('aria-current')).toBe('page');
-    expect(aboutLink.className).toBe('');
-    expect(aboutLink.getAttribute('aria-current')).toBeNull();
+    expect(homeLink.className).toBe('router-active')
+    expect(homeLink.getAttribute('aria-current')).toBe('page')
+    expect(aboutLink.className).toBe('')
+    expect(aboutLink.getAttribute('aria-current')).toBeNull()
 
-    await fireEvent.click(aboutLink);
+    await fireEvent.click(aboutLink)
 
-    expect(homeLink.className).toBe('');
-    expect(homeLink.getAttribute('aria-current')).toBeNull();
-    expect(aboutLink.className).toBe('router-active');
-    expect(aboutLink.getAttribute('aria-current')).toBe('page');
-});
+    expect(homeLink.className).toBe('')
+    expect(homeLink.getAttribute('aria-current')).toBeNull()
+    expect(aboutLink.className).toBe('router-active')
+    expect(aboutLink.getAttribute('aria-current')).toBe('page')
+})
 
 test('SLink - Sets correct href', () => {
     const { getByTestId } = render(SLink, {
@@ -169,11 +169,11 @@ test('SLink - Sets correct href', () => {
             params: { id: '1', name: 'dan' },
             query: { test: 'test' },
             routes,
-            id: 'e2d2ed',
-        },
-    });
+            id: 'e2d2ed'
+        }
+    })
 
-    const blogLink = getByTestId('e2d2ed');
+    const blogLink = getByTestId('e2d2ed')
 
-    expect(blogLink.getAttribute('href')).toBe('/blog/1/dan?test=test');
-});
+    expect(blogLink.getAttribute('href')).toBe('/blog/1/dan?test=test')
+})

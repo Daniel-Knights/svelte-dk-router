@@ -1,9 +1,9 @@
-import type { Route, FormattedRoute } from './types';
-import { error, warn, flattenRoutes } from './utils';
+import type { Route, FormattedRoute } from './types'
+import { error, warn, flattenRoutes } from './utils'
 
 const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
-    const flattened = flattenRoutes(routes);
-    let namedParams = {};
+    const flattened = flattenRoutes(routes)
+    let namedParams = {}
 
     flattened.forEach((routeOne, indexOne) => {
         routeOne.fullPath.split('/').forEach(section => {
@@ -13,24 +13,24 @@ const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
                         'Named-params must be unique within a given routes full-path. Duplicates detected: "' +
                             section +
                             '"'
-                    );
+                    )
                 } else {
-                    namedParams[section.slice(1)] = true;
+                    namedParams[section.slice(1)] = true
                 }
             }
-        });
+        })
 
-        namedParams = {};
+        namedParams = {}
 
         flattened.forEach((routeTwo, indexTwo) => {
-            if (indexOne === indexTwo) return;
+            if (indexOne === indexTwo) return
 
             if (routeOne.name === routeTwo.name) {
                 error(
                     'The "name" property must be unique. Duplicates detected: "' +
                         routeOne.name +
                         '"'
-                );
+                )
             }
 
             if (
@@ -42,51 +42,51 @@ const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
                     'Paths must be unique. Duplicates detected: "' +
                         routeOne.fullPath +
                         '"'
-                );
+                )
             }
-        });
-    });
-};
+        })
+    })
+}
 
 const validatePassedParams = (
     path: string,
     params: Record<string, string>,
     silenceError = false
 ): Record<string, boolean | string> => {
-    let errorString = '';
+    let errorString = ''
 
     // Validate required params
     if (path) {
         path.split('/').forEach((section, i) => {
-            if (i === 0 || section[0] !== ':') return;
+            if (i === 0 || section[0] !== ':') return
 
-            section = section.split(':')[1];
+            section = section.split(':')[1]
 
             if (!params || !params[section]) {
-                errorString += ` "${section}"`;
+                errorString += ` "${section}"`
             }
-        });
+        })
     }
 
     if (params) {
         // Compare passed params with path params
         Object.keys(params).forEach(passedParam => {
             if (!path || !path.includes('/:' + passedParam)) {
-                warn('Invalid param: "' + passedParam + '"');
+                warn('Invalid param: "' + passedParam + '"')
 
                 // Cleanup
-                delete params[passedParam];
+                delete params[passedParam]
             }
-        });
+        })
     }
 
     if (errorString && !silenceError) {
-        error('Missing required param(s):' + errorString);
+        error('Missing required param(s):' + errorString)
 
-        return { errorString };
+        return { errorString }
     }
 
-    return { valid: true };
-};
+    return { valid: true }
+}
 
-export { validateRoutes, validatePassedParams };
+export { validateRoutes, validatePassedParams }

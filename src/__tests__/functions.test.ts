@@ -8,259 +8,259 @@ import {
     beforeEach,
     hash,
     pathname,
-    search,
-} from '../router';
-import { routeProps, routes } from '../router/logic';
-import { testRoutes } from './static/routes';
-import userRoutes from '../routes';
+    search
+} from '../router'
+import { routeProps, routes } from '../router/logic'
+import { testRoutes } from './static/routes'
+import userRoutes from '../routes'
 
-const testObjOne = { test: 'test' };
-const testObjTwo = { id: '1', name: 'dan' };
+const testObjOne = { test: 'test' }
+const testObjTwo = { id: '1', name: 'dan' }
 
 // @ts-ignore
-beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE));
+beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE))
 
-test('setRoutes()', () => expect(routes).toEqual(userRoutes));
+test('setRoutes()', () => expect(routes).toEqual(userRoutes))
 
 test('setRoutes() - Strip invalid properties', () => {
-    userRoutes[0]['invalidProperty'] = 'invalidProperty';
+    userRoutes[0]['invalidProperty'] = 'invalidProperty'
 
-    console.warn = jest.fn();
-
-    // @ts-ignore
-    setRoutes(userRoutes, process.env.HASH_MODE);
+    console.warn = jest.fn()
 
     // @ts-ignore
-    expect(routes[0].invalidProperty).toBeUndefined();
-});
+    setRoutes(userRoutes, process.env.HASH_MODE)
+
+    // @ts-ignore
+    expect(routes[0].invalidProperty).toBeUndefined()
+})
 
 test('push() - Use window.history.pushState to change route', async () => {
-    expect(route).toMatchObject(testRoutes[0]);
+    expect(route).toMatchObject(testRoutes[0])
 
-    await push('/about');
+    await push('/about')
 
-    expect(route).toMatchObject(testRoutes[1]);
+    expect(route).toMatchObject(testRoutes[1])
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(pathname).toBe('/about');
+        expect(pathname).toBe('/about')
     } else {
-        expect(hash).toBe('#/about');
+        expect(hash).toBe('#/about')
     }
 
-    await push('Home');
+    await push('Home')
 
-    expect(route).toMatchObject(testRoutes[0]);
+    expect(route).toMatchObject(testRoutes[0])
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(pathname).toBe('/');
+        expect(pathname).toBe('/')
     } else {
-        expect(hash).toBe('#/');
+        expect(hash).toBe('#/')
     }
 
     await push('/blog', {
         params: testObjTwo,
-        query: testObjOne,
-    });
+        query: testObjOne
+    })
 
-    expect(route).toMatchObject(testRoutes[2].children[0]);
-    expect(route.params).toMatchObject(testObjTwo);
-    expect(route.query).toMatchObject(testObjOne);
+    expect(route).toMatchObject(testRoutes[2].children[0])
+    expect(route.params).toMatchObject(testObjTwo)
+    expect(route.query).toMatchObject(testObjOne)
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(pathname).toBe('/blog/1/dan');
-        expect(search).toBe('?test=test');
+        expect(pathname).toBe('/blog/1/dan')
+        expect(search).toBe('?test=test')
     } else {
-        expect(hash).toBe('#/blog/1/dan?test=test');
+        expect(hash).toBe('#/blog/1/dan?test=test')
     }
-});
+})
 
 test('push() - Returns correct route', async () => {
     await push('/').then(newRoute => {
-        expect(newRoute).toMatchObject(testRoutes[0]);
-    });
+        expect(newRoute).toMatchObject(testRoutes[0])
+    })
 
-    const newRoute = await push('/about');
+    const newRoute = await push('/about')
 
-    expect(newRoute).toMatchObject(testRoutes[1]);
-});
+    expect(newRoute).toMatchObject(testRoutes[1])
+})
 
 test('replace() - Use window.history.replaceState to change route', async () => {
     beforeEach((to, from) => {
-        if (!routeProps) return;
+        if (!routeProps) return
         if (routeProps.replaceTest) {
-            expect(from).not.toMatchObject(testRoutes[1]);
+            expect(from).not.toMatchObject(testRoutes[1])
         }
-    });
+    })
 
-    await replace('/about');
+    await replace('/about')
 
-    expect(route).toMatchObject(testRoutes[1]);
+    expect(route).toMatchObject(testRoutes[1])
 
     await replace('Blog', {
         params: testObjTwo,
         query: testObjOne,
-        props: { replaceTest: true },
-    });
+        props: { replaceTest: true }
+    })
 
-    expect(route).toMatchObject(testRoutes[2].children[0]);
-    expect(route.params).toMatchObject(testObjTwo);
-    expect(route.query).toMatchObject(testObjOne);
+    expect(route).toMatchObject(testRoutes[2].children[0])
+    expect(route.params).toMatchObject(testObjTwo)
+    expect(route.query).toMatchObject(testObjOne)
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(pathname).toBe('/blog/1/dan');
-        expect(search).toBe('?test=test');
+        expect(pathname).toBe('/blog/1/dan')
+        expect(search).toBe('?test=test')
     } else {
-        expect(hash).toBe('#/blog/1/dan?test=test');
+        expect(hash).toBe('#/blog/1/dan?test=test')
     }
-});
+})
 
 test('replace() - Returns correct route', async () => {
     await replace('future').then(newRoute => {
-        expect(newRoute).toMatchObject(testRoutes[1].children[0]);
-    });
+        expect(newRoute).toMatchObject(testRoutes[1].children[0])
+    })
 
-    const newRoute = await replace('/');
+    const newRoute = await replace('/')
 
-    expect(newRoute).toMatchObject(testRoutes[0]);
-});
+    expect(newRoute).toMatchObject(testRoutes[0])
+})
 
 test('setQuery() - Set the current query', async () => {
-    await setQuery(testObjOne);
+    await setQuery(testObjOne)
 
-    expect(route.query).toMatchObject(testObjOne);
-
-    // @ts-ignore
-    if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=test');
-    } else {
-        expect(hash).toBe('#/?test=test');
-    }
-
-    await setQuery({ test: 'different' });
-
-    expect(route.query).toMatchObject({ test: 'different' });
+    expect(route.query).toMatchObject(testObjOne)
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=different');
+        expect(search).toBe('?test=test')
     } else {
-        expect(hash).toBe('#/?test=different');
+        expect(hash).toBe('#/?test=test')
     }
-});
+
+    await setQuery({ test: 'different' })
+
+    expect(route.query).toMatchObject({ test: 'different' })
+
+    // @ts-ignore
+    if (!process.env.HASH_MODE) {
+        expect(search).toBe('?test=different')
+    } else {
+        expect(hash).toBe('#/?test=different')
+    }
+})
 
 test('setQuery() - Update the current query', async () => {
-    await setQuery({ test: 'test', updated: 'not-updated' });
+    await setQuery({ test: 'test', updated: 'not-updated' })
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=test&updated=not-updated');
+        expect(search).toBe('?test=test&updated=not-updated')
     } else {
-        expect(hash).toBe('#/?test=test&updated=not-updated');
+        expect(hash).toBe('#/?test=test&updated=not-updated')
     }
 
-    await setQuery({ updated: 'updated' }, true);
+    await setQuery({ updated: 'updated' }, true)
 
-    expect(route.query).toMatchObject({ test: 'test', updated: 'updated' });
+    expect(route.query).toMatchObject({ test: 'test', updated: 'updated' })
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=test&updated=updated');
+        expect(search).toBe('?test=test&updated=updated')
     } else {
-        expect(hash).toBe('#/?test=test&updated=updated');
+        expect(hash).toBe('#/?test=test&updated=updated')
     }
 
-    await setQuery({ test: 'test-updated', another: 'one' }, true);
+    await setQuery({ test: 'test-updated', another: 'one' }, true)
 
     expect(route.query).toMatchObject({
         test: 'test-updated',
         another: 'one',
-        updated: 'updated',
-    });
+        updated: 'updated'
+    })
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(search).toBe('?test=test-updated&updated=updated&another=one');
+        expect(search).toBe('?test=test-updated&updated=updated&another=one')
     } else {
-        expect(hash).toBe('#/?test=test-updated&updated=updated&another=one');
+        expect(hash).toBe('#/?test=test-updated&updated=updated&another=one')
     }
-});
+})
 
 test('setQuery() - Returns correct route', async () => {
-    await push('About');
+    await push('About')
 
-    const updatedRoute = await setQuery(testObjOne);
+    const updatedRoute = await setQuery(testObjOne)
 
     expect(updatedRoute).toMatchObject({
         ...testRoutes[1],
-        query: testObjOne,
-    });
-});
+        query: testObjOne
+    })
+})
 
 test('setQuery() - Push/replace', async () => {
-    expect(route).not.toMatchObject(testRoutes[0]);
+    expect(route).not.toMatchObject(testRoutes[0])
 
-    await push('/');
+    await push('/')
 
     beforeEach((to, from) => {
         if (to.query && to.query.test === 'setQuery test') {
-            expect(from).toMatchObject(testRoutes[0]);
+            expect(from).toMatchObject(testRoutes[0])
         }
-    });
+    })
 
-    await setQuery({ test: 'setQuery test' }, false, false);
-    await setQuery({ test: 'setQuery test' });
-});
+    await setQuery({ test: 'setQuery test' }, false, false)
+    await setQuery({ test: 'setQuery test' })
+})
 
 test('setParams() - Set named-params', async () => {
-    await push('/blog', { params: testObjTwo });
+    await push('/blog', { params: testObjTwo })
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(pathname).toBe('/blog/1/dan');
+        expect(pathname).toBe('/blog/1/dan')
     } else {
-        expect(hash).toBe('#/blog/1/dan');
+        expect(hash).toBe('#/blog/1/dan')
     }
 
-    await setParams({ id: '2', name: 'John' });
+    await setParams({ id: '2', name: 'John' })
 
-    expect(route.params).toMatchObject({ id: '2', name: 'John' });
+    expect(route.params).toMatchObject({ id: '2', name: 'John' })
 
     // @ts-ignore
     if (!process.env.HASH_MODE) {
-        expect(pathname).toBe('/blog/2/John');
+        expect(pathname).toBe('/blog/2/John')
     } else {
-        expect(hash).toBe('#/blog/2/John');
+        expect(hash).toBe('#/blog/2/John')
     }
-});
+})
 
 test('setParams() - Returns correct route', async () => {
-    await push('/blog', { params: testObjTwo });
+    await push('/blog', { params: testObjTwo })
 
-    const updatedRoute = await setParams({ id: '2', name: 'dan' });
+    const updatedRoute = await setParams({ id: '2', name: 'dan' })
 
     expect(updatedRoute).toMatchObject({
         ...testRoutes[2].children[0],
-        params: { id: '2', name: 'dan' },
-    });
-});
+        params: { id: '2', name: 'dan' }
+    })
+})
 
 test('setParams() - Push/replace', async () => {
-    await push('/');
+    await push('/')
 
-    expect(route).not.toMatchObject(testRoutes[2].children[0]);
+    expect(route).not.toMatchObject(testRoutes[2].children[0])
 
-    await push('/blog', { params: { id: '1', name: 'dan' } });
+    await push('/blog', { params: { id: '1', name: 'dan' } })
 
     beforeEach((to, from) => {
         if (to.params && to.params.name === 'set-params-test') {
-            expect(from).toMatchObject(testRoutes[2].children[0]);
+            expect(from).toMatchObject(testRoutes[2].children[0])
         }
-    });
+    })
 
-    await setParams({ id: '1', name: 'set-params-test' }, false);
-    await setParams({ id: '1', name: 'set-params-test' });
-});
+    await setParams({ id: '1', name: 'set-params-test' }, false)
+    await setParams({ id: '1', name: 'set-params-test' })
+})

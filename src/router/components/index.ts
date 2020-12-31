@@ -1,6 +1,6 @@
 // @ts-ignore
-import SLink from './SLink.svelte';
+import SLink from './SLink.svelte'
 // @ts-ignore
-import SView from './SView.svelte';
+import SView from './SView.svelte'
 
-export { SLink, SView };
+export { SLink, SView }

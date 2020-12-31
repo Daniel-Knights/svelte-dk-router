@@ -1,17 +1,17 @@
 // @ts-ignore
-import home from '../../views/home.svelte';
+import home from '../../views/home.svelte'
 // @ts-ignore
-import about from '../../views/about.svelte';
+import about from '../../views/about.svelte'
 // @ts-ignore
-import blog from '../../views/blog.svelte';
+import blog from '../../views/blog.svelte'
 // @ts-ignore
-import future from '../../views/nested/future.svelte';
+import future from '../../views/nested/future.svelte'
 // @ts-ignore
-import origins from '../../views/nested/origins.svelte';
+import origins from '../../views/nested/origins.svelte'
 // @ts-ignore
-import more from '../../views/nested/more.svelte';
+import more from '../../views/nested/more.svelte'
 // @ts-ignore
-import fallback from '../../views/fallback.svelte';
+import fallback from '../../views/fallback.svelte'
 
 const testRoutes = [
     {
@@ -19,14 +19,14 @@ const testRoutes = [
         path: '/',
         component: home,
         meta: {
-            name: 'hello',
+            name: 'hello'
         },
         name: 'Home',
         crumbs: ['Home'],
         depth: 1,
         fullPath: '/',
         regex: /^\/?$/i,
-        fullRegex: /^\/?$/i,
+        fullRegex: /^\/?$/i
     },
     {
         title: 'About',
@@ -55,8 +55,8 @@ const testRoutes = [
                                 fullPath: '/about/future/more/even-more',
                                 rootPath: '/about',
                                 regex: /^\/even-more\/?$/i,
-                                fullRegex: /^\/about\/future\/more\/even-more\/?$/i,
-                            },
+                                fullRegex: /^\/about\/future\/more\/even-more\/?$/i
+                            }
                         ],
                         parent: {},
                         rootParent: {},
@@ -65,8 +65,8 @@ const testRoutes = [
                         fullPath: '/about/future/more',
                         rootPath: '/about',
                         regex: /^\/more\/?$/i,
-                        fullRegex: /^\/about\/future\/more\/?$/i,
-                    },
+                        fullRegex: /^\/about\/future\/more\/?$/i
+                    }
                 ],
                 parent: {},
                 rootParent: {},
@@ -75,7 +75,7 @@ const testRoutes = [
                 fullPath: '/about/future',
                 rootPath: '/about',
                 regex: /^\/future\/?$/i,
-                fullRegex: /^\/about\/future\/?$/i,
+                fullRegex: /^\/about\/future\/?$/i
             },
             {
                 title: 'Origins | About',
@@ -95,8 +95,8 @@ const testRoutes = [
                         fullPath: '/about/origins/more',
                         rootPath: '/about',
                         regex: /^\/more\/?$/i,
-                        fullRegex: /^\/about\/origins\/more\/?$/i,
-                    },
+                        fullRegex: /^\/about\/origins\/more\/?$/i
+                    }
                 ],
                 parent: {},
                 rootParent: {},
@@ -105,15 +105,15 @@ const testRoutes = [
                 fullPath: '/about/origins',
                 rootPath: '/about',
                 regex: /^\/origins\/?$/i,
-                fullRegex: /^\/about\/origins\/?$/i,
-            },
+                fullRegex: /^\/about\/origins\/?$/i
+            }
         ],
         crumbs: ['About'],
         depth: 1,
         fullPath: '/about',
         rootPath: '/about',
         regex: /^\/about\/?$/i,
-        fullRegex: /^\/about\/?$/i,
+        fullRegex: /^\/about\/?$/i
     },
     {
         title: 'Blog',
@@ -136,8 +136,8 @@ const testRoutes = [
                         fullPath: '/blog/:id/:name/more:hey',
                         rootPath: '/blog',
                         regex: /^\/more:hey\/?$/i,
-                        fullRegex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/more:hey\/?$/i,
-                    },
+                        fullRegex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/more:hey\/?$/i
+                    }
                 ],
                 parent: {},
                 rootParent: {},
@@ -146,15 +146,15 @@ const testRoutes = [
                 fullPath: '/blog/:id/:name',
                 rootPath: '/blog',
                 regex: /^\/?$/i,
-                fullRegex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/?$/i,
-            },
+                fullRegex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/?$/i
+            }
         ],
         crumbs: ['Blog'],
         depth: 1,
         fullPath: '/blog',
         rootPath: '/blog',
         regex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/?$/i,
-        fullRegex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/?$/i,
+        fullRegex: /^\/blog\/(?:[^/]+?)\/(?:[^/]+?)\/?$/i
     },
     {
         name: 'Fallback',
@@ -164,8 +164,8 @@ const testRoutes = [
         crumbs: ['Fallback'],
         depth: 1,
         fullPath: '(*)',
-        rootPath: '/',
-    },
-];
+        rootPath: '/'
+    }
+]
 
-export { testRoutes };
+export { testRoutes }

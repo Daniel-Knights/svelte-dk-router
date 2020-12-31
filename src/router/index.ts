@@ -1,4 +1,4 @@
-export { SLink, SView } from './components';
+export { SLink, SView } from './components'
 export {
     route,
     routeChart,
@@ -19,5 +19,5 @@ export {
     pathname,
     href,
     protocol,
-    search,
-} from './logic';
+    search
+} from './logic'
