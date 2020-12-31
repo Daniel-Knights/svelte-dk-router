@@ -23,10 +23,6 @@ writableRoute.subscribe(newRoute => {
     route = { ...newRoute };
 });
 
-const setProps = (props: Record<string, unknown>): void => {
-    routeProps = props;
-};
-
 const changeRoute = async (
     passedRoute: PassedRoute,
     replace?: boolean,
@@ -104,9 +100,7 @@ const changeRoute = async (
 
     if (!routeExists) return;
 
-    if (newPath === '(*)') {
-        newPath = path;
-    }
+    if (newPath === '(*)') newPath = path;
 
     const paramsResult = validatePassedParams(newRoute.fullPath, params);
 
@@ -140,7 +134,7 @@ const changeRoute = async (
 
     // Props handling
     routeProps = null;
-    if (props) setProps(props);
+    if (props) routeProps = props;
 
     writableRoute.set(newRoute);
     chartState(newRoute);
@@ -148,9 +142,7 @@ const changeRoute = async (
     // Update page title
     const title = document.getElementsByTagName('title')[0];
 
-    if (newTitle && title) {
-        title.innerHTML = newTitle;
-    }
+    if (newTitle && title) title.innerHTML = newTitle;
 
     if (passedPath) newPath = passedPath;
 
@@ -158,9 +150,7 @@ const changeRoute = async (
     setUrl(newPath, replace, hashHistory);
 
     // After route change navigation guard
-    if (afterCallback) {
-        afterCallback(route, fromRoute);
-    }
+    if (afterCallback) afterCallback(route, fromRoute);
 
     return route;
 };
