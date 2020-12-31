@@ -1,38 +1,50 @@
-export interface Route {
-    name?: string;
-    title?: string;
-    path: string;
-    component;
-    query?: Record<string, string>;
-    params?: Record<string, string>;
-    meta?: Record<string, unknown>;
-    children?: Route[];
+interface Route {
+    name?: string
+    title?: string
+    path: string
+    component
+    query?: Record<string, string>
+    params?: Record<string, string>
+    meta?: Record<string, unknown>
+    children?: Route[]
 }
 
-export interface FormattedRoute extends Route {
-    fullPath: string;
-    rootPath: string;
-    regex: RegExp;
-    fullRegex: RegExp;
-    depth: number;
-    crumbs: string[];
-    children?: FormattedRoute[];
-    parent?: FormattedRoute;
-    rootParent?: FormattedRoute;
+interface FormattedRoute extends Route {
+    fullPath: string
+    rootPath: string
+    regex: RegExp
+    fullRegex: RegExp
+    depth: number
+    crumbs: string[]
+    children?: FormattedRoute[]
+    parent?: FormattedRoute
+    rootParent?: FormattedRoute
 }
 
-export interface PassedRoute {
-    identifier?: string;
-    name?: string;
-    path?: string;
-    query?: Record<string, string>;
-    params?: Record<string, string>;
-    props?: Record<string, unknown>;
+interface PassedRoute {
+    identifier?: string
+    name?: string
+    path?: string
+    query?: Record<string, string>
+    params?: Record<string, string>
+    props?: unknown
 }
 
-export interface Guard {
-    (to?: FormattedRoute, from?: FormattedRoute):
+interface SetProps {
+    (props: unknown): void
+}
+
+interface BeforeEach {
+    (to?: FormattedRoute, from?: FormattedRoute, setProps?: SetProps):
         | void
         | boolean
-        | Promise<void | boolean>;
+        | Promise<void | boolean>
 }
+interface AfterEach {
+    (to?: FormattedRoute, from?: FormattedRoute, props?: unknown):
+        | void
+        | boolean
+        | Promise<void | boolean>
+}
+
+export type { Route, FormattedRoute, PassedRoute, BeforeEach, AfterEach }

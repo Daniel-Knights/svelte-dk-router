@@ -1,133 +1,139 @@
-import { writable, readable } from 'svelte/store';
-import { Route, FormattedRoute, warn } from '../static';
+import { writable, readable } from 'svelte/store'
+import type { Route, FormattedRoute } from '../static'
 import {
     error,
+    warn,
     currentPath,
     formatRouteQueryFromString,
     formatParamsFromPath,
     formatPathProperties,
     formatRouteRegex,
     validateRoutes,
-    stripInvalidProperties,
-} from '../static';
-import { afterCallback, beforeCallback } from './guard';
-import { chartState } from './nested';
+    stripInvalidProperties
+} from '../static'
+import { afterCallback, beforeCallback } from './guard'
+import { chartState } from './nested'
 
 // Reactive route data
-const writableRoute = writable(null);
+const writableRoute = writable(null)
 
 // Readable route-store
 const routeStore = readable({}, set => {
     writableRoute.subscribe(routeValue => {
-        set(routeValue);
-    });
-});
+        set(routeValue)
+    })
+})
 
 // Provided routes
-let routes: FormattedRoute[];
-let hashHistory;
+let routes: FormattedRoute[], hashHistory, routeProps
+
+const setProps = (props: unknown): void => {
+    if (props && routeProps) {
+        error('Props can only be set once per navigation')
+    } else routeProps = props
+}
 
 // Set provided routes
 const setRoutes = (userRoutes: Route[], hashMode = false): void => {
-    const depth = 1;
+    const depth = 1
 
-    if (hashMode) hashHistory = true;
+    if (hashMode) hashHistory = true
 
     // Validate and format
     const formatRoutes = (passedRoutes, parent?: FormattedRoute) => {
         passedRoutes.forEach(userRoute => {
-            const { name, path, component } = userRoute;
+            const { name, path, component } = userRoute
 
             if (path === undefined || !component) {
-                return error('"path" and "component" are required properties');
+                return error('"path" and "component" are required properties')
             }
 
             if (name && name.includes('/')) {
                 warn(
                     `Route-names which include "/" could interfere with route-matching: ${name}`
-                );
+                )
             }
 
             // Set component name as route name if none supplied
             if (!name) {
-                userRoute['name'] = component.name;
+                userRoute['name'] = component.name
             }
 
             // Set parent properties
             if (parent) {
-                userRoute['parent'] = parent;
+                userRoute['parent'] = parent
 
                 if (parent.rootParent) {
-                    userRoute['rootParent'] = parent.rootParent;
-                } else userRoute['rootParent'] = parent;
+                    userRoute['rootParent'] = parent.rootParent
+                } else userRoute['rootParent'] = parent
             }
 
             // Array of route names to trace origins
             if (!userRoute.parent) {
-                userRoute['crumbs'] = [userRoute.name];
+                userRoute['crumbs'] = [userRoute.name]
             } else {
-                userRoute['crumbs'] = [...userRoute.parent.crumbs, userRoute.name];
+                userRoute['crumbs'] = [...userRoute.parent.crumbs, userRoute.name]
             }
 
             // Set depth of route/nested-route
             if (userRoute.parent) {
-                userRoute['depth'] = userRoute.parent.depth + 1;
+                userRoute['depth'] = userRoute.parent.depth + 1
             } else {
-                userRoute['depth'] = depth;
+                userRoute['depth'] = depth
             }
 
             // Set path properties
-            formatPathProperties(userRoute, path);
+            formatPathProperties(userRoute, path)
 
             // Generate dynamic regex for each route
-            formatRouteRegex(userRoute);
+            formatRouteRegex(userRoute)
 
             if (userRoute.children) {
                 // Recursively format children
-                formatRoutes(userRoute.children, userRoute);
+                formatRoutes(userRoute.children, userRoute)
             }
-        });
-    };
+        })
+    }
 
-    formatRoutes(userRoutes, null);
-    stripInvalidProperties(userRoutes);
-    validateRoutes(userRoutes);
+    formatRoutes(userRoutes, null)
+    stripInvalidProperties(userRoutes)
+    validateRoutes(userRoutes)
 
-    routes = userRoutes as FormattedRoute[];
+    routes = userRoutes as FormattedRoute[]
 
-    loadState();
-};
+    loadState()
+}
 
 // Determine the current route and update route data on page-load
 const loadState = async (): Promise<void | FormattedRoute> => {
-    const query = window.location.search || window.location.hash.split('?')[1];
-    let path = currentPath(hashHistory);
-    let currentRoute: FormattedRoute;
+    const query = window.location.search || window.location.hash.split('?')[1]
+    let path = currentPath(hashHistory)
+    let currentRoute: FormattedRoute
 
-    if (path[1] === '#') path = path.slice(2);
+    if (path[1] === '#') path = path.slice(2)
 
-    if (!routes) return;
+    if (!routes) return
     else {
         const filterRoutes = passedRoutes => {
             passedRoutes.forEach(singleRoute => {
-                if (currentRoute) return;
+                if (currentRoute) return
 
-                const { fullRegex, children } = singleRoute;
+                const { fullRegex, children } = singleRoute
 
                 // Compare route path against URL path
                 if (path && path.match(fullRegex)) {
-                    formatRouteQueryFromString(query, singleRoute);
-                    formatParamsFromPath(path, singleRoute);
+                    formatRouteQueryFromString(query, singleRoute)
+                    formatParamsFromPath(path, singleRoute)
 
-                    currentRoute = singleRoute;
+                    currentRoute = singleRoute
                 } else if (children) {
                     // Recursively filter through child routes
-                    filterRoutes(children);
+                    filterRoutes(children)
                 }
-            });
-        };
+            })
+        }
 
-        filterRoutes(routes);
+        filterRoutes(routes)
     }
 
     // Determine if route has nested base-path
@@ -135,43 +141,43 @@ const loadState = async (): Promise<void | FormattedRoute> => {
         currentRoute.children.forEach(child => {
             if (child.path === '') {
                 if (currentRoute.params) {
-                    child['params'] = currentRoute.params;
+                    child['params'] = currentRoute.params
                 }
 
                 if (currentRoute.query) {
-                    child['query'] = currentRoute.query;
+                    child['query'] = currentRoute.query
                 }
 
-                currentRoute = child;
+                currentRoute = child
             }
-        });
+        })
     }
 
-    if (!currentRoute) return error('Unknown route');
+    if (!currentRoute) return error('Unknown route')
 
     if (beforeCallback) {
-        const beforeResult = await beforeCallback(currentRoute, null);
+        const beforeResult = await beforeCallback(currentRoute, null, setProps)
 
-        if (beforeResult === false) return;
+        if (beforeResult === false) return
     }
 
-    writableRoute.set(currentRoute);
-    chartState(currentRoute);
+    writableRoute.set(currentRoute)
+    chartState(currentRoute)
 
     // Update title
-    const title = document.getElementsByTagName('title')[0];
+    const title = document.getElementsByTagName('title')[0]
 
     if (currentRoute && currentRoute.title && title) {
-        title.innerHTML = currentRoute.title;
+        title.innerHTML = currentRoute.title
     }
 
     if (afterCallback) {
-        await afterCallback(currentRoute, null);
+        await afterCallback(currentRoute, null, routeProps)
     }
 
-    return currentRoute;
-};
+    return currentRoute
+}
 
-window.addEventListener('popstate', loadState);
+window.addEventListener('popstate', loadState)
 
-export { routes, writableRoute, routeStore, hashHistory, setRoutes };
+export { routes, writableRoute, routeStore, hashHistory, routeProps, setProps, setRoutes }

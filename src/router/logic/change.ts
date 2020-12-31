@@ -1,158 +1,156 @@
-import type { PassedRoute, FormattedRoute } from '../static';
+import type { PassedRoute, FormattedRoute } from '../static'
 import {
     setUrl,
     formatQueryFromObject,
     validatePassedParams,
-    formatPathFromParams,
-} from '../static';
-import { hashHistory, routes, writableRoute } from './state';
-import { beforeCallback, afterCallback } from './guard';
-import { chartState } from './nested';
+    formatPathFromParams
+} from '../static'
+import { hashHistory, routes, writableRoute, routeProps, setProps } from './state'
+import { beforeCallback, afterCallback } from './guard'
+import { chartState } from './nested'
 
 // Current route data
-let route: FormattedRoute = null;
+let route: FormattedRoute = null
 // Previous route data
-let fromRoute: FormattedRoute = null;
+let fromRoute: FormattedRoute = null
 // New route data
-let newPath: string, newTitle: string, newRoute: FormattedRoute;
-
-let routeProps;
+let newPath: string, newTitle: string, newRoute: FormattedRoute
 
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => {
-    route = { ...newRoute };
-});
+    route = { ...newRoute }
+})
 
 const changeRoute = async (
     passedRoute: PassedRoute,
     replace?: boolean,
     passedPath?: string
 ): Promise<void | FormattedRoute> => {
-    const { name, path, query, params, props } = passedRoute;
-    let fullPath;
+    const { name, path, query, params, props } = passedRoute
+    let fullPath
 
     if (passedRoute['fullPath']) {
-        fullPath = passedRoute['fullPath'];
+        fullPath = passedRoute['fullPath']
     }
 
-    let routeExists = false;
+    let routeExists = false
 
     const setNewRouteData = routeData => {
-        const hasDefaultChild = routeData.children && !routeData.children[0].path;
+        const hasDefaultChild = routeData.children && !routeData.children[0].path
 
-        if (routeData.title) newTitle = routeData.title;
+        if (routeData.title) newTitle = routeData.title
 
         // Cleanup
         if (routeData.query) {
-            delete routeData.query;
+            delete routeData.query
 
             if (hasDefaultChild) {
-                delete routeData.children[0].query;
+                delete routeData.children[0].query
             }
         }
         if (routeData.params) {
-            delete routeData.params;
+            delete routeData.params
 
             if (hasDefaultChild) {
-                delete routeData.children[0].params;
+                delete routeData.children[0].params
             }
         }
 
-        routeExists = true;
-        newPath = routeData.fullPath;
-        newRoute = routeData;
+        routeExists = true
+        newPath = routeData.fullPath
+        newRoute = routeData
 
         // Check for default child
         if (newRoute.children) {
             newRoute.children.forEach(child => {
                 if (child.path === '') {
-                    newRoute = child;
+                    newRoute = child
                 }
-            });
+            })
         }
-    };
+    }
 
     // Set new route data
     const matchRoute = passedRoutes => {
         passedRoutes.forEach(routeData => {
-            if (routeExists) return;
+            if (routeExists) return
             if (name && routeData.name === name) {
                 // If route changed by name
-                setNewRouteData(routeData);
+                setNewRouteData(routeData)
             } else if (fullPath && fullPath.match(routeData.fullRegex)) {
                 // If route changed by path
-                setNewRouteData(routeData);
+                setNewRouteData(routeData)
             } else if (routeData.children) {
                 // Recursively filter child routes
-                matchRoute(routeData.children);
+                matchRoute(routeData.children)
             }
 
             if (!newRoute) {
                 if (path && path.match(routeData.regex)) {
                     // If route changed by path
-                    setNewRouteData(routeData);
+                    setNewRouteData(routeData)
                 }
             }
-        });
-    };
+        })
+    }
 
-    matchRoute(routes);
+    matchRoute(routes)
 
-    if (!routeExists) return;
+    if (!routeExists) return
 
-    if (newPath === '(*)') newPath = path;
+    if (newPath === '(*)') newPath = path
 
-    const paramsResult = validatePassedParams(newRoute.fullPath, params);
+    const paramsResult = validatePassedParams(newRoute.fullPath, params)
 
     if (!paramsResult.valid) {
         throw new Error(
             ('Missing required param(s):' + paramsResult.errorString) as string
-        );
+        )
     }
 
     // Query handling
     if (query) {
-        newRoute['query'] = query;
-        newPath += '?' + formatQueryFromObject(query);
+        newRoute['query'] = query
+        newPath += '?' + formatQueryFromObject(query)
     }
 
     // Named-params handling
     if (params) {
-        newRoute['params'] = params;
-        newPath = formatPathFromParams(newPath, params);
+        newRoute['params'] = params
+        newPath = formatPathFromParams(newPath, params)
     }
 
     // Set fromRoute before route is updated
-    if (!replace) fromRoute = route;
+    if (!replace) fromRoute = route
+
+    // Props handling
+    setProps(null)
+    if (props) setProps(props)
 
     // Before route change navigation guard
     if (beforeCallback) {
-        const beforeResult = await beforeCallback(newRoute, fromRoute);
+        const beforeResult = await beforeCallback(newRoute, fromRoute, setProps)
 
-        if (beforeResult === false) return;
+        if (beforeResult === false) return
     }
 
-    // Props handling
-    routeProps = null;
-    if (props) routeProps = props;
-
-    writableRoute.set(newRoute);
-    chartState(newRoute);
+    writableRoute.set(newRoute)
+    chartState(newRoute)
 
     // Update page title
-    const title = document.getElementsByTagName('title')[0];
+    const title = document.getElementsByTagName('title')[0]
 
-    if (newTitle && title) title.innerHTML = newTitle;
+    if (newTitle && title) title.innerHTML = newTitle
 
-    if (passedPath) newPath = passedPath;
+    if (passedPath) newPath = passedPath
 
     // Update URL/state
-    setUrl(newPath, replace, hashHistory);
+    setUrl(newPath, replace, hashHistory)
 
     // After route change navigation guard
-    if (afterCallback) afterCallback(route, fromRoute);
+    if (afterCallback) afterCallback(route, fromRoute, routeProps)
 
-    return route;
-};
+    return route
+}
 
-export { route, fromRoute, routeProps, changeRoute };
+export { route, fromRoute, changeRoute }

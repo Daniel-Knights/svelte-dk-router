@@ -1,15 +1,15 @@
-import type { Guard } from '../static';
+import type { BeforeEach, AfterEach } from '../static'
 
-let beforeCallback: Guard, afterCallback: Guard;
+let beforeCallback: BeforeEach, afterCallback: AfterEach
 
 // Set function to run before each route change
-const beforeEach = (cb: Guard): void => {
-    beforeCallback = cb;
-};
+const beforeEach = (cb: BeforeEach): void => {
+    beforeCallback = cb
+}
 
 // Set function to run after each route change
-const afterEach = (cb: Guard): void => {
-    afterCallback = cb;
-};
+const afterEach = (cb: AfterEach): void => {
+    afterCallback = cb
+}
 
-export { beforeCallback, afterCallback, beforeEach, afterEach };
+export { beforeCallback, afterCallback, beforeEach, afterEach }

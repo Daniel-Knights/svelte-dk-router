@@ -3,9 +3,9 @@
 
     let query = { id: '1', name: 'dan' },
         params = { id: '1', name: 'dan' },
-        paramsTwo = { id: '1' },
-        paramsThree = { id: '1', name: 'dan', test: 'kajsdkajd' },
-        paramsFour = { id: '1', test: 'heeloas' },
+        missingParams = { id: '1' },
+        invalidParams = { id: '1', name: 'dan', test: 'kajsdkajd' },
+        missingInvalidParams = { id: '1', test: 'heeloas' },
         props = { random: 'uowjkdwjndlkwjned' };
 </script>
 
@@ -25,9 +25,9 @@
         </SLink>
         <SLink name={'About'}>About</SLink>
         <SLink name={'Future'} {params} {props}>Blog</SLink>
-        <SLink path={'/blog'} params={paramsTwo} {props}>Blog - Missing Params</SLink>
-        <SLink path={'/blog'} params={paramsThree} {props}>Blog - Invalid Params</SLink>
-        <SLink path={'/blog'} params={paramsFour} {props}>
+        <SLink path={'/blog'} params={missingParams} {props}>Blog - Missing Params</SLink>
+        <SLink path={'/blog'} params={invalidParams} {props}>Blog - Invalid Params</SLink>
+        <SLink path={'/blog'} params={missingInvalidParams} {props}>
             Blog - Missing + Invalid Params
         </SLink>
         <SLink path={'/sadcasdc'}>Unknown Route</SLink>
