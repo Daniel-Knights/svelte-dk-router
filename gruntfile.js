@@ -10,20 +10,20 @@ module.exports = function (grunt) {
                             'dist/*.js',
                             'dist/components/*.js',
                             'dist/logic/*.js',
-                            'dist/static/*.js',
+                            'dist/static/*.js'
                         ],
                         dest: 'dist',
                         cwd: '.',
-                        rename: (dst, src) => src,
-                    },
-                ],
-            },
-        },
-    });
+                        rename: (dst, src) => src
+                    }
+                ]
+            }
+        }
+    })
 
     // load plugins
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-uglify')
 
     // register at least this one task
-    grunt.registerTask('default', ['uglify']);
-};
+    grunt.registerTask('default', ['uglify'])
+}
