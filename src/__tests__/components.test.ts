@@ -8,172 +8,178 @@ import routes from '../routes'
 // @ts-ignore
 beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 
-test('Instantiates components', () => {
-    expect(() =>
-        render(SLink, {
-            props: { name: 'About', routes }
+describe('<SLink> + <SView>', () => {
+    test('Instantiates components', () => {
+        expect(() =>
+            render(SLink, {
+                props: { name: 'About', routes }
+            })
+        ).not.toThrow()
+
+        expect(() => render(SView)).not.toThrow()
+    })
+})
+
+describe('<SView>', () => {
+    test('Renders correct routes', async () => {
+        // Silence faulty unknown path error
+        console.error = () => ''
+
+        const { getByTestId } = render(SView, {
+            props: { id: 'sview-depth-one' }
         })
-    ).not.toThrow()
+        const depthOneView = getByTestId('sview-depth-one')
 
-    expect(() => render(SView)).not.toThrow()
+        expect(depthOneView).not.toBeNull
+        expect(depthOneView.id).toBe('home-view-rendered')
+
+        await push('future')
+
+        const depthOneViewUpdated = getByTestId('sview-depth-one')
+        const depthTwoView = document.getElementById('future-view-rendered')
+
+        // Parent-view
+        expect(depthOneViewUpdated.id).toBe('about-view-rendered')
+        // Nested-view
+        expect(depthTwoView).not.toBeNull
+    })
 })
 
-test('SView - Renders correct routes', async () => {
-    // Silence faulty unknown path error
-    console.error = () => ''
+describe('<SLink>', () => {
+    test('Changes route by name', async () => {
+        const { getByTestId } = render(SLink, {
+            props: { name: 'About', routes, id: 'khjb23' }
+        })
 
-    const { getByTestId } = render(SView, {
-        props: { id: 'sview-depth-one' }
-    })
-    const depthOneView = getByTestId('sview-depth-one')
+        const link = getByTestId('khjb23')
 
-    expect(depthOneView).not.toBeNull
-    expect(depthOneView.id).toBe('home-view-rendered')
+        await fireEvent.click(link)
 
-    await push('future')
-
-    const depthOneViewUpdated = getByTestId('sview-depth-one')
-    const depthTwoView = document.getElementById('future-view-rendered')
-
-    // Parent-view
-    expect(depthOneViewUpdated.id).toBe('about-view-rendered')
-    // Nested-view
-    expect(depthTwoView).not.toBeNull
-})
-
-test('SLink - Changes route by name', async () => {
-    const { getByTestId } = render(SLink, {
-        props: { name: 'About', routes, id: 'khjb23' }
+        expect(route).toMatchObject(testRoutes[1])
     })
 
-    const link = getByTestId('khjb23')
+    test('Changes route by path', async () => {
+        const { getByTestId } = render(SLink, {
+            props: { path: '/about', routes, id: 'jbj3h4b' }
+        })
 
-    await fireEvent.click(link)
+        const link = getByTestId('jbj3h4b')
 
-    expect(route).toMatchObject(testRoutes[1])
-})
+        await fireEvent.click(link)
 
-test('SLink - Changes route by path', async () => {
-    const { getByTestId } = render(SLink, {
-        props: { path: '/about', routes, id: 'jbj3h4b' }
+        expect(route).toMatchObject(testRoutes[1])
     })
 
-    const link = getByTestId('jbj3h4b')
+    test('Changes route with query, params and props, defaults to first child', async () => {
+        const { getByTestId } = render(SLink, {
+            props: {
+                path: '/blog',
+                params: { id: '1', name: 'dan' },
+                query: { test: 'test' },
+                props: { test: 'test' },
+                routes,
+                id: '3g4fa'
+            }
+        })
 
-    await fireEvent.click(link)
+        const link = getByTestId('3g4fa')
 
-    expect(route).toMatchObject(testRoutes[1])
-})
+        await fireEvent.click(link)
 
-test('SLink - Changes route with query, params and props, defaults to first child', async () => {
-    const { getByTestId } = render(SLink, {
-        props: {
-            path: '/blog',
-            params: { id: '1', name: 'dan' },
-            query: { test: 'test' },
-            props: { test: 'test' },
-            routes,
-            id: '3g4fa'
-        }
+        expect(route).toMatchObject(testRoutes[2].children[0])
+        expect(route.params).toMatchObject({ id: '1', name: 'dan' })
+        expect(route.query).toMatchObject({ test: 'test' })
+        expect(routeProps).toMatchObject({ test: 'test' })
     })
 
-    const link = getByTestId('3g4fa')
+    test('Changes route using window.history.replaceState', async () => {
+        const { getByTestId } = render(SLink, {
+            props: {
+                path: '/',
+                routes,
+                id: 'jh454',
+                props: { replaceTest: true },
+                replace: true
+            }
+        })
+        render(SLink, {
+            props: { path: '/about', routes, id: 'enrfjk' }
+        })
 
-    await fireEvent.click(link)
+        const homeLink = getByTestId('jh454')
+        const aboutLink = getByTestId('enrfjk')
 
-    expect(route).toMatchObject(testRoutes[2].children[0])
-    expect(route.params).toMatchObject({ id: '1', name: 'dan' })
-    expect(route.query).toMatchObject({ test: 'test' })
-    expect(routeProps).toMatchObject({ test: 'test' })
-})
+        afterEach((to, from) => {
+            if (!routeProps) return
+            if (routeProps.replaceTest) {
+                expect(from).not.toMatchObject(testRoutes[1])
+            }
+        })
 
-test('SLink - Changes route using window.history.replaceState', async () => {
-    const { getByTestId } = render(SLink, {
-        props: {
-            path: '/',
-            routes,
-            id: 'jh454',
-            props: { replaceTest: true },
-            replace: true
-        }
-    })
-    render(SLink, {
-        props: { path: '/about', routes, id: 'enrfjk' }
-    })
+        await fireEvent.click(aboutLink)
+        await fireEvent.click(homeLink)
 
-    const homeLink = getByTestId('jh454')
-    const aboutLink = getByTestId('enrfjk')
-
-    afterEach((to, from) => {
-        if (!routeProps) return
-        if (routeProps.replaceTest) {
-            expect(from).not.toMatchObject(testRoutes[1])
-        }
+        expect(route).toMatchObject(testRoutes[0])
     })
 
-    await fireEvent.click(aboutLink)
-    await fireEvent.click(homeLink)
+    test('Emits correct "navigation" event', async () => {
+        const { getByTestId, component } = render(SLink, {
+            props: { name: 'About', routes, id: 'oinkjn' }
+        })
 
-    expect(route).toMatchObject(testRoutes[0])
-})
+        const link = getByTestId('oinkjn')
 
-test('SLink - Emits correct "navigation" event', async () => {
-    const { getByTestId, component } = render(SLink, {
-        props: { name: 'About', routes, id: 'oinkjn' }
+        let fired
+
+        component.$on('navigation', e => {
+            expect(e.detail).toMatchObject(testRoutes[1])
+            fired = true
+        })
+
+        await fireEvent.click(link)
+
+        expect(fired).toBeTruthy()
     })
 
-    const link = getByTestId('oinkjn')
+    test('Applies router-active class and aria-current attribute', async () => {
+        const { getByTestId } = render(SLink, {
+            props: { path: '/', routes, id: 's0d9' }
+        })
+        render(SLink, {
+            props: { path: '/about', routes, id: '23lk4' }
+        })
 
-    let fired
+        const homeLink = getByTestId('s0d9')
+        const aboutLink = getByTestId('23lk4')
 
-    component.$on('navigation', e => {
-        expect(e.detail).toMatchObject(testRoutes[1])
-        fired = true
+        await fireEvent.click(homeLink)
+
+        expect(homeLink.className).toBe('router-active')
+        expect(homeLink.getAttribute('aria-current')).toBe('page')
+        expect(aboutLink.className).toBe('')
+        expect(aboutLink.getAttribute('aria-current')).toBeNull()
+
+        await fireEvent.click(aboutLink)
+
+        expect(homeLink.className).toBe('')
+        expect(homeLink.getAttribute('aria-current')).toBeNull()
+        expect(aboutLink.className).toBe('router-active')
+        expect(aboutLink.getAttribute('aria-current')).toBe('page')
     })
 
-    await fireEvent.click(link)
+    test('Sets correct href', () => {
+        const { getByTestId } = render(SLink, {
+            props: {
+                path: '/blog',
+                params: { id: '1', name: 'dan' },
+                query: { test: 'test' },
+                routes,
+                id: 'e2d2ed'
+            }
+        })
 
-    expect(fired).toBeTruthy()
-})
+        const blogLink = getByTestId('e2d2ed')
 
-test('SLink - Applies router-active class and aria-current attribute', async () => {
-    const { getByTestId } = render(SLink, {
-        props: { path: '/', routes, id: 's0d9' }
+        expect(blogLink.getAttribute('href')).toBe('/blog/1/dan?test=test')
     })
-    render(SLink, {
-        props: { path: '/about', routes, id: '23lk4' }
-    })
-
-    const homeLink = getByTestId('s0d9')
-    const aboutLink = getByTestId('23lk4')
-
-    await fireEvent.click(homeLink)
-
-    expect(homeLink.className).toBe('router-active')
-    expect(homeLink.getAttribute('aria-current')).toBe('page')
-    expect(aboutLink.className).toBe('')
-    expect(aboutLink.getAttribute('aria-current')).toBeNull()
-
-    await fireEvent.click(aboutLink)
-
-    expect(homeLink.className).toBe('')
-    expect(homeLink.getAttribute('aria-current')).toBeNull()
-    expect(aboutLink.className).toBe('router-active')
-    expect(aboutLink.getAttribute('aria-current')).toBe('page')
-})
-
-test('SLink - Sets correct href', () => {
-    const { getByTestId } = render(SLink, {
-        props: {
-            path: '/blog',
-            params: { id: '1', name: 'dan' },
-            query: { test: 'test' },
-            routes,
-            id: 'e2d2ed'
-        }
-    })
-
-    const blogLink = getByTestId('e2d2ed')
-
-    expect(blogLink.getAttribute('href')).toBe('/blog/1/dan?test=test')
 })

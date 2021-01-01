@@ -4,9 +4,10 @@ import {
     hash,
     host,
     hostname,
+    href,
     origin,
     pathname,
-    href,
+    port,
     protocol,
     search,
     setRoutes,
@@ -38,111 +39,155 @@ const testObjTwo = { id: '1', name: 'Dan' }
 // @ts-ignore
 beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 
-test('route - Correct data', async () => {
-    expect(route).toMatchObject(testRoutes[0])
+describe('route', () => {
+    test('Contains correct data', async () => {
+        expect(route).toMatchObject(testRoutes[0])
 
-    formattedProperties.forEach(property => {
-        expect(route[property]).not.toBeUndefined()
-        expect(route[property]).not.toBeNull()
-    })
-
-    await push('/about')
-
-    expect(route).toMatchObject(testRoutes[1])
-
-    setQuery(testObjOne)
-    expect(route.query).toMatchObject(testObjOne)
-
-    await push('/blog', { params: testObjTwo })
-
-    expect(route).toMatchObject(testRoutes[2].children[0])
-    expect(route.params).toMatchObject(testObjTwo)
-})
-
-test('routeChart - Correct data', async () => {
-    expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
-
-    Object.values(routeChart).forEach(route => {
         formattedProperties.forEach(property => {
             expect(route[property]).not.toBeUndefined()
             expect(route[property]).not.toBeNull()
         })
-    })
 
-    await push('/about')
+        await push('/about')
 
-    expect(routeChart[1]).toMatchObject(testRoutes[1])
+        expect(route).toMatchObject(testRoutes[1])
 
-    setQuery(testObjOne)
-
-    Object.values(routeChart).forEach((route: FormattedRoute) => {
+        setQuery(testObjOne)
         expect(route.query).toMatchObject(testObjOne)
-    })
 
-    await push('/blog', { params: testObjTwo })
+        await push('/blog', { params: testObjTwo })
 
-    expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
-
-    Object.values(routeChart).forEach((route: FormattedRoute) => {
+        expect(route).toMatchObject(testRoutes[2].children[0])
         expect(route.params).toMatchObject(testObjTwo)
     })
 })
 
-test('routeStore - Correct data', async () => {
-    let currentRoute
+describe('routeChart', () => {
+    test('Contains correct data', async () => {
+        expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
 
-    routeStore.subscribe((newRoute: FormattedRoute) => {
-        currentRoute = newRoute
+        Object.values(routeChart).forEach(route => {
+            formattedProperties.forEach(property => {
+                expect(route[property]).not.toBeUndefined()
+                expect(route[property]).not.toBeNull()
+            })
+        })
+
+        await push('/about')
+
+        expect(routeChart[1]).toMatchObject(testRoutes[1])
+
+        setQuery(testObjOne)
+
+        Object.values(routeChart).forEach((route: FormattedRoute) => {
+            expect(route.query).toMatchObject(testObjOne)
+        })
+
+        await push('/blog', { params: testObjTwo })
+
+        expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
+
+        Object.values(routeChart).forEach((route: FormattedRoute) => {
+            expect(route.params).toMatchObject(testObjTwo)
+        })
     })
-
-    await push('/')
-
-    expect(currentRoute).toMatchObject(testRoutes[0])
-
-    await push('/about')
-
-    expect(currentRoute).toMatchObject(testRoutes[1])
 })
 
-test('routeChartStore - Correct data', async () => {
-    let currentChart
+describe('routeStore', () => {
+    test('Contains correct data', async () => {
+        let currentRoute
 
-    routeChartStore.subscribe((newChart: Record<string, FormattedRoute>) => {
-        currentChart = newChart
+        routeStore.subscribe((newRoute: FormattedRoute) => {
+            currentRoute = newRoute
+        })
+
+        await push('/')
+
+        expect(currentRoute).toMatchObject(testRoutes[0])
+
+        await push('/about')
+
+        expect(currentRoute).toMatchObject(testRoutes[1])
     })
-
-    await push('/')
-
-    expect(currentChart[1]).toMatchObject(testRoutes[0])
-
-    await push('/about/origins/more')
-
-    expect(currentChart[1]).toMatchObject(testRoutes[1])
-    expect(currentChart[2]).toMatchObject(testRoutes[1].children[1])
-    expect(currentChart[3]).toMatchObject(testRoutes[1].children[1].children[0])
 })
 
-test('routeProps - Correct data', async () => {
-    await push('/', { props: testObjOne })
+describe('routeChartStore', () => {
+    test('Contains correct data', async () => {
+        let currentChart
 
-    expect(routeProps).toMatchObject(testObjOne)
+        routeChartStore.subscribe((newChart: Record<string, FormattedRoute>) => {
+            currentChart = newChart
+        })
 
-    await push('/about', { props: testObjTwo })
+        await push('/')
 
-    expect(routeProps).toMatchObject(testObjTwo)
+        expect(currentChart[1]).toMatchObject(testRoutes[0])
+
+        await push('/about/origins/more')
+
+        expect(currentChart[1]).toMatchObject(testRoutes[1])
+        expect(currentChart[2]).toMatchObject(testRoutes[1].children[1])
+        expect(currentChart[3]).toMatchObject(testRoutes[1].children[1].children[0])
+    })
 })
 
-test('Correct window.location properties', async () => {
-    await push('/about')
+describe('routeProps', () => {
+    test('Contains correct data', async () => {
+        await push('/', { props: testObjOne })
 
-    expect(hash).toBe(window.location.hash)
-    expect(host).toBe(window.location.host)
-    expect(hostname).toBe(window.location.hostname)
-    expect(origin).toBe(window.location.origin)
-    expect(pathname).toBe(window.location.pathname)
-    expect(href).toBe(window.location.href)
-    expect(protocol).toBe(window.location.protocol)
+        expect(routeProps).toMatchObject(testObjOne)
 
-    setQuery({ test: 'test' })
-    expect(search).toBe(window.location.search)
+        await push('/about', { props: testObjTwo })
+
+        expect(routeProps).toMatchObject(testObjTwo)
+    })
+})
+
+describe('window.location', () => {
+    test('Variables contain correct location properties', async () => {
+        await push('/about')
+
+        expect(hash).toBe(window.location.hash)
+        expect(host).toBe(window.location.host)
+        expect(hostname).toBe(window.location.hostname)
+        expect(href).toBe(window.location.href)
+        expect(origin).toBe(window.location.origin)
+        expect(pathname).toBe(window.location.pathname)
+        expect(port).toBe(window.location.port)
+        expect(protocol).toBe(window.location.protocol)
+
+        await setQuery({ test: 'test' })
+        expect(search).toBe(window.location.search)
+
+        await push('/blog', { params: { id: '1', name: 'dan' } })
+
+        // @ts-ignore
+        if (process.env.HASH_MODE) {
+            expect(hash).toBe('#/blog/1/dan')
+        } else expect(hash).toBe('')
+
+        expect(host).toBe('localhost')
+        expect(hostname).toBe('localhost')
+
+        // @ts-ignore
+        if (process.env.HASH_MODE) {
+            expect(href).toBe('http://localhost/#/blog/1/dan')
+        } else expect(href).toBe('http://localhost/blog/1/dan')
+
+        expect(origin).toBe('http://localhost')
+
+        // @ts-ignore
+        if (process.env.HASH_MODE) {
+            expect(pathname).toBe('/')
+        } else expect(pathname).toBe('/blog/1/dan')
+
+        expect(port).toBe('')
+        expect(protocol).toBe('http:')
+
+        await setQuery({ test: 'another-test' })
+        // @ts-ignore
+        if (process.env.HASH_MODE) {
+            expect(search).toBe('')
+        } else expect(search).toBe('?test=another-test')
+    })
 })

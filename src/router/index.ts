@@ -15,9 +15,10 @@ export {
     hash,
     host,
     hostname,
+    href,
     origin,
     pathname,
-    href,
+    port,
     protocol,
     search
 } from './logic'
