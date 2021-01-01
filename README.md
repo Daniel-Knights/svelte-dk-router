@@ -36,14 +36,14 @@ npm i svelte-dk-router
 First set your routes:
 
 ```js
-import { setRoutes } from 'svelte-dk-router';
-import home from './views/home.svelte';
-import about from './views/about.svelte';
-import origins from './views/nested/origins.svelte';
-import future from './views/nested/future.svelte';
-import more from './views/nested/more.svelte';
-import blog from './views/blog.svelte';
-import fallback from './views/fallback.svelte';
+import { setRoutes } from 'svelte-dk-router'
+import home from './views/home.svelte'
+import about from './views/about.svelte'
+import origins from './views/nested/origins.svelte'
+import future from './views/nested/future.svelte'
+import more from './views/nested/more.svelte'
+import blog from './views/blog.svelte'
+import fallback from './views/fallback.svelte'
 
 const routes = [
     {
@@ -53,8 +53,8 @@ const routes = [
         path: '/',
         component: home,
         meta: {
-            name: 'dan',
-        },
+            name: 'dan'
+        }
     },
     {
         // If no name passed,
@@ -73,9 +73,9 @@ const routes = [
                         title: 'More | About',
                         // Full-path: /about/more
                         path: '/more',
-                        component: more,
-                    },
-                ],
+                        component: more
+                    }
+                ]
             },
             {
                 title: 'Origins | About',
@@ -87,17 +87,17 @@ const routes = [
                         title: 'More | About',
                         // Full-path: /about/origins/more
                         path: '/more',
-                        component: more,
-                    },
-                ],
-            },
-        ],
+                        component: more
+                    }
+                ]
+            }
+        ]
     },
     {
         title: 'Blog',
         // Named-params are specified with a colon
         path: '/blog/:id/:name',
-        component: blog,
+        component: blog
     },
     // Define your fallback last
     // Must have a path of '(*)'
@@ -105,13 +105,13 @@ const routes = [
         name: 'Fallback',
         title: '404',
         path: '(*)',
-        component: fallback,
-    },
-];
+        component: fallback
+    }
+]
 
-setRoutes(routes);
+setRoutes(routes)
 // Or, for hash-based routing:
-setRoutes(routes, true);
+setRoutes(routes, true)
 ```
 
 Then, use the view component:
@@ -265,8 +265,8 @@ Available properties you can pass:
 await push('Blog', {
     params: { id: '1', name: 'dan' },
     query: { postTitle: 'how-to-use-svelte-dk-router' },
-    props: { post: blogPost },
-});
+    props: { post: blogPost }
+})
 ```
 
 #### <a id="replace"></a>`replace(identifier: string, routeData?: object): current route`
@@ -336,12 +336,13 @@ import {
     hash,
     host,
     hostname,
+    href,
     origin,
     pathname,
-    href,
+    port,
     protocol,
-    search,
-} from 'svelte-dk-router';
+    search
+} from 'svelte-dk-router'
 ```
 
 These variables update on each route change, ensuring simplicity and parity throughout your application.

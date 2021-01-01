@@ -25,7 +25,11 @@ const routeStore = readable({}, set => {
 })
 
 // Provided routes
-let routes: FormattedRoute[], hashHistory, routeProps
+let routes: FormattedRoute[]
+// Hash-mode or history-mode
+let hashHistory
+
+let routeProps
 
 const setProps = (props: unknown): void => {
     if (props && routeProps) {
