@@ -12,19 +12,21 @@ describe('beforeEach()', () => {
                 case '1':
                     expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[2].children[0])
+
+                    await push('About', { query: { stage: '2' } })
+
                     break
                 case '2':
-                    expect(from).toMatchObject(testRoutes[2].children[0])
+                    expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[1])
+
+                    await push('/', { query: { stage: '3' } })
+
                     break
                 case '3':
-                    expect(from).toMatchObject(testRoutes[2].children[0])
+                    expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[0])
                     break
-            }
-
-            if (to.name === 'About') {
-                await push('/', { query: { stage: '3' } })
             }
         })
 
@@ -32,7 +34,6 @@ describe('beforeEach()', () => {
             params: { id: '1', name: 'dan' },
             query: { stage: '1' }
         })
-        push('About', { query: { stage: '2' } })
     })
 })
 
@@ -40,30 +41,31 @@ describe('afterEach()', () => {
     test('Triggers with correct to/from routes', async () => {
         afterEach(async (to, from) => {
             switch (to.query.stage) {
-                case '1':
+                case '4':
                     expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[2].children[0])
+
+                    await push('About', { query: { stage: '5' } })
+
                     break
-                case '2':
+                case '5':
                     expect(from).toMatchObject(testRoutes[2].children[0])
                     expect(to).toMatchObject(testRoutes[1])
+
+                    await push('/', { query: { stage: '6' } })
+
                     break
-                case '3':
-                    expect(from).toMatchObject(testRoutes[2].children[0])
+                case '6':
+                    expect(from).toMatchObject(testRoutes[1])
                     expect(to).toMatchObject(testRoutes[0])
                     break
-            }
-
-            if (to.name === 'About') {
-                await push('/', { query: { stage: '3' } })
             }
         })
 
         await push('Blog', {
             params: { id: '1', name: 'dan' },
-            query: { stage: '1' }
+            query: { stage: '4' }
         })
-        push('About', { query: { stage: '2' } })
     })
 })
 
@@ -74,11 +76,14 @@ describe('beforeEach() + afterEach()', () => {
             if (to.query.stage === '2') setProps('test')
         })
 
-        afterEach((to, from, props) => {
+        afterEach(async (to, from, props) => {
             switch (to.query.stage) {
                 case '1':
                     expect(props).toMatchObject({ test: 'test' })
                     expect(routeProps).toMatchObject({ test: 'test' })
+
+                    await push('/about', { query: { stage: '2' } })
+
                     break
                 case '2':
                     expect(props).toBe('test')
@@ -88,6 +93,5 @@ describe('beforeEach() + afterEach()', () => {
         })
 
         await push('/', { query: { stage: '1' } })
-        push('/about', { query: { stage: '2' } })
     })
 })
