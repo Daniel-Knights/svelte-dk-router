@@ -9,9 +9,25 @@ import { hashHistory, routes, writableRoute, routeProps, setProps } from './stat
 import { beforeCallback, afterCallback } from './guard'
 import { chartState } from './nested'
 
-// Current route data
+/**
+ * Object containing all data for the current route.
+ * @property `title` - Page-title
+ * @property `name` - Routes' name
+ * @property `path` - Routes' path
+ * @property `component` - Svelte component
+ * @property `children` - Nested-routes
+ * @property `parent` - Parent-route
+ * @property `rootParent` - Ancestor-route
+ * @property `crumbs` - Array of route-names within the route-heirarchy
+ * @property `depth` - Routes' depth within its route-heirarchy
+ * @property `fullPath` - Path joined with any matching ancestor paths
+ * @property `rootPath` - Ancestor-routes' path
+ * @property `regex` - Generated regex for the routes' path
+ * @property `fullRegex` - Generated regex for the routes' full-path
+ */
 let route: FormattedRoute = null
-// Previous route data
+
+/** Previous route data */
 let fromRoute: FormattedRoute = null
 // New route data
 let newPath: string, newTitle: string, newRoute: FormattedRoute
@@ -21,6 +37,13 @@ writableRoute.subscribe(newRoute => {
     route = { ...newRoute }
 })
 
+/**
+ * Central function responsible for all navigations.
+ * @param passedRoute
+ * @param replace - (Optional) - Use `window.history.replaceState` instead of `window.history.pushState`.
+ * @param passedPath - (Optional) - Use a set path instead of the given-routes' path.
+ * @returns The current route or throws an error.
+ */
 const changeRoute = async (
     passedRoute: PassedRoute,
     replace?: boolean,

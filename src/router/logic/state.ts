@@ -14,30 +14,44 @@ import {
 import { afterCallback, beforeCallback } from './guard'
 import { chartState } from './nested'
 
-// Reactive route data
+/** Reactive route data */
 const writableRoute = writable(null)
 
-// Readable route-store
+/**
+ * Readable Svelte store which triggers on each navigation and returns the current route.
+ * @example
+ * routeStore.subscribe(newRoute => {
+ *   breadcrumbNavigation.textContent = newRoute.crumbs.join(' / ')
+ * })
+ */
 const routeStore = readable({}, set => {
     writableRoute.subscribe(routeValue => {
         set(routeValue)
     })
 })
 
-// Provided routes
+/** User-provided routes */
 let routes: FormattedRoute[]
-// Hash-mode or history-mode
+/** Hash-mode or history-mode */
 let hashHistory
 
+/**
+ * Contains any props set on navigation through `<SLink {props}>`, `push`, `replace` or `beforeEach((to, from, setProps))`.
+ */
 let routeProps
 
+/** Sets user provided props */
 const setProps = (props: unknown): void => {
     if (props && routeProps) {
         error('Props can only be set once per navigation')
     } else routeProps = props
 }
 
-// Set provided routes
+/**
+ * Sets a provided array of routes.
+ * @param userRoutes
+ * @param hashMode - (Optional, defaults to `false` (history-mode)).
+ */
 const setRoutes = (userRoutes: Route[], hashMode = false): void => {
     const depth = 1
 
@@ -108,8 +122,11 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
     loadState()
 }
 
-// Determine the current route and update route data on page-load
-const loadState = async (): Promise<void | FormattedRoute> => {
+/**
+ * Determine the current route and update route data on page-load.
+ * @returns `void` or logs an error if the route is unknown.
+ */
+const loadState = async (): Promise<void> => {
     const query = window.location.search || window.location.hash.split('?')[1]
     let path = currentPath(hashHistory)
     let currentRoute: FormattedRoute
@@ -178,8 +195,6 @@ const loadState = async (): Promise<void | FormattedRoute> => {
     if (afterCallback) {
         await afterCallback(currentRoute, null, routeProps)
     }
-
-    return currentRoute
 }
 
 window.addEventListener('popstate', loadState)

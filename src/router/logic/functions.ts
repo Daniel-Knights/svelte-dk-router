@@ -3,6 +3,12 @@ import { error, invalidIdentifier, compareRoutes } from '../static'
 import { changeRoute, route as currentRoute } from './change'
 import { routes } from './state'
 
+/**
+ * Same function used by `push` and `replace` with a 'switch' for whether to use `window.history.pushState` or `window.history.replaceState`.
+ * @param routeData - (Optional) - Any associated route-data, i.e. `params`, `query` and `props`.
+ * @param replace - Use window.history.pushState or window.history.replaceState.
+ * @returns The current route or throws an error.
+ */
 const pushOrReplace = async (
     routeData: PassedRoute,
     replace: boolean
@@ -59,7 +65,16 @@ const pushOrReplace = async (
     return returnedRoute
 }
 
-// Push to the current history entry
+/**
+ * Uses `window.history.pushState` to update the current history entry. Returns a promise.
+ * @param identifier - Name or path.
+ * @param routeData - (Optional) - Any associated route-data, i.e. `params`, `query` and `props`.
+ * @returns The current route or throws an error.
+ * @example
+ * await push('/', { query: { id: '1' } })
+ *   .then(route => '')
+ *   .catch(err => '')
+ */
 const push = (
     identifier: string,
     routeData?: PassedRoute
@@ -67,7 +82,16 @@ const push = (
     return pushOrReplace({ identifier, ...routeData }, false)
 }
 
-// Replace the current history entry
+/**
+ * Uses window.history.replaceState to update the current history entry. Returns a promise.
+ * @param identifier - Name or path.
+ * @param routeData - (Optional) - Any associated route-data, i.e. `params`, `query` and `props`.
+ * @returns The current route or throws an error.
+ * @example
+ * await replace('/', { query: { id: '1' } })
+ *   .then(route => '')
+ *   .catch(err => '')
+ */
 const replace = (
     identifier: string,
     routeData?: PassedRoute
@@ -75,7 +99,17 @@ const replace = (
     return pushOrReplace({ identifier, ...routeData }, true)
 }
 
-// Set or update query params
+/**
+ * Set or update query-params. Returns a promise.
+ * @param query - Any valid key/value pairs.
+ * @param update - (Optional, defaults to `false`) - Update or overwrite existing query.
+ * @param replace - (Optional, defaults to `true`) - Use window.history.pushState or window.history.replaceState.
+ * @returns The current route or throws an error.
+ * @example
+ * await setQuery({ id: '1' })
+ *   .then(route => '')
+ *   .catch(err => '')
+ */
 const setQuery = async (
     query: Record<string, string>,
     update = false,
@@ -98,7 +132,16 @@ const setQuery = async (
     return changeRoute({ ...currentRoute, query: formattedQuery }, replace)
 }
 
-// Update named-params
+/**
+ * Set named-params. Returns a promise.
+ * @param params - Any predefined key/value pairs.
+ * @param replace - (Optional, defaults to `true`) - Use window.history.pushState or window.history.replaceState.
+ * @returns The current route or throws an error.
+ * @example
+ * await setParams({ name: 'dan' })
+ *   .then(route => '')
+ *   .catch(err => '')
+ */
 const setParams = async (
     params: Record<string, string>,
     replace = true

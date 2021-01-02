@@ -1,19 +1,35 @@
 import { readable, writable } from 'svelte/store'
 import type { FormattedRoute } from '../static'
 
-// Track current depth of nested routes
+/** Track current depth of nested routes */
 const writableDepthChart = writable({})
 
-// Exported static chart object
-let routeChart
+/**
+ * Object containing all routes within the current route heirarchy, listed by depth (`1` = root, `2` = child, etc.).
+ * @example
+ * {
+ *   1: {title: "About", path: "/about", children: Array(2), name: "About", component: ƒ, …}
+ *   2: {name: "Default About", path: "", children: Array(1), parent: {…}, component: ƒ, …}
+ * }
+ */
+let routeChart: Record<string, FormattedRoute>
 
 writableDepthChart.subscribe(newChart => (routeChart = newChart))
 
-// Exported readable chart-store
+/**
+ * Readable Svelte store which triggers on each navigation and returns the current route-heirarchy, listed by depth (`1` = root, `2` = child, etc.).
+ * @example
+ * routeChartStore.subscribe(newChart => {
+ *   if (newChart[1].name === 'Home') {
+ *     // Do something...
+ *   }
+ * })
+ */
 const routeChartStore = readable({}, set => {
     writableDepthChart.subscribe(newChart => set(newChart))
 })
 
+/** Updates the current depth-chart of routes */
 const chartState = (route: FormattedRoute): void => {
     const { rootParent, crumbs } = route
     const tempChart = { 1: rootParent }

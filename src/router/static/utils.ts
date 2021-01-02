@@ -1,18 +1,29 @@
 import type { PassedRoute, FormattedRoute, Route } from './types'
 import { updateLocationData } from '../logic/properties'
 
+/** Logs a formatted error with the given-string */
 const error = (msg: string): void => {
     console.error('Svelte-Router [Error]: ' + msg)
 }
+/** Logs a formatted warning with the given-string */
 const warn = (msg: string): void => {
     console.warn('Svelte-Router [Warn]: ' + msg)
 }
 
-// Hash path or history path
+/**
+ * Determines if path is hash-based or history-based.
+ * @returns The correct path.
+ */
 const currentPath = (hash: boolean): string => {
     return hash ? '/' + window.location.hash.split('?')[0] : window.location.pathname
 }
 
+/**
+ * Updates the current URL.
+ * @param path
+ * @param replace - `window.history.replaceState` or `window.history.pushState`.
+ * @param hash - Whether to prepend URL with `/#` or not.
+ */
 const setUrl = (path: string, replace: boolean, hash: boolean): void => {
     if (hash && path[1] !== '#') path = '/#' + path
 
@@ -25,6 +36,7 @@ const setUrl = (path: string, replace: boolean, hash: boolean): void => {
     updateLocationData()
 }
 
+/** Recursively unpacks nested-routes into a single array */
 const flattenRoutes = (passedRoutes: Route[] | FormattedRoute[]): FormattedRoute[] => {
     let flattened = []
 
@@ -43,6 +55,7 @@ const flattenRoutes = (passedRoutes: Route[] | FormattedRoute[]): FormattedRoute
     return flattened
 }
 
+/** Strips any invalid properties and logs a warning for each one */
 const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void => {
     const flattened = flattenRoutes(passedRoutes)
     const validKeys = [
@@ -66,13 +79,18 @@ const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void 
         Object.keys(flattenedRoute).forEach(key => {
             if (!validKeys.includes(key)) {
                 warn(`Invalid property on route "${flattenedRoute.fullPath}": ${key}`)
+
                 delete flattenedRoute[key]
             }
         })
     })
 }
 
-// Return original path if route is invalid
+/**
+ * Returns the original passed-path if route is fallback.
+ * @param passedRoute - Fallback route.
+ * @param passedIdentifier
+ */
 const invalidIdentifier = (
     passedRoute: PassedRoute,
     passedIdentifier: string | PassedRoute
@@ -88,7 +106,7 @@ const invalidIdentifier = (
     }
 }
 
-// Set query params to route object on page-load
+/** Sets query-params to route object on page-load */
 const formatRouteQueryFromString = (
     query: string | URLSearchParams,
     route: FormattedRoute
@@ -102,7 +120,7 @@ const formatRouteQueryFromString = (
     })
 }
 
-// Set named params to route object on page-load
+/** Sets named-params to route object on page-load */
 const formatParamsFromPath = (path: string, route: FormattedRoute): void => {
     if (!route.fullPath) return
 
@@ -119,6 +137,7 @@ const formatParamsFromPath = (path: string, route: FormattedRoute): void => {
     })
 }
 
+/** Formats all path-related properties and set them to each given-route */
 const formatPathProperties = (passedRoute: FormattedRoute, path: string): void => {
     const { parent } = passedRoute
     // Set path properties
@@ -134,6 +153,7 @@ const formatPathProperties = (passedRoute: FormattedRoute, path: string): void =
     }
 }
 
+/** Generates regex for each provided-route and set them to the `regex` and `fullRegex` properties */
 const formatRouteRegex = (passedRoute: FormattedRoute): void => {
     const { path, fullPath } = passedRoute
 
@@ -166,6 +186,7 @@ const formatRouteRegex = (passedRoute: FormattedRoute): void => {
     passedRoute['fullRegex'] = new RegExp('^' + fullRegex + '\\/?$', 'i')
 }
 
+/** Formats query-string for updating the URL */
 const formatQueryFromObject = (query: Record<string, string>): string => {
     const formattedQuery = Object.entries(query)
         .map(([key, value], i, arr) => {
@@ -178,6 +199,7 @@ const formatQueryFromObject = (query: Record<string, string>): string => {
     return formattedQuery
 }
 
+/** Replaces predefined params with passed-params for updating the URL */
 const formatPathFromParams = (path: string, params: Record<string, string>): string => {
     if (!path || !params) return
 
@@ -190,6 +212,10 @@ const formatPathFromParams = (path: string, params: Record<string, string>): str
     return path
 }
 
+/**
+ * Loops through all routes and compares against the passed-route.
+ * @returns The matched route or a fallback-route (if defined).
+ */
 const compareRoutes = (
     routes: FormattedRoute[],
     route: PassedRoute

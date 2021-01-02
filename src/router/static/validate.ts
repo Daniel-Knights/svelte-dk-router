@@ -1,6 +1,10 @@
 import type { Route, FormattedRoute } from './types'
 import { error, warn, flattenRoutes } from './utils'
 
+/**
+ * Flatten routes and ensure there are no duplicate names, full-paths or named-params (within a given full-path).
+ * @param routes
+ */
 const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
     const flattened = flattenRoutes(routes)
     let namedParams = {}
@@ -48,6 +52,13 @@ const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
     })
 }
 
+/**
+ * Check for invalid passed-params (params which haven't been defined), and missing required-params.
+ * @param path
+ * @param params
+ * @param silenceError - Prevent missing-param error from being logged/thrown.
+ * @returns An error-string for `changeRoute` to throw or a boolean indicating the params are valid.
+ */
 const validatePassedParams = (
     path: string,
     params: Record<string, string>,
