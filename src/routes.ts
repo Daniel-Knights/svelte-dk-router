@@ -1,17 +1,17 @@
 // @ts-ignore
-import home from './views/home.svelte';
+import home from './views/home.svelte'
 // @ts-ignore
-import about from './views/about.svelte';
+import about from './views/about.svelte'
 // @ts-ignore
-import origins from './views/nested/origins.svelte';
+import origins from './views/nested/origins.svelte'
 // @ts-ignore
-import future from './views/nested/future.svelte';
+import future from './views/nested/future.svelte'
 // @ts-ignore
-import more from './views/nested/more.svelte';
+import more from './views/nested/more.svelte'
 // @ts-ignore
-import blog from './views/blog.svelte';
+import blog from './views/blog.svelte'
 // @ts-ignore
-import fallback from './views/fallback.svelte';
+import fallback from './views/fallback.svelte'
 
 const routes = [
     {
@@ -19,8 +19,8 @@ const routes = [
         path: '/',
         component: home,
         meta: {
-            name: 'hello',
-        },
+            name: 'hello'
+        }
     },
     {
         title: 'About',
@@ -42,11 +42,11 @@ const routes = [
                                 name: 'hello',
                                 title: 'Even More | About',
                                 path: '/even-more',
-                                component: more,
-                            },
-                        ],
-                    },
-                ],
+                                component: more
+                            }
+                        ]
+                    }
+                ]
             },
             {
                 title: 'Origins | About',
@@ -57,11 +57,11 @@ const routes = [
                         name: 'Origins | More',
                         title: 'More | About',
                         path: '/more',
-                        component: more,
-                    },
-                ],
-            },
-        ],
+                        component: more
+                    }
+                ]
+            }
+        ]
     },
     {
         title: 'Blog',
@@ -72,22 +72,22 @@ const routes = [
                 title: 'Future | Blog',
                 path: '',
                 component: future,
-                children: [{ name: 'blog more', path: '/more:hey', component: more }],
+                children: [{ name: 'blog more', path: '/more:hey', component: more }]
             },
             {
                 name: 'blog origins',
                 title: 'Origins | Blog',
                 path: '/origins/:test',
-                component: origins,
-            },
-        ],
+                component: origins
+            }
+        ]
     },
     {
         name: 'Fallback',
         title: '404',
         path: '(*)',
-        component: fallback,
-    },
-];
+        component: fallback
+    }
+]
 
-export default routes;
+export default routes

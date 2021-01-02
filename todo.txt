@@ -1,4 +1,0 @@
-guards
-    setProps/props
-        tests
-        readme

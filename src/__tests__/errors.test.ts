@@ -17,11 +17,9 @@ const store = Error
 beforeAll(() => {
     console.error = jest.fn()
     console.warn = jest.fn()
-    // eslint-disable-next-line
     Error = jest.fn()
 })
 
-// eslint-disable-next-line
 afterAll(() => (Error = store))
 
 afterEach(() => jest.resetAllMocks())
@@ -364,7 +362,6 @@ describe('Fallback', () => {
 
 describe('Promise rejections', () => {
     test('Correct error messages', async () => {
-        // eslint-disable-next-line
         Error = store
 
         push('/unknown').catch(err =>
