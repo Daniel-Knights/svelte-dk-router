@@ -97,7 +97,7 @@ describe('routeStore', () => {
     test('Contains correct data', async () => {
         let currentRoute
 
-        routeStore.subscribe((newRoute: FormattedRoute) => {
+        routeStore.subscribe(newRoute => {
             currentRoute = newRoute
         })
 
