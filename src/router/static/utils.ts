@@ -78,7 +78,7 @@ const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void 
     flattened.forEach(flattenedRoute => {
         Object.keys(flattenedRoute).forEach(key => {
             if (!validKeys.includes(key)) {
-                warn(`Invalid property on route "${flattenedRoute.fullPath}": ${key}`)
+                warn(`Invalid property on route "${flattenedRoute.fullPath}": "${key}"`)
 
                 delete flattenedRoute[key]
             }

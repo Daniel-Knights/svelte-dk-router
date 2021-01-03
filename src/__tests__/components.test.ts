@@ -22,7 +22,7 @@ describe('<SLink> + <SView>', () => {
 
 describe('<SView>', () => {
     test('Renders correct routes', async () => {
-        // Silence faulty unknown path error
+        // Silence faulty unknown route error
         console.error = () => ''
 
         const { getByTestId } = render(SView, {
@@ -132,8 +132,12 @@ describe('<SLink>', () => {
         let fired
 
         component.$on('navigation', e => {
-            expect(e.detail).toMatchObject(testRoutes[1])
-            fired = true
+            if (e.detail) {
+                expect(e.detail.success).toBeTruthy()
+                expect(e.detail.route).toMatchObject(testRoutes[1])
+
+                fired = true
+            }
         })
 
         await fireEvent.click(link)

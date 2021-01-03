@@ -270,6 +270,34 @@ describe('setParams()', () => {
     })
 })
 
+describe('Fallback', () => {
+    test('Navigates to fallback when no other routes match', async () => {
+        const { getByTestId } = render(SLink, {
+            props: {
+                path: '/unknown',
+                routes: userRoutes,
+                id: 'fdcgfc'
+            }
+        })
+
+        const link = getByTestId('fdcgfc')
+
+        await fireEvent.click(link)
+
+        expect(console.error).toHaveBeenCalledTimes(2)
+        expect(Error).toHaveBeenCalledTimes(1)
+        expect(route).toMatchObject(testRoutes[3])
+
+        await push('/')
+
+        expect(route).toMatchObject(testRoutes[0])
+
+        await push('/unknown').catch(() => '')
+
+        expect(route).toMatchObject(testRoutes[3])
+    })
+})
+
 describe('<SLink>', () => {
     test('Logs error when unknown name is passed', () => {
         render(SLink, {
@@ -319,6 +347,32 @@ describe('<SLink>', () => {
         expect(console.error).toHaveBeenCalledTimes(1)
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
+
+    test('Emits correct "navigation" error', async () => {
+        Error = store
+
+        const { getByTestId, component } = render(SLink, {
+            props: { path: '/unknown', testRoutes, id: 'khvvkhjv' }
+        })
+
+        const link = getByTestId('khvvkhjv')
+
+        let fired
+
+        component.$on('navigation', e => {
+            if (e.detail) {
+                expect(e.detail.success).toBeFalsy()
+                expect(e.detail.err.message).toBe(`Unknown route: "/unknown"`)
+                expect(console.error).toHaveBeenCalledTimes(2)
+
+                fired = true
+            }
+        })
+
+        await fireEvent.click(link)
+
+        expect(fired).toBeTruthy()
+    })
 })
 
 describe('beforeEach()', () => {
@@ -334,36 +388,8 @@ describe('beforeEach()', () => {
     })
 })
 
-describe('Fallback', () => {
-    test('Navigates to fallback when no other routes match', async () => {
-        const { getByTestId } = render(SLink, {
-            props: {
-                path: '/unknown',
-                routes: userRoutes,
-                id: 'fdcgfc'
-            }
-        })
-
-        const link = getByTestId('fdcgfc')
-
-        await fireEvent.click(link)
-
-        expect(route).toMatchObject(testRoutes[3])
-
-        await push('/')
-
-        expect(route).toMatchObject(testRoutes[0])
-
-        await push('/unknown').catch(() => '')
-
-        expect(route).toMatchObject(testRoutes[3])
-    })
-})
-
 describe('Promise rejections', () => {
     test('Correct error messages', async () => {
-        Error = store
-
         push('/unknown').catch(err =>
             expect(err.message).toBe('Unknown route: "/unknown"')
         )

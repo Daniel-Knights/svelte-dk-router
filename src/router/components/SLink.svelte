@@ -65,9 +65,13 @@
 <a
     href={path}
     on:click|preventDefault={async () => {
-        const result = await changeRoute(routeData, replace, identifier)
-
-        dispatch('navigation', result)
+        await changeRoute(routeData, replace, identifier)
+            .then(result => {
+                dispatch('navigation', { success: true, route: result })
+            })
+            .catch(err => {
+                dispatch('navigation', { success: false, err })
+            })
     }}
     class={routerActive ? 'router-active' : ''}
     aria-current={routerActive ? 'page' : null}>

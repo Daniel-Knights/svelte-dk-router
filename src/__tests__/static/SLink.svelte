@@ -68,6 +68,12 @@
     href={path}
     on:click|preventDefault={async () => {
         const result = await changeRoute(routeData, replace, identifier)
+            .then(result => {
+                dispatch('navigation', { success: true, route: result })
+            })
+            .catch(err => {
+                dispatch('navigation', { success: false, err })
+            })
 
         dispatch('navigation', result)
     }}
