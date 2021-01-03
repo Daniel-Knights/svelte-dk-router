@@ -17,6 +17,7 @@
         replace = undefined
 
     const dispatch = createEventDispatcher()
+    const identifier = name || path
 
     let routerActive
 
@@ -25,14 +26,12 @@
 
     if (route) {
         if (route.path === '(*)') {
-            error(`Unknown route "${name || path}"`)
+            error(`Unknown route "${identifier}"`)
+        } else {
+            name = route.name
+            path = route.fullPath
         }
-
-        name = route.name
-        path = route.path !== '(*)' ? route.fullPath : path
-    }
-
-    if (!route) error(`Unknown route "${name || path}"`)
+    } else error(`Unknown route "${identifier}"`)
 
     // Handle named-params
     if (validatePassedParams(path, params).valid && params) {
@@ -42,6 +41,8 @@
     if (query) {
         path += '?' + formatQueryFromObject(query)
     }
+
+    const routeData = { name, path, params, query, props }
 
     // Router-active class matching
     writableDepthChart.subscribe(chart => {
@@ -64,7 +65,7 @@
 <a
     href={path}
     on:click|preventDefault={async () => {
-        const result = await changeRoute({ name, path, params, query, props }, replace)
+        const result = await changeRoute(routeData, replace, identifier)
 
         dispatch('navigation', result)
     }}

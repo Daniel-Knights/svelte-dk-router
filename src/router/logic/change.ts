@@ -1,5 +1,8 @@
 import type { PassedRoute, FormattedRoute } from '../static'
 import {
+    error,
+    invalidIdentifier,
+    compareRoutes,
     setUrl,
     formatQueryFromObject,
     validatePassedParams,
@@ -37,89 +40,64 @@ writableRoute.subscribe(newRoute => {
     route = { ...newRoute }
 })
 
+/** Formats and sets new route-data */
+const setNewRouteData = (routeData: FormattedRoute): void => {
+    const hasDefaultChild = routeData.children && !routeData.children[0].path
+
+    if (routeData.title) newTitle = routeData.title
+
+    // Cleanup
+    if (routeData.query) {
+        delete routeData.query
+
+        if (hasDefaultChild) {
+            delete routeData.children[0].query
+        }
+    }
+    if (routeData.params) {
+        delete routeData.params
+
+        if (hasDefaultChild) {
+            delete routeData.children[0].params
+        }
+    }
+
+    newPath = routeData.fullPath
+    newRoute = routeData
+
+    // Check for default child
+    if (newRoute.children) {
+        newRoute.children.forEach(child => {
+            if (child.path === '') {
+                newRoute = child
+            }
+        })
+    }
+}
+
 /**
  * Central function responsible for all navigations.
  * @param passedRoute
  * @param replace - (Optional) - Use `window.history.replaceState` instead of `window.history.pushState`.
- * @param passedPath - (Optional) - Use a set path instead of the given-routes' path.
+ * @param identifier - (Optional) - The passed name or path. Used for error-handling.
  * @returns The current route or throws an error.
  */
 const changeRoute = async (
     passedRoute: PassedRoute,
     replace?: boolean,
-    passedPath?: string
+    identifier?: string
 ): Promise<void | FormattedRoute> => {
-    const { name, path, query, params, props } = passedRoute
-    let fullPath
-
-    if (passedRoute['fullPath']) {
-        fullPath = passedRoute['fullPath']
-    }
-
-    let routeExists = false
-
-    const setNewRouteData = routeData => {
-        const hasDefaultChild = routeData.children && !routeData.children[0].path
-
-        if (routeData.title) newTitle = routeData.title
-
-        // Cleanup
-        if (routeData.query) {
-            delete routeData.query
-
-            if (hasDefaultChild) {
-                delete routeData.children[0].query
-            }
-        }
-        if (routeData.params) {
-            delete routeData.params
-
-            if (hasDefaultChild) {
-                delete routeData.children[0].params
-            }
-        }
-
-        routeExists = true
-        newPath = routeData.fullPath
-        newRoute = routeData
-
-        // Check for default child
-        if (newRoute.children) {
-            newRoute.children.forEach(child => {
-                if (child.path === '') {
-                    newRoute = child
-                }
-            })
-        }
-    }
+    const { path, query, params, props } = passedRoute
 
     // Set new route data
-    const matchRoute = passedRoutes => {
-        passedRoutes.forEach(routeData => {
-            if (routeExists) return
-            if (name && routeData.name === name) {
-                // If route changed by name
-                setNewRouteData(routeData)
-            } else if (fullPath && fullPath.match(routeData.fullRegex)) {
-                // If route changed by path
-                setNewRouteData(routeData)
-            } else if (routeData.children) {
-                // Recursively filter child routes
-                matchRoute(routeData.children)
-            }
+    const matchedRoute = compareRoutes(routes, passedRoute)
 
-            if (!newRoute) {
-                if (path && path.match(routeData.regex)) {
-                    // If route changed by path
-                    setNewRouteData(routeData)
-                }
-            }
-        })
+    if (!matchedRoute) {
+        error(`Unknown route: "${identifier}"`)
+        throw new Error(`Unknown route: "${identifier}"`)
     }
 
-    matchRoute(routes)
-
-    if (!routeExists) return
+    setNewRouteData(matchedRoute)
 
     if (newPath === '(*)') newPath = path
 
@@ -165,13 +143,20 @@ const changeRoute = async (
 
     if (newTitle && title) title.innerHTML = newTitle
 
-    if (passedPath) newPath = passedPath
+    const invalidPath = invalidIdentifier(newRoute, identifier)
+
+    if (invalidPath) newPath = invalidPath
 
     // Update URL/state
     setUrl(newPath, replace, hashHistory)
 
     // After route change navigation guard
     if (afterCallback) afterCallback(route, fromRoute, routeProps)
+
+    if (matchedRoute.path === '(*)') {
+        error(`Unknown route: "${identifier}"`)
+        throw new Error(`Unknown route: "${identifier}"`)
+    }
 
     return route
 }
