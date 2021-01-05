@@ -78,7 +78,7 @@ interface SetProps {
  * @returns `void | boolean | Promise<void | boolean>`
  */
 interface BeforeEach {
-    (to?: FormattedRoute, from?: FormattedRoute, setProps?: SetProps):
+    (to?: FormattedRoute, from?: FormattedRoute | null, setProps?: SetProps):
         | void
         | boolean
         | Promise<void | boolean>

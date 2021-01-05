@@ -1,4 +1,5 @@
 import type { FormattedRoute } from '../router/static'
+import { values } from '../router/static'
 import {
     route,
     hash,
@@ -66,7 +67,7 @@ describe('routeChart', () => {
     test('Contains correct data', async () => {
         expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
 
-        Object.values(routeChart).forEach(route => {
+        values(routeChart).forEach(route => {
             formattedProperties.forEach(property => {
                 expect(route[property]).not.toBeUndefined()
                 expect(route[property]).not.toBeNull()
@@ -79,7 +80,7 @@ describe('routeChart', () => {
 
         setQuery(testObjOne)
 
-        Object.values(routeChart).forEach((route: FormattedRoute) => {
+        values(routeChart).forEach((route: FormattedRoute) => {
             expect(route.query).toMatchObject(testObjOne)
         })
 
@@ -87,7 +88,7 @@ describe('routeChart', () => {
 
         expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
 
-        Object.values(routeChart).forEach((route: FormattedRoute) => {
+        values(routeChart).forEach((route: FormattedRoute) => {
             expect(route.params).toMatchObject(testObjTwo)
         })
     })
@@ -145,7 +146,7 @@ describe('routeProps', () => {
 
 describe('window.location', () => {
     test('Variables contain correct location properties', async () => {
-        await push('/about')
+        await push('/')
 
         expect(hash).toBe(window.location.hash)
         expect(host).toBe(window.location.host)

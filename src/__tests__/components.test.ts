@@ -48,14 +48,14 @@ describe('<SView>', () => {
 describe('<SLink>', () => {
     test('Changes route by name', async () => {
         const { getByTestId } = render(SLink, {
-            props: { name: 'About', routes, id: 'khjb23' }
+            props: { name: 'Home', routes, id: 'khjb23' }
         })
 
         const link = getByTestId('khjb23')
 
         await fireEvent.click(link)
 
-        expect(route).toMatchObject(testRoutes[1])
+        expect(route).toMatchObject(testRoutes[0])
     })
 
     test('Changes route by path', async () => {
@@ -110,8 +110,7 @@ describe('<SLink>', () => {
         const aboutLink = getByTestId('enrfjk')
 
         afterEach((to, from) => {
-            if (!routeProps) return
-            if (routeProps.replaceTest) {
+            if (routeProps && (routeProps as Record<string, string>).replaceTest) {
                 expect(from).not.toMatchObject(testRoutes[1])
             }
         })

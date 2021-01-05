@@ -229,8 +229,8 @@ describe('setParams()', () => {
         // @ts-ignore
         await setParams({ test: 'test' }).catch(() => '')
 
-        expect(console.error).toHaveBeenCalledTimes(2)
-        expect(Error).toHaveBeenCalledTimes(2)
+        expect(console.error).toHaveBeenCalledTimes(1)
+        expect(Error).toHaveBeenCalledTimes(1)
     })
 
     test('Logs/throws error when route has no defined params', async () => {
@@ -252,9 +252,9 @@ describe('setParams()', () => {
     })
 
     test('Logs warning when invalid named-param is passed', async () => {
-        await push('/blog', { params: { id: '1', name: 'Dan' } })
+        await push('/blog', { params: { id: '2', name: 'Steve' } })
 
-        await setParams({ id: '2', name: 'Steve', invalid: 'invalid' })
+        await setParams({ id: '3', name: 'John', invalid: 'invalid' })
 
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
@@ -369,6 +369,7 @@ describe('<SLink>', () => {
             }
         })
 
+        await push('/') // Prevent duplicate navigation error
         await fireEvent.click(link)
 
         expect(fired).toBeTruthy()
@@ -398,7 +399,7 @@ describe('Promise rejections', () => {
         )
         // @ts-ignore
         push().catch(err =>
-            expect(err.message).toBe("'path' or 'name' argument required")
+            expect(err.message).toBe('"path" or "name" argument required')
         )
 
         replace('/unknown').catch(err =>
@@ -409,7 +410,7 @@ describe('Promise rejections', () => {
         )
         // @ts-ignore
         replace().catch(err =>
-            expect(err.message).toBe("'path' or 'name' argument required")
+            expect(err.message).toBe('"path" or "name" argument required')
         )
 
         setQuery({ test: 'test' }).catch(err =>

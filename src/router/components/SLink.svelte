@@ -67,6 +67,8 @@
     on:click|preventDefault={async () => {
         await changeRoute(routeData, replace, identifier)
             .then(result => {
+                if (!result) return
+
                 dispatch('navigation', { success: true, route: result })
             })
             .catch(err => {

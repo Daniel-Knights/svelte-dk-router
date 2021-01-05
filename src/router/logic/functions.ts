@@ -15,8 +15,8 @@ const pushOrReplace = async (
     const { identifier } = routeData
 
     if (!identifier) {
-        error("'path' or 'name' argument required")
-        throw new Error("'path' or 'name' argument required")
+        error('"path" or "name" argument required')
+        throw new Error('"path" or "name" argument required')
     }
 
     if (identifier[0] === '/') {

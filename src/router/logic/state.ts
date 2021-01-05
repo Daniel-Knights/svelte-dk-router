@@ -8,8 +8,8 @@ import {
     formatParamsFromPath,
     formatPathProperties,
     formatRouteRegex,
-    validateRoutes,
-    stripInvalidProperties
+    stripInvalidProperties,
+    validateRoutes
 } from '../static'
 import { afterCallback, beforeCallback } from './guard'
 import { chartState } from './nested'
@@ -33,12 +33,12 @@ const routeStore = readable({}, set => {
 /** User-provided routes */
 let routes: FormattedRoute[]
 /** Hash-mode or history-mode */
-let hashHistory
+let hashHistory: boolean
 
 /**
  * Contains any props set on navigation through `<SLink {props}>`, `push`, `replace` or `beforeEach((to, from, setProps))`.
  */
-let routeProps
+let routeProps: unknown
 
 /** Sets user provided props */
 const setProps = (props: unknown): void => {
@@ -68,7 +68,7 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
 
             if (name && name.includes('/')) {
                 warn(
-                    `Route-names which include "/" could interfere with route-matching: ${name}`
+                    `Route-names which include "/" could interfere with route-matching: "${name}"`
                 )
             }
 
@@ -122,14 +122,15 @@ const setRoutes = (userRoutes: Route[], hashMode = false): void => {
     loadState()
 }
 
+let currentRoute: FormattedRoute
 /**
  * Determine the current route and update route data on page-load.
  * @returns `void` or logs an error if the route is unknown.
  */
 const loadState = async (): Promise<void> => {
     const query = window.location.search || window.location.hash.split('?')[1]
+
     let path = currentPath(hashHistory)
-    let currentRoute: FormattedRoute
 
     if (path[1] === '#') path = path.slice(2)
 
@@ -192,11 +193,18 @@ const loadState = async (): Promise<void> => {
         title.innerHTML = currentRoute.title
     }
 
-    if (afterCallback) {
-        await afterCallback(currentRoute, null, routeProps)
-    }
+    if (afterCallback) await afterCallback(currentRoute, null, routeProps)
 }
 
 window.addEventListener('popstate', loadState)
 
-export { routes, writableRoute, routeStore, hashHistory, routeProps, setProps, setRoutes }
+export {
+    routes,
+    writableRoute,
+    routeStore,
+    hashHistory,
+    routeProps,
+    setProps,
+    setRoutes,
+    currentRoute
+}

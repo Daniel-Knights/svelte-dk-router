@@ -1,5 +1,5 @@
 import type { Route, FormattedRoute } from './types'
-import { error, warn, flattenRoutes } from './utils'
+import { error, warn, keys, flattenRoutes } from './utils'
 
 /**
  * Flatten routes and ensure there are no duplicate names, full-paths or named-params (within a given full-path).
@@ -81,7 +81,7 @@ const validatePassedParams = (
 
     if (params) {
         // Compare passed params with path params
-        Object.keys(params).forEach(passedParam => {
+        keys(params).forEach(passedParam => {
             if (!path || !path.includes('/:' + passedParam)) {
                 warn('Invalid param: "' + passedParam + '"')
 

@@ -5,10 +5,11 @@ import {
     compareRoutes,
     setUrl,
     formatQueryFromObject,
-    validatePassedParams,
-    formatPathFromParams
+    formatPathFromParams,
+    isSameRoute,
+    validatePassedParams
 } from '../static'
-import { hashHistory, routes, writableRoute, routeProps, setProps } from './state'
+import { routes, hashHistory, writableRoute, routeProps, setProps } from './state'
 import { beforeCallback, afterCallback } from './guard'
 import { chartState } from './nested'
 
@@ -31,7 +32,8 @@ import { chartState } from './nested'
 let route: FormattedRoute = null
 
 /** Previous route data */
-let fromRoute: FormattedRoute = null
+let fromRoute: FormattedRoute = null,
+    previousIdentifier: string
 // New route data
 let newPath: string, newTitle: string, newRoute: FormattedRoute
 
@@ -88,8 +90,6 @@ const changeRoute = async (
     identifier?: string
 ): Promise<void | FormattedRoute> => {
     const { path, query, params, props } = passedRoute
-
-    // Set new route data
     const matchedRoute = compareRoutes(routes, passedRoute)
 
     if (!matchedRoute) {
@@ -121,6 +121,18 @@ const changeRoute = async (
         newPath = formatPathFromParams(newPath, params)
     }
 
+    // Prevent duplicate navigation
+    if (
+        isSameRoute(
+            { ...matchedRoute, params, query },
+            route,
+            identifier,
+            previousIdentifier
+        )
+    ) {
+        return
+    } else previousIdentifier = identifier
+
     // Set fromRoute before route is updated
     if (!replace) fromRoute = route
 
@@ -140,11 +152,11 @@ const changeRoute = async (
 
     // Update page title
     const title = document.getElementsByTagName('title')[0]
-
-    if (newTitle && title) title.innerHTML = newTitle
+    if (newTitle && title) {
+        title.innerHTML = newTitle
+    }
 
     const invalidPath = invalidIdentifier(newRoute, identifier)
-
     if (invalidPath) newPath = invalidPath
 
     // Update URL/state

@@ -1,0 +1,6 @@
+Update slink readme
+Prevent infinite loops
+Remove need to return false in beforeEach
+Compile svelte components
+anchor links/scroll-behaviour
+named-params at start of path

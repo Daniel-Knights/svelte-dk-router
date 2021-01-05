@@ -11,6 +11,36 @@ const warn = (msg: string): void => {
 }
 
 /**
+ * Checks type is 'object' then returns an array of that objects' keys.
+ * @returns An empty array if type is not 'object', `Object.keys(obj)` if it is
+ */
+const keys = (obj: Record<string, unknown> | FormattedRoute): string[] => {
+    if (typeof obj !== 'object') return []
+
+    return Object.keys(obj)
+}
+
+/**
+ * Checks type is 'object' then returns an array of that objects' values.
+ * @returns An empty array if type is not 'object', `Object.values(obj)` if it is
+ */
+const values = (obj: Record<string, unknown> | FormattedRoute): unknown[] => {
+    if (typeof obj !== 'object') return []
+
+    return Object.values(obj)
+}
+
+/**
+ * Checks type is 'object' then returns an array of that objects' values.
+ * @returns An empty array if type is not 'object', `Object.entries(obj)` if it is
+ */
+const entries = (obj: Record<string, unknown> | FormattedRoute): unknown[] => {
+    if (typeof obj !== 'object') return []
+
+    return Object.entries(obj)
+}
+
+/**
  * Determines if path is hash-based or history-based.
  * @returns The correct path.
  */
@@ -76,7 +106,7 @@ const stripInvalidProperties = (passedRoutes: Route[] | FormattedRoute[]): void 
     ]
 
     flattened.forEach(flattenedRoute => {
-        Object.keys(flattenedRoute).forEach(key => {
+        keys(flattenedRoute).forEach(key => {
             if (!validKeys.includes(key)) {
                 warn(`Invalid property on route "${flattenedRoute.fullPath}": "${key}"`)
 
@@ -188,7 +218,7 @@ const formatRouteRegex = (passedRoute: FormattedRoute): void => {
 
 /** Formats query-string for updating the URL */
 const formatQueryFromObject = (query: Record<string, string>): string => {
-    const formattedQuery = Object.entries(query)
+    const formattedQuery = entries(query)
         .map(([key, value], i, arr) => {
             if (i !== arr.length - 1) {
                 return key + '=' + value + '&'
@@ -203,13 +233,68 @@ const formatQueryFromObject = (query: Record<string, string>): string => {
 const formatPathFromParams = (path: string, params: Record<string, string>): string => {
     if (!path || !params) return
 
-    Object.entries(params).forEach(([key, value]) => {
+    entries(params).forEach(([key, value]) => {
         if (path.includes('/:')) {
             path = path.replace('/:' + key, '/' + value)
         }
     })
 
     return path
+}
+
+/**
+ * Determines if the passed routes are the same.
+ * @param routeOne - `FormattedRoute`
+ * @param routeTwo - `FormattedRoute`
+ * @param identifier - name or path used to navigated
+ * @returns `true` if routes match, `false` if not
+ */
+const isSameRoute = (
+    routeOne: FormattedRoute,
+    routeTwo: FormattedRoute,
+    identifier: string,
+    previousIdentifier: string
+): boolean => {
+    if (
+        keys(routeOne.params).length !== keys(routeTwo.params).length ||
+        keys(routeOne.query).length !== keys(routeTwo.query).length
+    ) {
+        return false
+    }
+
+    const pathMatch = routeOne.fullPath === routeTwo.fullPath && routeOne.path !== '(*)'
+    const fallbackMatch =
+        routeOne.path === '(*)' &&
+        (identifier === window.location.pathname ||
+            identifier === window.location.hash.slice(1) ||
+            identifier === previousIdentifier)
+
+    let paramMatch = true,
+        queryMatch = true
+
+    if (routeOne.params) {
+        keys(routeOne.params).forEach(param => {
+            if (!routeTwo.params || routeTwo.params[param] !== routeOne.params[param]) {
+                paramMatch = false
+            }
+        })
+    }
+
+    if (routeOne.query) {
+        entries(routeOne.query).forEach(([key, value]) => {
+            if (
+                !routeTwo.query ||
+                !routeTwo.query[key] ||
+                routeTwo.query[key] !== value
+            ) {
+                queryMatch = false
+            }
+        })
+    } else if (!routeOne.query && routeTwo.query) queryMatch = false
+
+    if ((pathMatch || fallbackMatch) && paramMatch && queryMatch) {
+        return true
+    } else return false
 }
 
 /**
@@ -256,6 +341,9 @@ const compareRoutes = (
 export {
     error,
     warn,
+    keys,
+    values,
+    entries,
     currentPath,
     setUrl,
     flattenRoutes,
@@ -267,5 +355,6 @@ export {
     formatRouteRegex,
     formatQueryFromObject,
     formatPathFromParams,
+    isSameRoute,
     compareRoutes
 }

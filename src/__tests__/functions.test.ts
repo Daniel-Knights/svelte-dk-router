@@ -94,15 +94,14 @@ describe('push()', () => {
 describe('replace()', () => {
     test('Uses window.history.replaceState to change route', async () => {
         beforeEach((to, from) => {
-            if (!routeProps) return
-            if (routeProps.replaceTest) {
-                expect(from).not.toMatchObject(testRoutes[1])
+            if (routeProps && (routeProps as Record<string, string>).replaceTest) {
+                expect(from).not.toMatchObject(testRoutes[0])
             }
         })
 
-        await replace('/about')
+        await push('/')
 
-        expect(route).toMatchObject(testRoutes[1])
+        expect(route).toMatchObject(testRoutes[0])
 
         await replace('Blog', {
             params: testObjTwo,
@@ -208,18 +207,24 @@ describe('setQuery()', () => {
     })
 
     test('Push/replace', async () => {
+        let fired
+
         expect(route).not.toMatchObject(testRoutes[0])
 
         await push('/')
 
         beforeEach((to, from) => {
-            if (to.query && to.query.test === 'setQuery test') {
+            if (to.query && to.query.test === 'test') {
                 expect(from).toMatchObject(testRoutes[0])
+
+                fired = true
             }
         })
 
-        await setQuery({ test: 'setQuery test' }, false, false)
-        await setQuery({ test: 'setQuery test' })
+        await setQuery({ test: 'test' }, false, false)
+        await setQuery({ test: 'test 2' })
+
+        expect(fired).toBeTruthy()
     })
 })
 
@@ -258,6 +263,8 @@ describe('setParams()', () => {
     })
 
     test('Push/replace', async () => {
+        let fired
+
         await push('/')
 
         expect(route).not.toMatchObject(testRoutes[2].children[0])
@@ -265,12 +272,16 @@ describe('setParams()', () => {
         await push('/blog', { params: { id: '1', name: 'dan' } })
 
         beforeEach((to, from) => {
-            if (to.params && to.params.name === 'set-params-test') {
+            if (to.params && to.params.name === 'test') {
                 expect(from).toMatchObject(testRoutes[2].children[0])
+
+                fired = true
             }
         })
 
-        await setParams({ id: '1', name: 'set-params-test' }, false)
-        await setParams({ id: '1', name: 'set-params-test' })
+        await setParams({ id: '1', name: 'test' }, false)
+        await setParams({ id: '1', name: 'test-2' })
+
+        expect(fired).toBeTruthy()
     })
 })
