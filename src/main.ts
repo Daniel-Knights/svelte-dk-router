@@ -1,25 +1,26 @@
 import App from './App.svelte'
 import routes from './routes'
-import { setRoutes, beforeEach, afterEach, push, replace } from './router'
+import { setRoutes, beforeEach, afterEach, route, routeProps } from './router'
 
-beforeEach(async (to, from, setProps) => {
-    // console.log('before', to, from)
-    // if (to.path !== '/') {
+beforeEach((to, from, { setProps, redirect }) => {
+    console.log(to.name, 'kjdnkwjdnkwdn')
+    // if (to.name === 'Home') {
+    //     redirect('/about', { query: { i: 'jnkjnkjn' } })
+    //     setProps('wdwd')
+    // } else if (to.name === 'About') {
+    //     redirect('/')
+    setProps('Hello')
     // }
-    // push('/')
-    // push('/about')
+    console.log(routeProps, 'b4')
+    // console.log(route, 'b4')
 })
-afterEach(async (to, from, props) => {
-    // return false
-    // console.log('after', to, from)
-    // console.log(routeChart)
-    // if (to.name === 'About') {
-    // push('/about')
-    // push('/')
-    // }
+afterEach((to, from, { props, redirect }) => {
+    if (to.name === 'Home') redirect('Future', { params: { name: 'dan', id: '1' } })
+    console.log(route, 'after')
+    console.log(props, 'after')
 })
 
-setRoutes(routes)
+setRoutes(routes, true)
 
 const app = new App({ target: document.body })
 

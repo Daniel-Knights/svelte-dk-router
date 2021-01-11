@@ -1,6 +1,8 @@
-Update slink readme
-Prevent infinite loops
-Remove need to return false in beforeEach
+Update slink/guards readme
 Compile svelte components
 anchor links/scroll-behaviour
 named-params at start of path
+
+tests
+    redirect guards
+    duplicate navigation

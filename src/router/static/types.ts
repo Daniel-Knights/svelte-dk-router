@@ -1,5 +1,5 @@
 /**
- * User-defined routes.
+ * User-defined route.
  * @property `name?` - `string`
  * @property `title?` - `string`
  * @property `path` - `string`
@@ -21,7 +21,6 @@ interface Route {
 }
 
 /**
- * User route once processed.
  * @extends Route
  * @property `fullPath` - `string`
  * @property `rootPath` - `string`
@@ -46,7 +45,6 @@ interface FormattedRoute extends Route {
 }
 
 /**
- * Passed-route information
  * @property `identifier?` - `string`
  * @property `name?` - `string`
  * @property `path?` - `string`
@@ -64,12 +62,23 @@ interface PassedRoute {
 }
 
 /**
- * Set-props function for `beforeEach` callback.
- * @property `(props)` - `unknown`
- * @returns `void`
+ * `context` object parameter for the `beforeEach` callback
+ * @property `setProps` - Sets provided props if they haven't already been set
+ * @property `redirect` - Redirect initial navigation to another route
  */
-interface SetProps {
-    (props: unknown): void
+interface BeforeContext {
+    setProps: (props: unknown) => void
+    redirect: (identifier: string, options?: PassedRoute) => void
+}
+
+/**
+ * `context` object parameter for the `afterEach` callback
+ * @property `props` - Contains any props set on navigation
+ * @property `redirect` - Redirect initial navigation to another route
+ */
+interface AfterContext {
+    props: unknown
+    redirect: (identifier: string, options?: PassedRoute) => void
 }
 
 /**
@@ -78,7 +87,7 @@ interface SetProps {
  * @returns `void | boolean | Promise<void | boolean>`
  */
 interface BeforeEach {
-    (to?: FormattedRoute, from?: FormattedRoute | null, setProps?: SetProps):
+    (to?: FormattedRoute, from?: FormattedRoute | null, context?: BeforeContext):
         | void
         | boolean
         | Promise<void | boolean>
@@ -90,7 +99,22 @@ interface BeforeEach {
  * @returns `void | Promise<void>`
  */
 interface AfterEach {
-    (to?: FormattedRoute, from?: FormattedRoute, props?: unknown): void | Promise<void>
+    (
+        to?: FormattedRoute,
+        from?: FormattedRoute,
+        context?: AfterContext
+    ): void | Promise<void>
 }
 
-export type { Route, FormattedRoute, PassedRoute, BeforeEach, AfterEach }
+/**
+ * @property `path` - string
+ * @property `title` - string
+ * @property `route` - FormattedRoute
+ */
+interface NewRoute {
+    path: string
+    title: string
+    route: FormattedRoute
+}
+
+export type { Route, FormattedRoute, PassedRoute, BeforeEach, AfterEach, NewRoute }
