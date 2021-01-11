@@ -3,10 +3,11 @@
     import { changeRoute, writableDepthChart } from '../../router/logic'
     import {
         error,
+        isEqualObject,
         formatPathFromParams,
+        formatQueryFromObject,
         compareRoutes,
-        validatePassedParams,
-        formatQueryFromObject
+        validatePassedParams
     } from '../../router/static'
 
     export let name = undefined,
@@ -56,7 +57,7 @@
             return (routerActive = false)
         }
 
-        const paramMatch = JSON.stringify(params) === JSON.stringify(chartRoute.params)
+        const paramMatch = params ? isEqualObject(params, chartRoute.params) : true
 
         if (chartRoute.name === name && paramMatch) {
             routerActive = true

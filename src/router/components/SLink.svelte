@@ -1,12 +1,13 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { routes, changeRoute, writableDepthChart } from '../logic'
+    import { changeRoute, writableDepthChart, routerState } from '../logic'
     import {
+        error,
         formatPathFromParams,
+        formatQueryFromObject,
         compareRoutes,
         validatePassedParams,
-        error,
-        formatQueryFromObject
+        isEqualObject
     } from '../static'
 
     export let name = undefined,
@@ -22,7 +23,7 @@
     let routerActive
 
     // Match identifier to set routes
-    const route = compareRoutes(routes, { name, path, params })
+    const route = compareRoutes(routerState.routes, { name, path, params })
 
     if (route) {
         if (route.path === '(*)') {
@@ -54,7 +55,7 @@
             return (routerActive = false)
         }
 
-        const paramMatch = JSON.stringify(params) === JSON.stringify(chartRoute.params)
+        const paramMatch = params ? isEqualObject(params, chartRoute.params) : true
 
         if (chartRoute.name === name && paramMatch) {
             routerActive = true
