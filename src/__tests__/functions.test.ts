@@ -10,7 +10,7 @@ import {
     pathname,
     search
 } from '../router'
-import { routeProps, routes } from '../router/logic'
+import { routeProps, routerState } from '../router/logic'
 import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
 
@@ -21,7 +21,7 @@ const testObjTwo = { id: '1', name: 'dan' }
 beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE))
 
 describe('setRoutes()', () => {
-    test('Sets correct routes', () => expect(routes).toEqual(userRoutes))
+    test('Sets correct routes', () => expect(routerState.routes).toEqual(userRoutes))
 
     test('Strips invalid properties', () => {
         userRoutes[0]['invalidProperty'] = 'invalidProperty'
@@ -32,7 +32,7 @@ describe('setRoutes()', () => {
         setRoutes(userRoutes, process.env.HASH_MODE)
 
         // @ts-ignore
-        expect(routes[0].invalidProperty).toBeUndefined()
+        expect(routerState.routes[0].invalidProperty).toBeUndefined()
     })
 })
 

@@ -1,210 +1,50 @@
-import { writable, readable } from 'svelte/store'
-import type { Route, FormattedRoute } from '../static'
-import {
-    error,
-    warn,
-    currentPath,
-    formatRouteQueryFromString,
-    formatParamsFromPath,
-    formatPathProperties,
-    formatRouteRegex,
-    stripInvalidProperties,
-    validateRoutes
-} from '../static'
-import { afterCallback, beforeCallback } from './guard'
-import { chartState } from './nested'
+import { readable, writable } from 'svelte/store'
+import type { FormattedRoute } from '../static'
+
+/**
+ * Current state.
+ * @property `hashHistory` - boolean
+ * @property `routes` - FormattedRoute[]
+ * @property `route` - FormattedRoute
+ */
+export const routerState = {
+    hashHistory: false,
+    routes: []
+}
+
+/**
+ * Object containing all data for the current route.
+ * @property `title` - Page-title
+ * @property `name` - Routes' name
+ * @property `path` - Routes' path
+ * @property `component` - Svelte component
+ * @property `children` - Nested-routes
+ * @property `parent` - Parent-route
+ * @property `rootParent` - Ancestor-route
+ * @property `crumbs` - Array of route-names within the route-heirarchy
+ * @property `depth` - Routes' depth within its route-heirarchy
+ * @property `fullPath` - Path joined with any matching ancestor paths
+ * @property `rootPath` - Ancestor-routes' path
+ * @property `regex` - Generated regex for the routes' path
+ * @property `fullRegex` - Generated regex for the routes' full-path
+ */
+export let route: FormattedRoute = null
 
 /** Reactive route data */
-const writableRoute = writable(null)
-
+export const writableRoute = writable(null)
 /**
  * Readable Svelte store which triggers on each navigation and returns the current route.
  * @example
  * routeStore.subscribe(newRoute => {
- *   breadcrumbNavigation.textContent = newRoute.crumbs.join(' / ')
+ *   breadcrumbNavigation.textContent = newRoute.crumbs.join('/')
  * })
  */
-const routeStore = readable({}, set => {
+export const routeStore = readable({}, set => {
     writableRoute.subscribe(routeValue => {
         set(routeValue)
     })
 })
-
-/** User-provided routes */
-let routes: FormattedRoute[]
-/** Hash-mode or history-mode */
-let hashHistory: boolean
-
-/**
- * Contains any props set on navigation through `<SLink {props}>`, `push`, `replace` or `beforeEach((to, from, setProps))`.
- */
-let routeProps: unknown
-
-/** Sets user provided props */
-const setProps = (props: unknown): void => {
-    if (props && routeProps) {
-        error('Props can only be set once per navigation')
-    } else routeProps = props
-}
-
-/**
- * Sets a provided array of routes.
- * @param userRoutes
- * @param hashMode - (Optional, defaults to `false` (history-mode)).
- */
-const setRoutes = (userRoutes: Route[], hashMode = false): void => {
-    const depth = 1
-
-    if (hashMode) hashHistory = true
-
-    // Validate and format
-    const formatRoutes = (passedRoutes, parent?: FormattedRoute) => {
-        passedRoutes.forEach(userRoute => {
-            const { name, path, component } = userRoute
-
-            if (path === undefined || !component) {
-                return error('"path" and "component" are required properties')
-            }
-
-            if (name && name.includes('/')) {
-                warn(
-                    `Route-names which include "/" could interfere with route-matching: "${name}"`
-                )
-            }
-
-            // Set component name as route name if none supplied
-            if (!name) {
-                userRoute['name'] = component.name
-            }
-
-            // Set parent properties
-            if (parent) {
-                userRoute['parent'] = parent
-
-                if (parent.rootParent) {
-                    userRoute['rootParent'] = parent.rootParent
-                } else userRoute['rootParent'] = parent
-            }
-
-            // Array of route names to trace origins
-            if (!userRoute.parent) {
-                userRoute['crumbs'] = [userRoute.name]
-            } else {
-                userRoute['crumbs'] = [...userRoute.parent.crumbs, userRoute.name]
-            }
-
-            // Set depth of route/nested-route
-            if (userRoute.parent) {
-                userRoute['depth'] = userRoute.parent.depth + 1
-            } else {
-                userRoute['depth'] = depth
-            }
-
-            // Set path properties
-            formatPathProperties(userRoute, path)
-
-            // Generate dynamic regex for each route
-            formatRouteRegex(userRoute)
-
-            if (userRoute.children) {
-                // Recursively format children
-                formatRoutes(userRoute.children, userRoute)
-            }
-        })
-    }
-
-    formatRoutes(userRoutes, null)
-    stripInvalidProperties(userRoutes)
-    validateRoutes(userRoutes)
-
-    routes = userRoutes as FormattedRoute[]
-
-    loadState()
-}
-
-let currentRoute: FormattedRoute
-/**
- * Determine the current route and update route data on page-load.
- * @returns `void` or logs an error if the route is unknown.
- */
-const loadState = async (): Promise<void> => {
-    const query = window.location.search || window.location.hash.split('?')[1]
-
-    let path = currentPath(hashHistory)
-
-    if (path[1] === '#') path = path.slice(2)
-
-    if (!routes) return
-    else {
-        const filterRoutes = passedRoutes => {
-            passedRoutes.forEach(singleRoute => {
-                if (currentRoute) return
-
-                const { fullRegex, children } = singleRoute
-
-                // Compare route path against URL path
-                if (path && path.match(fullRegex)) {
-                    formatRouteQueryFromString(query, singleRoute)
-                    formatParamsFromPath(path, singleRoute)
-
-                    currentRoute = singleRoute
-                } else if (children) {
-                    // Recursively filter through child routes
-                    filterRoutes(children)
-                }
-            })
-        }
-
-        filterRoutes(routes)
-    }
-
-    // Determine if route has nested base-path
-    if (currentRoute && currentRoute.children) {
-        currentRoute.children.forEach(child => {
-            if (child.path === '') {
-                if (currentRoute.params) {
-                    child['params'] = currentRoute.params
-                }
-
-                if (currentRoute.query) {
-                    child['query'] = currentRoute.query
-                }
-
-                currentRoute = child
-            }
-        })
-    }
-
-    if (!currentRoute) return error('Unknown route')
-
-    if (beforeCallback) {
-        const beforeResult = await beforeCallback(currentRoute, null, setProps)
-
-        if (beforeResult === false) return
-    }
-
-    writableRoute.set(currentRoute)
-    chartState(currentRoute)
-
-    // Update title
-    const title = document.getElementsByTagName('title')[0]
-
-    if (currentRoute && currentRoute.title && title) {
-        title.innerHTML = currentRoute.title
-    }
-
-    if (afterCallback) await afterCallback(currentRoute, null, routeProps)
-}
-
-window.addEventListener('popstate', loadState)
-
-export {
-    routes,
-    writableRoute,
-    routeStore,
-    hashHistory,
-    routeProps,
-    setProps,
-    setRoutes,
-    currentRoute
-}
+// Update route each time writableRoute is updated
+writableRoute.subscribe(newRoute => {
+    route = { ...newRoute }
+})

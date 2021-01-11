@@ -378,7 +378,7 @@ describe('<SLink>', () => {
 
 describe('beforeEach()', () => {
     test('Logs error when attempting to set props more than once per navigation', async () => {
-        beforeEach((to, from, setProps) => {
+        beforeEach((to, from, { setProps }) => {
             setProps({ some: 'props' })
             setProps('Some other props')
         })

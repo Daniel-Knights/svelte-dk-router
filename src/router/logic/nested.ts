@@ -2,7 +2,7 @@ import { readable, writable } from 'svelte/store'
 import type { FormattedRoute } from '../static'
 
 /** Track current depth of nested routes */
-const writableDepthChart = writable({})
+export const writableDepthChart = writable({})
 
 /**
  * Object containing all routes within the current route heirarchy,
@@ -13,7 +13,7 @@ const writableDepthChart = writable({})
  *   2: {name: "Default About", path: "", children: Array(1), parent: {…}, component: ƒ, …}
  * }
  */
-let routeChart: Record<string, FormattedRoute>
+export let routeChart: Record<string, FormattedRoute>
 
 writableDepthChart.subscribe(newChart => (routeChart = newChart))
 
@@ -27,17 +27,17 @@ writableDepthChart.subscribe(newChart => (routeChart = newChart))
  *   }
  * })
  */
-const routeChartStore = readable({}, set => {
+export const routeChartStore = readable({}, set => {
     writableDepthChart.subscribe(newChart => set(newChart))
 })
 
 /** Updates the current depth-chart of routes */
-const chartState = (route: FormattedRoute): void => {
+export function chartState(route: FormattedRoute): void {
     const { rootParent, crumbs } = route
     const tempChart = { 1: rootParent }
     let tempDepth = 1
 
-    const filterChildren = passedRoute => {
+    function filterChildren(passedRoute) {
         if (route.params) {
             passedRoute['params'] = route.params
         }
@@ -67,5 +67,3 @@ const chartState = (route: FormattedRoute): void => {
 
     writableDepthChart.set(tempChart)
 }
-
-export { writableDepthChart, routeChart, routeChartStore, chartState }

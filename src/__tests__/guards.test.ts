@@ -71,12 +71,12 @@ describe('afterEach()', () => {
 
 describe('beforeEach() + afterEach()', () => {
     test('Correct props handling', async () => {
-        beforeEach((to, from, setProps) => {
+        beforeEach((to, from, { setProps }) => {
             if (to.query.stage === '7') setProps({ test: 'test' })
             if (to.query.stage === '8') setProps('test')
         })
 
-        afterEach(async (to, from, props) => {
+        afterEach(async (to, from, { props }) => {
             switch (to.query.stage) {
                 case '7':
                     expect(props).toMatchObject({ test: 'test' })
@@ -95,3 +95,30 @@ describe('beforeEach() + afterEach()', () => {
         await push('/', { query: { stage: '7' } })
     })
 })
+
+// describe('beforeEach() + afterEach()', () => {
+//     test('Correct redirect', async () => {
+//         beforeEach((to, from, { setProps, redirect }) => {
+//             if (to.query.stage === '7') setProps({ test: 'test' })
+//             if (to.query.stage === '8') setProps('test')
+//         })
+
+//         afterEach(async (to, from, {props}) => {
+//             switch (to.query.stage) {
+//                 case '7':
+//                     expect(props).toMatchObject({ test: 'test' })
+//                     expect(routeProps).toMatchObject({ test: 'test' })
+
+//                     await push('/about', { query: { stage: '8' } })
+
+//                     break
+//                 case '8':
+//                     expect(props).toBe('test')
+//                     expect(routeProps).toBe('test')
+//                     break
+//             }
+//         })
+
+//         await push('/', { query: { stage: '7' } })
+//     })
+// })

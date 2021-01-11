@@ -5,7 +5,7 @@ import { error, warn, keys, flattenRoutes } from './utils'
  * Flatten routes and ensure there are no duplicate names, full-paths or named-params (within a given full-path).
  * @param routes
  */
-const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
+export function validateRoutes(routes: Route[] | FormattedRoute[]): void {
     const flattened = flattenRoutes(routes)
     let namedParams = {}
 
@@ -59,11 +59,11 @@ const validateRoutes = (routes: Route[] | FormattedRoute[]): void => {
  * @param silenceError - Prevent missing-param error from being logged/thrown.
  * @returns An error-string for `changeRoute` to throw or a boolean indicating the params are valid.
  */
-const validatePassedParams = (
+export function validatePassedParams(
     path: string,
     params: Record<string, string>,
     silenceError = false
-): Record<string, boolean | string> => {
+): Record<string, boolean | string> {
     let errorString = ''
 
     // Validate required params
@@ -99,5 +99,3 @@ const validatePassedParams = (
 
     return { valid: true }
 }
-
-export { validateRoutes, validatePassedParams }
