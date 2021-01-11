@@ -18,7 +18,7 @@ let protocol = window.location.protocol
 let search = window.location.search
 
 /** Update `window.location` properties on route-change */
-const updateLocationData = (): void => {
+function updateLocationData(): void {
     hash = window.location.hash
     host = window.location.host
     hostname = window.location.hostname

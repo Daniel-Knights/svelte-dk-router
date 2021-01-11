@@ -11,7 +11,9 @@ export {
     afterEach,
     setQuery,
     setParams,
-    setRoutes,
+    setRoutes
+} from './logic'
+export {
     hash,
     host,
     hostname,
@@ -21,4 +23,4 @@ export {
     port,
     protocol,
     search
-} from './logic'
+} from './static'
