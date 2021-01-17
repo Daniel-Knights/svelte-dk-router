@@ -5,8 +5,8 @@ import type { FormattedRoute } from '../static'
  * Current state.
  * @property `hashHistory` - boolean
  * @property `routes` - FormattedRoute[]
- * @property `redirecting` - Record<"before" | "after", boolean>
- * @property `route` - FormattedRoute
+ * @property `navigating` - boolean
+ * @property `redirecting` - boolean
  */
 export const routerState = {
     hashHistory: false,

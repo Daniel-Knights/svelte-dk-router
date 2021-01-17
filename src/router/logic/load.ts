@@ -84,7 +84,7 @@ export async function loadState(): Promise<void> {
             return
         }
     }
-
+    console.log(1)
     writableRoute.set(currentRoute)
     chartState(currentRoute)
 

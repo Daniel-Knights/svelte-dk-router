@@ -40,6 +40,7 @@ const fromRoute = { route: null, identifier: null }
  * @param passedRoute
  * @param replace - (Optional) - Use `window.history.replaceState` instead of `window.history.pushState`.
  * @param identifier - (Optional) - The passed name or path. Used for error-handling.
+ * @param isRedirect - (Optional) - Determines if `push` or `replace` has been called inside a router-guard.
  * @returns The current route or throws an error.
  */
 export async function changeRoute(
@@ -112,7 +113,7 @@ export async function changeRoute(
             setProps
         )
 
-        if (beforeResult === false || (routerState.redirecting && !isRedirect)) {
+        if ((beforeResult === false || routerState.redirecting) && !isRedirect) {
             routerState.navigating = false
             routerState.redirecting = false
             return

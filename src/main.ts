@@ -18,12 +18,14 @@ beforeEach(async (to, from) => {
                 console.log(err)
             })
     } else if (to.name !== 'Future') {
+        console.log('object')
         await push('/blog', {
             params: { id: '1', name: 'dan' },
             props: 'redirect test',
             query: { id: '34tg34' }
         }).then(route => console.log(route, 'blog'))
     }
+    if (to.name === 'About') return false
 })
 
 // beforeEach(async (to, from) => {
