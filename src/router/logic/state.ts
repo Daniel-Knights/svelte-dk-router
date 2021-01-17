@@ -5,11 +5,14 @@ import type { FormattedRoute } from '../static'
  * Current state.
  * @property `hashHistory` - boolean
  * @property `routes` - FormattedRoute[]
+ * @property `redirecting` - Record<"before" | "after", boolean>
  * @property `route` - FormattedRoute
  */
 export const routerState = {
     hashHistory: false,
-    routes: []
+    routes: [],
+    navigating: false,
+    redirecting: false
 }
 
 /**
@@ -32,6 +35,7 @@ export let route: FormattedRoute = null
 
 /** Reactive route data */
 export const writableRoute = writable(null)
+
 /**
  * Readable Svelte store which triggers on each navigation and returns the current route.
  * @example
@@ -44,6 +48,7 @@ export const routeStore = readable({}, set => {
         set(routeValue)
     })
 })
+
 // Update route each time writableRoute is updated
 writableRoute.subscribe(newRoute => {
     route = { ...newRoute }

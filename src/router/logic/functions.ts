@@ -1,10 +1,10 @@
 import type { Route, PassedRoute, FormattedRoute } from '../static'
 import {
-    formatPathProperties,
+    warn,
     validateRoutes,
-    stripInvalidProperties,
     formatRouteRegex,
-    warn
+    formatPathProperties,
+    stripInvalidProperties
 } from '../static'
 import { error } from '../static'
 import { changeRoute } from './router'
@@ -22,6 +22,12 @@ async function pushOrReplace(
     replace: boolean
 ): Promise<void | FormattedRoute> {
     const { identifier } = routeData
+    let isRedirect
+
+    if (routerState.navigating) {
+        routerState.redirecting = true
+        isRedirect = true
+    }
 
     if (!identifier) {
         error('"path" or "name" argument required')
@@ -34,7 +40,7 @@ async function pushOrReplace(
         routeData.name = identifier
     }
 
-    return changeRoute(routeData, replace, identifier)
+    return changeRoute(routeData, replace, identifier, isRedirect)
 }
 
 /**

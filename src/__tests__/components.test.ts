@@ -12,7 +12,7 @@ describe('<SLink> + <SView>', () => {
     test('Instantiates components', () => {
         expect(() =>
             render(SLink, {
-                props: { name: 'About', routes }
+                props: { name: 'About' }
             })
         ).not.toThrow()
 
@@ -48,7 +48,7 @@ describe('<SView>', () => {
 describe('<SLink>', () => {
     test('Changes route by name', async () => {
         const { getByTestId } = render(SLink, {
-            props: { name: 'Home', routes, id: 'khjb23' }
+            props: { name: 'Home', id: 'khjb23' }
         })
 
         const link = getByTestId('khjb23')
@@ -60,7 +60,7 @@ describe('<SLink>', () => {
 
     test('Changes route by path', async () => {
         const { getByTestId } = render(SLink, {
-            props: { path: '/about', routes, id: 'jbj3h4b' }
+            props: { path: '/about', id: 'jbj3h4b' }
         })
 
         const link = getByTestId('jbj3h4b')
@@ -77,7 +77,6 @@ describe('<SLink>', () => {
                 params: { id: '1', name: 'dan' },
                 query: { test: 'test' },
                 props: { test: 'test' },
-                routes,
                 id: '3g4fa'
             }
         })
@@ -96,14 +95,13 @@ describe('<SLink>', () => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/',
-                routes,
                 id: 'jh454',
                 props: { replaceTest: true },
                 replace: true
             }
         })
         render(SLink, {
-            props: { path: '/about', routes, id: 'enrfjk' }
+            props: { path: '/about', id: 'enrfjk' }
         })
 
         const homeLink = getByTestId('jh454')
@@ -123,7 +121,7 @@ describe('<SLink>', () => {
 
     test('Emits correct "navigation" event', async () => {
         const { getByTestId, component } = render(SLink, {
-            props: { name: 'About', routes, id: 'oinkjn' }
+            props: { name: 'About', id: 'oinkjn' }
         })
 
         const link = getByTestId('oinkjn')
@@ -146,10 +144,10 @@ describe('<SLink>', () => {
 
     test('Applies router-active class and aria-current attribute', async () => {
         const { getByTestId } = render(SLink, {
-            props: { path: '/', routes, id: 's0d9' }
+            props: { path: '/', id: 's0d9' }
         })
         render(SLink, {
-            props: { path: '/about', routes, id: '23lk4' }
+            props: { path: '/about', id: '23lk4' }
         })
 
         const homeLink = getByTestId('s0d9')
@@ -176,7 +174,6 @@ describe('<SLink>', () => {
                 path: '/blog',
                 params: { id: '1', name: 'dan' },
                 query: { test: 'test' },
-                routes,
                 id: 'e2d2ed'
             }
         })

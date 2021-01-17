@@ -62,35 +62,16 @@ interface PassedRoute {
 }
 
 /**
- * `context` object parameter for the `beforeEach` callback
- * @property `setProps` - Sets provided props if they haven't already been set
- * @property `redirect` - Redirect initial navigation to another route
- */
-interface BeforeContext {
-    setProps: (props: unknown) => void
-    redirect: (identifier: string, options?: PassedRoute) => void
-}
-
-/**
- * `context` object parameter for the `afterEach` callback
- * @property `props` - Contains any props set on navigation
- * @property `redirect` - Redirect initial navigation to another route
- */
-interface AfterContext {
-    props: unknown
-    redirect: (identifier: string, options?: PassedRoute) => void
-}
-
-/**
  * `beforeEach` navigation-guard callback.
  * @property `(to?, from?, setProps?)`
  * @returns `void | boolean | Promise<void | boolean>`
  */
 interface BeforeEach {
-    (to?: FormattedRoute, from?: FormattedRoute | null, context?: BeforeContext):
-        | void
-        | boolean
-        | Promise<void | boolean>
+    (
+        to?: FormattedRoute,
+        from?: FormattedRoute | null,
+        setProps?: (props: unknown) => void
+    ): void | boolean | Promise<void | boolean>
 }
 
 /**
@@ -99,11 +80,7 @@ interface BeforeEach {
  * @returns `void | Promise<void>`
  */
 interface AfterEach {
-    (
-        to?: FormattedRoute,
-        from?: FormattedRoute,
-        context?: AfterContext
-    ): void | Promise<void>
+    (to?: FormattedRoute, from?: FormattedRoute, props?: unknown): void | Promise<void>
 }
 
 /**

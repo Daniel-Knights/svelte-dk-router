@@ -1,5 +1,5 @@
 <script>
-    export let title, body;
+    export let title, body
 </script>
 
 <div class="post">

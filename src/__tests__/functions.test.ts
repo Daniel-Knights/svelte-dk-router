@@ -8,9 +8,10 @@ import {
     beforeEach,
     hash,
     pathname,
-    search
+    search,
+    routeProps
 } from '../router'
-import { routeProps, routerState } from '../router/logic'
+import { routerState } from '../router/logic'
 import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
 

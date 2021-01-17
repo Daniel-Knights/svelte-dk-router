@@ -1,12 +1,12 @@
 <script>
     import { push, replace, SLink, setQuery, setParams, routeProps } from '../router'
 
-    let query = { id: '1', name: 'dan' },
-        params = { id: '1', name: 'dan' },
-        missingParams = { id: '1' },
-        invalidParams = { id: '1', name: 'dan', test: 'kajsdkajd' },
-        missingInvalidParams = { id: '1', test: 'heeloas' },
-        props = { random: 'uowjkdwjndlkwjned' }
+    let query = { id: '1', name: 'dan' }
+    let params = { id: '1', name: 'dan' }
+    let missingParams = { id: '1' }
+    let invalidParams = { id: '1', name: 'dan', test: 'kajsdkajd' }
+    let missingInvalidParams = { id: '1', test: 'heeloas' }
+    let props = { random: 'uowjkdwjndlkwjned' }
 </script>
 
 <header>

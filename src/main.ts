@@ -1,26 +1,47 @@
 import App from './App.svelte'
 import routes from './routes'
-import { setRoutes, beforeEach, afterEach, route, routeProps } from './router'
+import {
+    setRoutes,
+    beforeEach,
+    afterEach,
+    route,
+    routeProps,
+    push,
+    replace
+} from './router'
 
-beforeEach((to, from, { setProps, redirect }) => {
-    console.log(to.name, 'kjdnkwjdnkwdn')
-    // if (to.name === 'Home') {
-    //     redirect('/about', { query: { i: 'jnkjnkjn' } })
-    //     setProps('wdwd')
-    // } else if (to.name === 'About') {
-    //     redirect('/')
-    setProps('Hello')
-    // }
-    console.log(routeProps, 'b4')
-    // console.log(route, 'b4')
-})
-afterEach((to, from, { props, redirect }) => {
-    if (to.name === 'Home') redirect('Future', { params: { name: 'dan', id: '1' } })
-    console.log(route, 'after')
-    console.log(props, 'after')
+beforeEach(async (to, from) => {
+    if (to.name !== 'About' && to.query?.id !== '34tg34') {
+        await replace('About')
+            .then(route => console.log(route, 'about'))
+            .catch(err => {
+                console.log(err)
+            })
+    } else if (to.name !== 'Future') {
+        await push('/blog', {
+            params: { id: '1', name: 'dan' },
+            props: 'redirect test',
+            query: { id: '34tg34' }
+        }).then(route => console.log(route, 'blog'))
+    }
 })
 
-setRoutes(routes, true)
+// beforeEach(async (to, from) => {
+//     console.log(to.name, 'kjnkjn')
+//     switch (to.query?.id) {
+//         case '6y5gt3':
+//             await push('/', { query: { id: '34tg34' } })
+//             break
+//     }
+// })
+
+setRoutes(routes)
+
+// setTimeout(() => {
+//     push('/', {
+//         query: { id: '34tg34' }
+//     }).then(route => console.log(route))
+// }, 1000)
 
 const app = new App({ target: document.body })
 

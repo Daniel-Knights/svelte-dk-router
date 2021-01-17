@@ -3,11 +3,11 @@
     import { changeRoute, writableDepthChart, routerState } from '../logic'
     import {
         error,
-        formatPathFromParams,
-        formatQueryFromObject,
+        isEqualObject,
         compareRoutes,
+        formatPathFromParams,
         validatePassedParams,
-        isEqualObject
+        formatQueryFromObject
     } from '../static'
 
     export let name = undefined,

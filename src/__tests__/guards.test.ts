@@ -8,31 +8,30 @@ beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 describe('beforeEach()', () => {
     test('Triggers with correct to/from routes', async () => {
         beforeEach(async (to, from) => {
-            switch (to.query.stage) {
-                case '1':
+            switch (to.query?.id) {
+                case 'cwdwdc':
                     expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[2].children[0])
 
-                    await push('About', { query: { stage: '2' } })
+                    await push('About', { query: { id: 't4v3re' } })
 
                     break
-                case '2':
+                case 't4v3re':
                     expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[1])
 
-                    await push('/', { query: { stage: '3' } })
+                    await push('/', { query: { id: '5brvw' } })
 
                     break
-                case '3':
+                case '5brvw':
                     expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[0])
-                    break
             }
         })
 
         await push('Blog', {
             params: { id: '1', name: 'dan' },
-            query: { stage: '1' }
+            query: { id: 'cwdwdc' }
         })
     })
 })
@@ -40,85 +39,60 @@ describe('beforeEach()', () => {
 describe('afterEach()', () => {
     test('Triggers with correct to/from routes', async () => {
         afterEach(async (to, from) => {
-            switch (to.query.stage) {
-                case '4':
+            switch (to.query?.id) {
+                case 'lkwqdm':
                     expect(from).toMatchObject(testRoutes[0])
                     expect(to).toMatchObject(testRoutes[2].children[0])
 
-                    await push('About', { query: { stage: '5' } })
+                    await push('About', { query: { id: 'qwoisjq' } })
 
                     break
-                case '5':
+                case 'qwoisjq':
                     expect(from).toMatchObject(testRoutes[2].children[0])
                     expect(to).toMatchObject(testRoutes[1])
 
-                    await push('/', { query: { stage: '6' } })
+                    await push('/', { query: { id: 'wwkrnlk' } })
 
                     break
-                case '6':
+                case 'wwkrnlk':
                     expect(from).toMatchObject(testRoutes[1])
                     expect(to).toMatchObject(testRoutes[0])
-                    break
             }
         })
 
+        // Rebase
+        await push('/')
+
         await push('Blog', {
             params: { id: '1', name: 'dan' },
-            query: { stage: '4' }
+            query: { id: 'lkwqdm' }
         })
     })
 })
 
 describe('beforeEach() + afterEach()', () => {
     test('Correct props handling', async () => {
-        beforeEach((to, from, { setProps }) => {
-            if (to.query.stage === '7') setProps({ test: 'test' })
-            if (to.query.stage === '8') setProps('test')
+        beforeEach((to, from, setProps) => {
+            if (to.query.id === 'eifunw') setProps({ test: 'test' })
+            if (to.query.id === 'ejwknrf') setProps('test')
         })
 
-        afterEach(async (to, from, { props }) => {
-            switch (to.query.stage) {
-                case '7':
+        afterEach(async (to, from, props) => {
+            switch (to.query.id) {
+                case 'eifunw':
                     expect(props).toMatchObject({ test: 'test' })
                     expect(routeProps).toMatchObject({ test: 'test' })
 
-                    await push('/about', { query: { stage: '8' } })
+                    await push('/about', { query: { id: 'ejwknrf' } })
 
                     break
-                case '8':
+                case 'ejwknrf':
                     expect(props).toBe('test')
                     expect(routeProps).toBe('test')
                     break
             }
         })
 
-        await push('/', { query: { stage: '7' } })
+        await push('/', { query: { id: 'eifunw' } })
     })
 })
-
-// describe('beforeEach() + afterEach()', () => {
-//     test('Correct redirect', async () => {
-//         beforeEach((to, from, { setProps, redirect }) => {
-//             if (to.query.stage === '7') setProps({ test: 'test' })
-//             if (to.query.stage === '8') setProps('test')
-//         })
-
-//         afterEach(async (to, from, {props}) => {
-//             switch (to.query.stage) {
-//                 case '7':
-//                     expect(props).toMatchObject({ test: 'test' })
-//                     expect(routeProps).toMatchObject({ test: 'test' })
-
-//                     await push('/about', { query: { stage: '8' } })
-
-//                     break
-//                 case '8':
-//                     expect(props).toBe('test')
-//                     expect(routeProps).toBe('test')
-//                     break
-//             }
-//         })
-
-//         await push('/', { query: { stage: '7' } })
-//     })
-// })

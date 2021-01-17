@@ -1,13 +1,13 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { changeRoute, writableDepthChart } from '../../router/logic'
+    import { changeRoute, writableDepthChart, routerState } from '../../router/logic'
     import {
         error,
+        compareRoutes,
         isEqualObject,
         formatPathFromParams,
-        formatQueryFromObject,
-        compareRoutes,
-        validatePassedParams
+        validatePassedParams,
+        formatQueryFromObject
     } from '../../router/static'
 
     export let name = undefined,
@@ -16,7 +16,6 @@
         params = undefined,
         props = undefined,
         replace = undefined,
-        routes = undefined,
         id = undefined
 
     const dispatch = createEventDispatcher()
@@ -25,7 +24,7 @@
     let routerActive
 
     // Match identifier to set routes
-    const route = compareRoutes(routes, { name, path, params })
+    const route = compareRoutes(routerState.routes, { name, path, params })
 
     if (route) {
         if (route.path === '(*)') {
@@ -37,7 +36,7 @@
     } else error(`Unknown route "${identifier}"`)
 
     // Handle named-params
-    if (validatePassedParams(path, params) && params) {
+    if (validatePassedParams(path, params).valid && params) {
         path = formatPathFromParams(path, params)
     }
 
@@ -68,7 +67,7 @@
 <a
     href={path}
     on:click|preventDefault={async () => {
-        const result = await changeRoute(routeData, replace, identifier)
+        await changeRoute(routeData, replace, identifier)
             .then(result => {
                 if (!result) return
 
@@ -77,8 +76,6 @@
             .catch(err => {
                 dispatch('navigation', { success: false, err })
             })
-
-        dispatch('navigation', result)
     }}
     class={routerActive ? 'router-active' : ''}
     aria-current={routerActive ? 'page' : null}

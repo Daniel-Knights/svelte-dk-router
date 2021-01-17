@@ -1,11 +1,11 @@
 import { render, fireEvent } from '@testing-library/svelte'
 import {
     push,
+    route,
     replace,
     setQuery,
     setParams,
     setRoutes,
-    route,
     beforeEach
 } from '../router'
 import { testRoutes } from './static/routes'
@@ -275,7 +275,6 @@ describe('Fallback', () => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/unknown',
-                routes: userRoutes,
                 id: 'fdcgfc'
             }
         })
@@ -301,7 +300,7 @@ describe('Fallback', () => {
 describe('<SLink>', () => {
     test('Logs error when unknown name is passed', () => {
         render(SLink, {
-            props: { path: 'Unknown', routes: userRoutes }
+            props: { path: 'Unknown' }
         })
 
         expect(console.error).toHaveBeenCalledTimes(1)
@@ -309,7 +308,7 @@ describe('<SLink>', () => {
 
     test('Logs error when unknown path is passed', () => {
         render(SLink, {
-            props: { path: '/unknown', routes: userRoutes }
+            props: { path: '/unknown' }
         })
 
         expect(console.error).toHaveBeenCalledTimes(1)
@@ -317,7 +316,7 @@ describe('<SLink>', () => {
 
     test('Logs error on missing named-params', () => {
         render(SLink, {
-            props: { path: '/blog', routes: userRoutes }
+            props: { path: '/blog' }
         })
 
         expect(console.error).toHaveBeenCalledTimes(1)
@@ -327,8 +326,7 @@ describe('<SLink>', () => {
         render(SLink, {
             props: {
                 path: '/blog',
-                params: { id: '1', name: 'dan', invalid: 'invalid' },
-                routes: userRoutes
+                params: { id: '1', name: 'dan', invalid: 'invalid' }
             }
         })
 
@@ -339,8 +337,7 @@ describe('<SLink>', () => {
         render(SLink, {
             props: {
                 path: '/blog',
-                params: { id: '1', invalid: 'invalid' },
-                routes: userRoutes
+                params: { id: '1', invalid: 'invalid' }
             }
         })
 
@@ -352,7 +349,7 @@ describe('<SLink>', () => {
         Error = store
 
         const { getByTestId, component } = render(SLink, {
-            props: { path: '/unknown', testRoutes, id: 'khvvkhjv' }
+            props: { path: '/unknown', id: 'khvvkhjv' }
         })
 
         const link = getByTestId('khvvkhjv')
@@ -378,7 +375,7 @@ describe('<SLink>', () => {
 
 describe('beforeEach()', () => {
     test('Logs error when attempting to set props more than once per navigation', async () => {
-        beforeEach((to, from, { setProps }) => {
+        beforeEach((to, from, setProps) => {
             setProps({ some: 'props' })
             setProps('Some other props')
         })
@@ -391,41 +388,41 @@ describe('beforeEach()', () => {
 
 describe('Promise rejections', () => {
     test('Correct error messages', async () => {
-        push('/unknown').catch(err =>
+        await push('/unknown').catch(err =>
             expect(err.message).toBe('Unknown route: "/unknown"')
         )
-        push('/blog').catch(err =>
+        await push('/blog').catch(err =>
             expect(err.message).toBe('Missing required param(s): "id" "name"')
         )
         // @ts-ignore
-        push().catch(err =>
+        await push().catch(err =>
             expect(err.message).toBe('"path" or "name" argument required')
         )
 
-        replace('/unknown').catch(err =>
+        await replace('/unknown').catch(err =>
             expect(err.message).toBe('Unknown route: "/unknown"')
         )
-        replace('/blog').catch(err =>
+        await replace('/blog').catch(err =>
             expect(err.message).toBe('Missing required param(s): "id" "name"')
         )
         // @ts-ignore
-        replace().catch(err =>
+        await replace().catch(err =>
             expect(err.message).toBe('"path" or "name" argument required')
         )
 
-        setQuery({ test: 'test' }).catch(err =>
+        await setQuery({ test: 'test' }).catch(err =>
             expect(err.message).toBe('Cannot set query of unknown route')
         )
 
         await replace('/blog', { params: { id: '1', name: 'dan' } })
 
-        setParams({ id: '2' }).catch(err =>
+        await setParams({ id: '2' }).catch(err =>
             expect(err.message).toBe('Missing required param(s): "name"')
         )
 
         await push('/unknown').catch(() => '')
 
-        setParams({ test: 'test' }).catch(err =>
+        await setParams({ test: 'test' }).catch(err =>
             expect(err.message).toBe('Cannot set params of unknown route')
         )
 

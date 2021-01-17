@@ -5,16 +5,18 @@ import {
     formatParamsFromPath,
     error
 } from '../static'
-import { afterContext, beforeContext, redirecting } from './router'
 import { afterCallback, beforeCallback } from './guard'
 import { routerState, writableRoute } from './state'
 import { chartState } from './nested'
+import { routeProps, setProps } from './router'
 
 /**
  * Determine the current route and update route data on page-load.
  * @returns `void` or logs an error if the route is unknown.
  */
 export async function loadState(): Promise<void> {
+    routerState.navigating = true
+
     let currentRoute: FormattedRoute
     let path = currentPath(routerState.hashHistory)
 
@@ -55,26 +57,32 @@ export async function loadState(): Promise<void> {
 
     if (path[1] === '#') path = path.slice(2)
 
-    if (!routerState.routes) return
-    else {
+    if (!routerState.routes) {
+        routerState.navigating = false
+        return
+    } else {
         const query = window.location.search || window.location.hash.split('?')[1]
 
         filterRoutes(routerState.routes, query)
     }
 
     // Determine if route has nested base-path and set properties if so
-    if (!currentRoute) return error('Unknown route')
-    else if (currentRoute && currentRoute.children) {
+    if (!currentRoute) {
+        routerState.navigating = false
+
+        return error('Unknown route')
+    } else if (currentRoute && currentRoute.children) {
         handleNestedBasePath()
     }
 
-    if (beforeCallback && !redirecting.state) {
-        const beforeResult = await beforeCallback(currentRoute, null, beforeContext)
+    if (beforeCallback) {
+        const beforeResult = await beforeCallback(currentRoute, null, setProps)
 
-        if (beforeResult === false) return
-    } else if (redirecting.state) {
-        redirecting.state = false
-        return
+        if (beforeResult === false || routerState.redirecting) {
+            routerState.navigating = false
+            routerState.redirecting = false
+            return
+        }
     }
 
     writableRoute.set(currentRoute)
@@ -87,11 +95,11 @@ export async function loadState(): Promise<void> {
         title.innerHTML = currentRoute.title
     }
 
-    if (afterCallback && !redirecting.state) {
-        afterCallback(currentRoute, null, afterContext)
-    } else {
-        redirecting.state = false
+    if (afterCallback) {
+        afterCallback(currentRoute, null, routeProps)
     }
+
+    routerState.navigating = false
 }
 
 window.addEventListener('popstate', loadState)

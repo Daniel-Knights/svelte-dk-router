@@ -51,8 +51,8 @@ export function isEqualObject(
         return false
     }
 
-    keys(objOne).forEach(param => {
-        if (!objTwo || objTwo[param] !== objOne[param]) {
+    keys(objOne).forEach(key => {
+        if (!objTwo || objTwo[key] !== objOne[key]) {
             match = false
         }
     })
@@ -282,11 +282,11 @@ export function isSameRoute(
     const fallbackMatch =
         routeOne.path === '(*)' &&
         (identifier === window.location.pathname ||
-            identifier === window.location.hash.slice(1) ||
+            identifier === window.location.hash.slice(1).split('?')[0] ||
             identifier === previousIdentifier)
 
-    let paramMatch = true,
-        queryMatch = true
+    let paramMatch = true
+    let queryMatch = true
 
     if (routeOne.params) {
         paramMatch = isEqualObject(routeOne.params, routeTwo.params)
@@ -310,7 +310,8 @@ export function compareRoutes(
     route: PassedRoute
 ): void | FormattedRoute {
     const { name, path } = route
-    let matchedRoute, fallbackRoute
+    let matchedRoute
+    let fallbackRoute
 
     function matchRoute(passedRoutes) {
         if (!passedRoutes) return

@@ -13,40 +13,6 @@ import { afterCallback, beforeCallback } from './guard'
 import { chartState } from './nested'
 import { route, routerState, writableRoute } from './state'
 
-/** Determine if `redirect` has been called inside `beforeEach` callback */
-export const redirecting = {
-    state: false,
-    change: false
-}
-
-/**
- * Redirect initial navigation to another route.
- * @param identifier - Route path or name used to redirect
- * @returns `changeRoute`
- */
-export function redirect(identifier: string, options?: PassedRoute): void {
-    redirecting.state = true
-    redirecting.change = true
-
-    const nameOrPath = identifier[0] === '/' ? { path: identifier } : { name: identifier }
-
-    changeRoute({ ...nameOrPath, ...options })
-}
-
-/**
- * Object argument for `beforeEach` callback.
- * @property `redirect` - Redirects initial navigation to another route
- * @property `setProps` - Sets provided props if they haven't already been set
- */
-export const beforeContext = { redirect, setProps }
-
-/**
- * Object argument for `beforeEach` callback.
- * @property `redirect` - Redirects initial navigation to another route
- * @property `setProps` - Sets provided props if they haven't already been set
- */
-export const afterContext = { redirect, props: null }
-
 /**
  * Contains any props set on navigation through:
  *
@@ -63,15 +29,11 @@ export function setProps(props: unknown): void {
         error('Props can only be set once per navigation')
     } else {
         routeProps = props
-        afterContext.props = props
     }
 }
 
 /** Previous route data */
-const fromRoute = {
-    route: null,
-    identifier: null
-}
+const fromRoute = { route: null, identifier: null }
 
 /**
  * Central function responsible for all navigations.
@@ -83,11 +45,15 @@ const fromRoute = {
 export async function changeRoute(
     passedRoute: PassedRoute,
     replace?: boolean,
-    identifier?: string
+    identifier?: string,
+    isRedirect?: boolean
 ): Promise<void | FormattedRoute> {
+    routerState.navigating = true
+
     const matchedRoute = compareRoutes(routerState.routes, passedRoute)
 
     if (!matchedRoute) {
+        routerState.navigating = false
         error(`Unknown route: "${identifier}"`)
         throw new Error(`Unknown route: "${identifier}"`)
     }
@@ -100,9 +66,8 @@ export async function changeRoute(
     const paramsResult = validatePassedParams(newRoute.route.fullPath, params)
 
     if (!paramsResult.valid) {
-        throw new Error(
-            ('Missing required param(s):' + paramsResult.errorString) as string
-        )
+        routerState.navigating = false
+        throw new Error('Missing required param(s):' + paramsResult.errorString)
     }
 
     // Query handling
@@ -126,27 +91,32 @@ export async function changeRoute(
             fromRoute.identifier
         )
     ) {
+        routerState.navigating = false
         return
     } else fromRoute.identifier = identifier
 
     // Set fromRoute before route is updated
-    if (!replace && !redirecting.change) fromRoute.route = route
+    if (!replace) {
+        fromRoute.route = route
+    }
 
     // Props handling
-    if (!redirecting.change) setProps(null)
+    setProps(null)
     if (props) setProps(props)
 
     // Before route change navigation guard
-    if (beforeCallback && !redirecting.change) {
+    if (beforeCallback) {
         const beforeResult = await beforeCallback(
             newRoute.route,
             fromRoute.route,
-            beforeContext
+            setProps
         )
 
-        if (beforeResult === false) return
-    } else if (redirecting.change) {
-        redirecting.change = false
+        if (beforeResult === false || (routerState.redirecting && !isRedirect)) {
+            routerState.navigating = false
+            routerState.redirecting = false
+            return
+        }
     }
 
     writableRoute.set(newRoute.route)
@@ -165,11 +135,11 @@ export async function changeRoute(
     setUrl(newRoute.path, replace, routerState.hashHistory)
 
     // After route change navigation guard
-    if (afterCallback && !redirecting.change) {
-        afterCallback(route, fromRoute.route, afterContext)
-    } else {
-        redirecting.change = false
+    if (afterCallback) {
+        afterCallback(route, fromRoute.route, routeProps)
     }
+
+    routerState.navigating = false
 
     if (matchedRoute.path === '(*)') {
         error(`Unknown route: "${identifier}"`)
@@ -179,11 +149,10 @@ export async function changeRoute(
     return route
 }
 
-const newRoute = { path: '', title: '', route: null }
-
 /** Formats and sets new route-data */
 function setNewRouteData(routeData: FormattedRoute): NewRoute {
     const hasDefaultChild = routeData.children && !routeData.children[0].path
+    const newRoute = { path: '', title: '', route: null }
 
     if (routeData.title) newRoute.title = routeData.title
 
