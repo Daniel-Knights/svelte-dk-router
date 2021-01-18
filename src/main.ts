@@ -25,7 +25,7 @@ beforeEach(async (to, from) => {
             query: { id: '34tg34' }
         }).then(route => console.log(route, 'blog'))
     }
-    if (to.name === 'About') return false
+    // if (to.name === 'About') return false
 })
 
 // beforeEach(async (to, from) => {

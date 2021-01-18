@@ -3,8 +3,8 @@ Compile svelte components
 anchor links/scroll-behaviour
 named-params at start of path
 separate router instances - setRoutes creates new class
-page load tests
 
 tests
     duplicate navigation
     guards redirect
+    page load
