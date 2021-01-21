@@ -41,7 +41,7 @@ const testObjTwo = { id: '1', name: 'Dan' }
 beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 
 describe('route', () => {
-    test('Contains correct data', async () => {
+    it('Contains correct data', async () => {
         expect(route).toMatchObject(testRoutes[0])
 
         formattedProperties.forEach(property => {
@@ -64,7 +64,7 @@ describe('route', () => {
 })
 
 describe('routeChart', () => {
-    test('Contains correct data', async () => {
+    it('Contains correct data', async () => {
         expect(routeChart[2]).toMatchObject(testRoutes[2].children[0])
 
         values(routeChart).forEach(route => {
@@ -95,7 +95,7 @@ describe('routeChart', () => {
 })
 
 describe('routeStore', () => {
-    test('Contains correct data', async () => {
+    it('Contains correct data', async () => {
         let currentRoute
 
         routeStore.subscribe(newRoute => {
@@ -113,7 +113,7 @@ describe('routeStore', () => {
 })
 
 describe('routeChartStore', () => {
-    test('Contains correct data', async () => {
+    it('Contains correct data', async () => {
         let currentChart
 
         routeChartStore.subscribe((newChart: Record<string, FormattedRoute>) => {
@@ -133,7 +133,7 @@ describe('routeChartStore', () => {
 })
 
 describe('routeProps', () => {
-    test('Contains correct data', async () => {
+    it('Contains correct data', async () => {
         await push('/', { props: testObjOne })
 
         expect(routeProps).toMatchObject(testObjOne)
@@ -145,7 +145,7 @@ describe('routeProps', () => {
 })
 
 describe('window.location', () => {
-    test('Variables contain correct location properties', async () => {
+    it('Contains correct location properties', async () => {
         await push('/')
 
         expect(hash).toBe(window.location.hash)

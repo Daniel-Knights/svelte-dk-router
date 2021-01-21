@@ -25,7 +25,7 @@ afterAll(() => (Error = store))
 afterEach(() => jest.resetAllMocks())
 
 describe('setRoutes()', () => {
-    test('Logs warning when passed invalid properties', () => {
+    it('Logs warning when passed invalid properties', () => {
         userRoutes[0]['invalidProperty'] = 'invalidProperty'
 
         // @ts-ignore
@@ -34,7 +34,7 @@ describe('setRoutes()', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs error on missing properties', () => {
+    it('Logs error on missing properties', () => {
         const memoComponent = userRoutes[0].component
 
         delete userRoutes[0].component
@@ -47,7 +47,7 @@ describe('setRoutes()', () => {
         userRoutes[0]['component'] = memoComponent
     })
 
-    test('Logs warning when name includes "/"', () => {
+    it('Logs warning when name includes "/"', () => {
         userRoutes[1].name = '/about'
 
         // @ts-ignore
@@ -56,7 +56,7 @@ describe('setRoutes()', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs error on missing children properties', () => {
+    it('Logs error on missing children properties', () => {
         const memoPath = userRoutes[1].children[0].children[0].path
         const memoComponent = userRoutes[2].children[1].component
 
@@ -72,7 +72,7 @@ describe('setRoutes()', () => {
         userRoutes[2].children[1]['component'] = memoComponent
     })
 
-    test('Logs error on duplicate named-params within a given full-path', () => {
+    it('Logs error on duplicate named-params within a given full-path', () => {
         const memoPathOne = userRoutes[2].children[0].children[0].path
 
         userRoutes[2].children[0].children[0].path = '/more:hey/:id'
@@ -85,7 +85,7 @@ describe('setRoutes()', () => {
         userRoutes[2].children[0].children[0].path = memoPathOne
     })
 
-    test('Logs error on duplicate properties', () => {
+    it('Logs error on duplicate properties', () => {
         const memoPathOne = userRoutes[0].path
         const memoPathTwo = userRoutes[1].path
 
@@ -101,7 +101,7 @@ describe('setRoutes()', () => {
         userRoutes[1].path = memoPathTwo
     })
 
-    test('Logs error on duplicate children properties', () => {
+    it('Logs error on duplicate children properties', () => {
         const memoNameOne = userRoutes[1].children[1].name
         const memoNameTwo = userRoutes[2].children[0].name
 
@@ -119,7 +119,7 @@ describe('setRoutes()', () => {
 })
 
 describe('push()', () => {
-    test('Logs error on unknown route', async () => {
+    it('Logs error on unknown route', async () => {
         await push('/unknown').catch(() => '')
 
         expect(console.error).toHaveBeenCalledTimes(1)
@@ -131,14 +131,14 @@ describe('push()', () => {
         expect(Error).toHaveBeenCalledTimes(2)
     })
 
-    test('Logs/throws error on missing named-params', async () => {
+    it('Logs/throws error on missing named-params', async () => {
         await push('/blog').catch(() => '')
 
         expect(console.error).toHaveBeenCalledTimes(1)
         expect(Error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs warning on invalid named-params', async () => {
+    it('Logs warning on invalid named-params', async () => {
         await push('/blog', {
             params: {
                 id: '1',
@@ -150,7 +150,7 @@ describe('push()', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs/throws error and warning on missing and invalid named-params', async () => {
+    it('Logs/throws error and warning on missing and invalid named-params', async () => {
         await push('/blog', {
             params: {
                 id: '1',
@@ -165,7 +165,7 @@ describe('push()', () => {
 })
 
 describe('replace()', () => {
-    test('Logs/throws error on unknown route', async () => {
+    it('Logs/throws error on unknown route', async () => {
         await replace('/unknown').catch(() => '')
 
         expect(console.error).toHaveBeenCalledTimes(1)
@@ -177,14 +177,14 @@ describe('replace()', () => {
         expect(Error).toHaveBeenCalledTimes(2)
     })
 
-    test('Logs/throws error on missing named-params', async () => {
+    it('Logs/throws error on missing named-params', async () => {
         await replace('/blog').catch(() => '')
 
         expect(console.error).toHaveBeenCalledTimes(1)
         expect(Error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs error on invalid named-params', async () => {
+    it('Logs error on invalid named-params', async () => {
         await replace('/blog', {
             params: {
                 id: '1',
@@ -196,7 +196,7 @@ describe('replace()', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs/throws error and warning on missing and invalid named-params', async () => {
+    it('Logs/throws error and warning on missing and invalid named-params', async () => {
         await replace('/blog', {
             params: {
                 id: '1',
@@ -211,7 +211,7 @@ describe('replace()', () => {
 })
 
 describe('setQuery()', () => {
-    test('Logs/throws error when current route is unknown', async () => {
+    it('Logs/throws error when current route is unknown', async () => {
         await push('/unknown').catch(() => '')
 
         // @ts-ignore
@@ -223,7 +223,7 @@ describe('setQuery()', () => {
 })
 
 describe('setParams()', () => {
-    test('Logs/throws error when current route is unknown', async () => {
+    it('Logs/throws error when current route is unknown', async () => {
         await push('/unknown').catch(() => '')
 
         // @ts-ignore
@@ -233,7 +233,7 @@ describe('setParams()', () => {
         expect(Error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs/throws error when route has no defined params', async () => {
+    it('Logs/throws error when route has no defined params', async () => {
         await push('/')
 
         await setParams({ invalid: 'invalid' }).catch(() => '')
@@ -242,7 +242,7 @@ describe('setParams()', () => {
         expect(Error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs/throws error on missing named-params', async () => {
+    it('Logs/throws error on missing named-params', async () => {
         await push('/blog', { params: { id: '1', name: 'Dan' } })
 
         await setParams({ id: '2' }).catch(() => '')
@@ -251,7 +251,7 @@ describe('setParams()', () => {
         expect(Error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs warning when invalid named-param is passed', async () => {
+    it('Logs warning when invalid named-param is passed', async () => {
         await push('/blog', { params: { id: '2', name: 'Steve' } })
 
         await setParams({ id: '3', name: 'John', invalid: 'invalid' })
@@ -259,7 +259,7 @@ describe('setParams()', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs/throws error and warning on missing/invalid named-params', async () => {
+    it('Logs/throws error and warning on missing/invalid named-params', async () => {
         await push('/blog', { params: { id: '1', name: 'Dan' } })
 
         await setParams({ id: '2', invalid: 'invalid' }).catch(() => '')
@@ -271,7 +271,7 @@ describe('setParams()', () => {
 })
 
 describe('Fallback', () => {
-    test('Navigates to fallback when no other routes match', async () => {
+    it('Navigates to fallback when no other routes match', async () => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/unknown',
@@ -298,7 +298,7 @@ describe('Fallback', () => {
 })
 
 describe('<SLink>', () => {
-    test('Logs error when unknown name is passed', () => {
+    it('Logs error when unknown name is passed', () => {
         render(SLink, {
             props: { path: 'Unknown' }
         })
@@ -306,7 +306,7 @@ describe('<SLink>', () => {
         expect(console.error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs error when unknown path is passed', () => {
+    it('Logs error when unknown path is passed', () => {
         render(SLink, {
             props: { path: '/unknown' }
         })
@@ -314,7 +314,7 @@ describe('<SLink>', () => {
         expect(console.error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs error on missing named-params', () => {
+    it('Logs error on missing named-params', () => {
         render(SLink, {
             props: { path: '/blog' }
         })
@@ -322,7 +322,7 @@ describe('<SLink>', () => {
         expect(console.error).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs warning on invalid named-params', () => {
+    it('Logs warning on invalid named-params', () => {
         render(SLink, {
             props: {
                 path: '/blog',
@@ -333,7 +333,7 @@ describe('<SLink>', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Logs error and warning on missing and invalid named-params', () => {
+    it('Logs error and warning on missing and invalid named-params', () => {
         render(SLink, {
             props: {
                 path: '/blog',
@@ -345,7 +345,7 @@ describe('<SLink>', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    test('Emits correct "navigation" error', async () => {
+    it('Emits correct "navigation" error', async () => {
         Error = store
 
         const { getByTestId, component } = render(SLink, {
@@ -374,7 +374,7 @@ describe('<SLink>', () => {
 })
 
 describe('beforeEach()', () => {
-    test('Logs error when attempting to set props more than once per navigation', async () => {
+    it('Logs error when attempting to set props more than once per navigation', async () => {
         beforeEach((to, from, setProps) => {
             setProps({ some: 'props' })
             setProps('Some other props')
@@ -387,7 +387,7 @@ describe('beforeEach()', () => {
 })
 
 describe('Promise rejections', () => {
-    test('Correct error messages', async () => {
+    it('Throws correct error messages', async () => {
         await push('/unknown').catch(err =>
             expect(err.message).toBe('Unknown route: "/unknown"')
         )

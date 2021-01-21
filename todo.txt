@@ -1,8 +1,6 @@
 Update slink/guards readme
 anchor links/scroll-behaviour
 named-params at start of path
-multiple redirects
-allow redirect if same route
 
 tests
     duplicate navigation

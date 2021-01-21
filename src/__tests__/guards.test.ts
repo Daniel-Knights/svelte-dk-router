@@ -1,4 +1,12 @@
-import { beforeEach, afterEach, push, setRoutes, routeProps, replace } from '../router'
+import {
+    beforeEach,
+    afterEach,
+    push,
+    setRoutes,
+    routeProps,
+    replace,
+    route
+} from '../router'
 import { testRoutes } from './static/routes'
 import routes from '../routes'
 
@@ -6,8 +14,12 @@ import routes from '../routes'
 beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 
 describe('beforeEach()', () => {
-    test('Triggers with correct to/from routes', async () => {
+    it('Triggers with correct to/from routes', async () => {
+        let fired
+
         beforeEach(async (to, from) => {
+            fired = true
+
             switch (to.query?.id) {
                 case 'cwdwdc':
                     expect(from).toMatchObject(testRoutes[0])
@@ -33,28 +45,44 @@ describe('beforeEach()', () => {
             params: { id: '1', name: 'dan' },
             query: { id: 'cwdwdc' }
         })
+
+        expect(fired).toBeTruthy()
     })
 
-    // test('Redirects with push and replace', async () => {
-    //     beforeEach(async to => {
-    //         if (to.path === '/') {
-    //             await push('About')
-    //         } else if (to.name === 'About') {
-    //             await replace('/blog', { params: { id: '1', name: 'dan' } })
-    //         }
-    //     })
+    it('Redirects with push and replace', async () => {
+        let fired
 
-    //     const pushResult = await push('/')
-    //     expect(pushResult).toMatchObject(testRoutes[1])
+        beforeEach(async to => {
+            fired = true
 
-    //     const replaceResult = await replace('/about')
-    //     expect(replaceResult).toMatchObject(testRoutes[2].children[0])
-    // })
+            if (to.path === '/') {
+                await push('About')
+            } else if (to.name === 'About') {
+                await replace('/blog', { params: { id: '1', name: 'dan' } })
+            }
+        })
+
+        const pushResult = await push('/')
+        expect(pushResult).toMatchObject(testRoutes[2].children[0])
+        expect(route).toMatchObject(testRoutes[2].children[0])
+
+        expect(fired).toBeTruthy()
+
+        const replaceResult = await replace('/about')
+        expect(replaceResult).toMatchObject(testRoutes[2].children[0])
+        expect(route).toMatchObject(testRoutes[2].children[0])
+
+        expect(fired).toBeTruthy()
+    })
 })
 
 describe('afterEach()', () => {
-    test('Triggers with correct to/from routes', async () => {
+    it('Triggers with correct to/from routes', async () => {
+        let fired
+
         afterEach(async (to, from) => {
+            fired = true
+
             switch (to.query?.id) {
                 case 'lkwqdm':
                     expect(from).toMatchObject(testRoutes[0])
@@ -83,33 +111,52 @@ describe('afterEach()', () => {
             params: { id: '1', name: 'dan' },
             query: { id: 'lkwqdm' }
         })
+
+        expect(fired).toBeTruthy()
     })
 
-    // test('Redirects with push and replace', async () => {
-    //     afterEach(async to => {
-    //         if (to.name === 'Blog') {
-    //             await replace('/')
-    //         } else if (to.name !== 'About') {
-    //             await push('About')
-    //         }
-    //     })
+    it('Redirects with push and replace', async () => {
+        let fired
 
-    //     const replaceResult = await replace('Blog', { params: { id: '1', name: 'dan' } })
-    //     expect(replaceResult).toMatchObject(testRoutes[0])
+        afterEach(async to => {
+            fired = true
+            console.log('to')
+            if (to.name === 'Future') {
+                await replace('/')
+            } else if (to.name !== 'About') {
+                await push('About')
+            }
+        })
 
-    //     const pushResult = await push('/')
-    //     expect(pushResult).toMatchObject(testRoutes[1])
-    // })
+        const replaceResult = await replace('Blog', { params: { id: '1', name: 'dan' } })
+        expect(replaceResult).toMatchObject(testRoutes[2].children[0])
+        // expect(route).toMatchObject(testRoutes[1])
+
+        expect(fired).toBeTruthy()
+
+        const pushResult = await push('/')
+        // expect(pushResult).toMatchObject(testRoutes[0])
+        // expect(route).toMatchObject(testRoutes[1])
+
+        expect(fired).toBeTruthy()
+    })
 })
 
 describe('beforeEach() + afterEach()', () => {
-    test('Correct props handling', async () => {
+    it('Sets props before navigation and provides them after', async () => {
+        let beforeFired
+        let afterFired
+
         beforeEach((to, from, setProps) => {
+            beforeFired = true
+
             if (to.query?.id === 'eifunw') setProps({ test: 'test' })
             if (to.query?.id === 'ejwknrf') setProps('test')
         })
 
         afterEach(async (to, from, props) => {
+            afterFired = true
+
             switch (to.query?.id) {
                 case 'eifunw':
                     expect(props).toMatchObject({ test: 'test' })
@@ -126,5 +173,8 @@ describe('beforeEach() + afterEach()', () => {
         })
 
         await push('/', { query: { id: 'eifunw' } })
+
+        expect(beforeFired).toBeTruthy()
+        expect(afterFired).toBeTruthy()
     })
 })

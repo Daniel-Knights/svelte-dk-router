@@ -9,7 +9,7 @@ import routes from '../routes'
 beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
 
 describe('<SLink> + <SView>', () => {
-    test('Instantiates components', () => {
+    it('Instantiates components', () => {
         expect(() =>
             render(SLink, {
                 props: { name: 'About' }
@@ -21,7 +21,7 @@ describe('<SLink> + <SView>', () => {
 })
 
 describe('<SView>', () => {
-    test('Renders correct routes', async () => {
+    it('Renders correct routes', async () => {
         // Silence faulty unknown route error
         console.error = () => ''
 
@@ -46,7 +46,7 @@ describe('<SView>', () => {
 })
 
 describe('<SLink>', () => {
-    test('Changes route by name', async () => {
+    it('Changes route by name', async () => {
         const { getByTestId } = render(SLink, {
             props: { name: 'Home', id: 'khjb23' }
         })
@@ -58,7 +58,7 @@ describe('<SLink>', () => {
         expect(route).toMatchObject(testRoutes[0])
     })
 
-    test('Changes route by path', async () => {
+    it('Changes route by path', async () => {
         const { getByTestId } = render(SLink, {
             props: { path: '/about', id: 'jbj3h4b' }
         })
@@ -70,7 +70,7 @@ describe('<SLink>', () => {
         expect(route).toMatchObject(testRoutes[1])
     })
 
-    test('Changes route with query, params and props, defaults to first child', async () => {
+    it('Changes route with query, params and props, defaults to first child', async () => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/blog',
@@ -91,7 +91,7 @@ describe('<SLink>', () => {
         expect(routeProps).toMatchObject({ test: 'test' })
     })
 
-    test('Changes route using window.history.replaceState', async () => {
+    it('Changes route using window.history.replaceState', async () => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/',
@@ -119,7 +119,7 @@ describe('<SLink>', () => {
         expect(route).toMatchObject(testRoutes[0])
     })
 
-    test('Emits correct "navigation" event', async () => {
+    it('Emits correct "navigation" event', async () => {
         const { getByTestId, component } = render(SLink, {
             props: { name: 'About', id: 'oinkjn' }
         })
@@ -142,7 +142,7 @@ describe('<SLink>', () => {
         expect(fired).toBeTruthy()
     })
 
-    test('Applies router-active class and aria-current attribute', async () => {
+    it('Applies router-active class and aria-current attribute', async () => {
         const { getByTestId } = render(SLink, {
             props: { path: '/', id: 's0d9' }
         })
@@ -168,7 +168,7 @@ describe('<SLink>', () => {
         expect(aboutLink.getAttribute('aria-current')).toBe('page')
     })
 
-    test('Sets correct href', () => {
+    it('Sets correct href', () => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/blog',

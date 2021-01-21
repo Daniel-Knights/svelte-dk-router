@@ -22,9 +22,9 @@ const testObjTwo = { id: '1', name: 'dan' }
 beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE))
 
 describe('setRoutes()', () => {
-    test('Sets correct routes', () => expect(routerState.routes).toEqual(userRoutes))
+    it('Sets correct routes', () => expect(routerState.routes).toEqual(userRoutes))
 
-    test('Strips invalid properties', () => {
+    it('Strips invalid properties', () => {
         userRoutes[0]['invalidProperty'] = 'invalidProperty'
 
         console.warn = jest.fn()
@@ -38,7 +38,7 @@ describe('setRoutes()', () => {
 })
 
 describe('push()', () => {
-    test('Uses window.history.pushState to change route', async () => {
+    it('Uses window.history.pushState to change route', async () => {
         expect(route).toMatchObject(testRoutes[0])
 
         await push('/about')
@@ -81,7 +81,7 @@ describe('push()', () => {
         }
     })
 
-    test('Returns correct route', async () => {
+    it('Returns correct route', async () => {
         await push('/').then(newRoute => {
             expect(newRoute).toMatchObject(testRoutes[0])
         })
@@ -93,7 +93,7 @@ describe('push()', () => {
 })
 
 describe('replace()', () => {
-    test('Uses window.history.replaceState to change route', async () => {
+    it('Uses window.history.replaceState to change route', async () => {
         beforeEach((to, from) => {
             if (routeProps && (routeProps as Record<string, string>).replaceTest) {
                 expect(from).not.toMatchObject(testRoutes[0])
@@ -123,7 +123,7 @@ describe('replace()', () => {
         }
     })
 
-    test('Returns correct route', async () => {
+    it('Returns correct route', async () => {
         await replace('future').then(newRoute => {
             expect(newRoute).toMatchObject(testRoutes[1].children[0])
         })
@@ -135,7 +135,7 @@ describe('replace()', () => {
 })
 
 describe('setQuery()', () => {
-    test('Sets the current query', async () => {
+    it('Sets the current query', async () => {
         await setQuery(testObjOne)
 
         expect(route.query).toMatchObject(testObjOne)
@@ -159,7 +159,7 @@ describe('setQuery()', () => {
         }
     })
 
-    test('Updates the current query', async () => {
+    it('Updates the current query', async () => {
         await setQuery({ test: 'test', updated: 'not-updated' })
 
         // @ts-ignore
@@ -196,7 +196,7 @@ describe('setQuery()', () => {
         }
     })
 
-    test('Returns correct route', async () => {
+    it('Returns correct route', async () => {
         await push('About')
 
         const updatedRoute = await setQuery(testObjOne)
@@ -207,7 +207,7 @@ describe('setQuery()', () => {
         })
     })
 
-    test('Push/replace', async () => {
+    it('Uses push instead of replace if third argument is `false`', async () => {
         let fired
 
         expect(route).not.toMatchObject(testRoutes[0])
@@ -230,7 +230,7 @@ describe('setQuery()', () => {
 })
 
 describe('setParams()', () => {
-    test('Sets named-params', async () => {
+    it('Sets named-params', async () => {
         await push('/blog', { params: testObjTwo })
 
         // @ts-ignore
@@ -252,7 +252,7 @@ describe('setParams()', () => {
         }
     })
 
-    test('Returns correct route', async () => {
+    it('Returns correct route', async () => {
         await push('/blog', { params: testObjTwo })
 
         const updatedRoute = await setParams({ id: '2', name: 'dan' })
@@ -263,7 +263,7 @@ describe('setParams()', () => {
         })
     })
 
-    test('Push/replace', async () => {
+    it('Uses replace instead of push if third argument is `false`', async () => {
         let fired
 
         await push('/')
