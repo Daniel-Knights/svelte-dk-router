@@ -40,14 +40,12 @@ const fromRoute = { route: null, identifier: null }
  * @param passedRoute
  * @param replace - (Optional) - Use `window.history.replaceState` instead of `window.history.pushState`.
  * @param identifier - (Optional) - The passed name or path. Used for error-handling.
- * @param isRedirect - (Optional) - Determines if `push` or `replace` has been called inside a router-guard.
  * @returns The current route or throws an error.
  */
 export async function changeRoute(
     passedRoute: PassedRoute,
     replace?: boolean,
-    identifier?: string,
-    isRedirect?: boolean
+    identifier?: string
 ): Promise<void | FormattedRoute> {
     routerState.navigating = true
 
@@ -90,11 +88,14 @@ export async function changeRoute(
             route,
             identifier,
             fromRoute.identifier
-        )
+        ) &&
+        !routerState.loading
     ) {
         routerState.navigating = false
         return
     } else fromRoute.identifier = identifier
+
+    if (routerState.loading) routerState.loading = false
 
     // Set fromRoute before route is updated
     if (!replace) {
@@ -113,10 +114,17 @@ export async function changeRoute(
             setProps
         )
 
-        if ((beforeResult === false || routerState.redirecting) && !isRedirect) {
+        routerState.navigationStack.push(passedRoute)
+
+        const index = routerState.navigationStack.indexOf(passedRoute)
+
+        if (beforeResult === false || (routerState.redirecting && index > 0)) {
             routerState.navigating = false
+            return route
+        }
+
+        if (routerState.redirecting) {
             routerState.redirecting = false
-            return
         }
     }
 
@@ -135,16 +143,16 @@ export async function changeRoute(
     // Update URL/state
     setUrl(newRoute.path, replace, routerState.hashHistory)
 
-    // After route change navigation guard
-    if (afterCallback) {
-        afterCallback(route, fromRoute.route, routeProps)
-    }
-
     routerState.navigating = false
 
     if (matchedRoute.path === '(*)') {
         error(`Unknown route: "${identifier}"`)
         throw new Error(`Unknown route: "${identifier}"`)
+    }
+
+    // After route change navigation guard
+    if (afterCallback) {
+        afterCallback(route, fromRoute.route, routeProps)
     }
 
     return route
@@ -174,7 +182,7 @@ function setNewRouteData(routeData: FormattedRoute): NewRoute {
     }
 
     newRoute.path = routeData.fullPath
-    newRoute.route = routeData
+    newRoute.route = { ...routeData }
 
     // Check for default child
     if (newRoute.route.children) {

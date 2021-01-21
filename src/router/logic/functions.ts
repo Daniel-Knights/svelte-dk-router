@@ -22,12 +22,8 @@ async function pushOrReplace(
     replace: boolean
 ): Promise<void | FormattedRoute> {
     const { identifier } = routeData
-    let isRedirect
 
-    if (routerState.navigating) {
-        routerState.redirecting = true
-        isRedirect = true
-    }
+    if (routerState.navigating) routerState.redirecting = true
 
     if (!identifier) {
         error('"path" or "name" argument required')
@@ -40,7 +36,7 @@ async function pushOrReplace(
         routeData.name = identifier
     }
 
-    return changeRoute(routeData, replace, identifier, isRedirect)
+    return changeRoute(routeData, replace, identifier)
 }
 
 /**
@@ -50,8 +46,8 @@ async function pushOrReplace(
  * @returns The current route or throws an error.
  * @example
  * await push('/', { query: { id: '1' } })
- *   .then(route => '')
- *   .catch(err => '')
+ *   .then(route => ...)
+ *   .catch(err => ...)
  */
 export function push(
     identifier: string,
@@ -67,8 +63,8 @@ export function push(
  * @returns The current route or throws an error.
  * @example
  * await replace('/', { query: { id: '1' } })
- *   .then(route => '')
- *   .catch(err => '')
+ *   .then(route => ...)
+ *   .catch(err => ...)
  */
 export function replace(
     identifier: string,
@@ -85,14 +81,14 @@ export function replace(
  * @returns The current route or throws an error.
  * @example
  * await setQuery({ id: '1' })
- *   .then(route => '')
- *   .catch(err => '')
+ *   .then(route => ...)
+ *   .catch(err => ...)
  */
 export async function setQuery(
     query: Record<string, string>,
     update = false,
     replace = true
-): Promise<FormattedRoute | void> {
+): Promise<void | FormattedRoute> {
     if (route.path === '(*)' || (!route.path && route.depth === 1)) {
         error('Cannot set query of unknown route')
         throw new Error('Cannot set query of unknown route')
@@ -107,6 +103,8 @@ export async function setQuery(
         }
     }
 
+    if (routerState.navigating) routerState.redirecting = true
+
     return changeRoute({ ...route, query: formattedQuery }, replace)
 }
 
@@ -117,13 +115,13 @@ export async function setQuery(
  * @returns The current route or throws an error.
  * @example
  * await setParams({ name: 'dan' })
- *   .then(route => '')
- *   .catch(err => '')
+ *   .then(route => ...)
+ *   .catch(err => ...)
  */
 export async function setParams(
     params: Record<string, string>,
     replace = true
-): Promise<FormattedRoute | void> {
+): Promise<void | FormattedRoute> {
     if (route.path === '(*)' || !route.fullPath) {
         error('Cannot set params of unknown route')
         throw new Error('Cannot set params of unknown route')
@@ -132,6 +130,8 @@ export async function setParams(
         error('Current route has no defined params')
         throw new Error('Current route has no defined params')
     }
+
+    if (routerState.navigating) routerState.redirecting = true
 
     return changeRoute({ ...route, params }, replace)
 }

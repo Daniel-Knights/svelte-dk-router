@@ -1,8 +1,8 @@
 Update slink/guards readme
-Compile svelte components
 anchor links/scroll-behaviour
 named-params at start of path
-separate router instances - setRoutes creates new class
+multiple redirects
+allow redirect if same route
 
 tests
     duplicate navigation

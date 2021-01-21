@@ -7,43 +7,30 @@ import {
     route,
     routeProps,
     push,
-    replace
+    replace,
+    setParams,
+    setQuery
 } from './router'
 
-beforeEach(async (to, from) => {
-    if (to.name !== 'About' && to.query?.id !== '34tg34') {
-        await replace('About')
-            .then(route => console.log(route, 'about'))
-            .catch(err => {
-                console.log(err)
-            })
-    } else if (to.name !== 'Future') {
-        console.log('object')
-        await push('/blog', {
-            params: { id: '1', name: 'dan' },
-            props: 'redirect test',
-            query: { id: '34tg34' }
-        }).then(route => console.log(route, 'blog'))
-    }
-    // if (to.name === 'About') return false
-})
+// beforeEach(async to => {
+//     if (to.name !== 'Future') {
+//         await replace('Blog', { params: { id: '1', name: 'dan' } })
+//             .then(r => console.log(r, 'sdgasd'))
+//             .catch(err => {
+//                 console.log(err)
+//             })
+//     }
+// })
 
-// beforeEach(async (to, from) => {
-//     console.log(to.name, 'kjnkjn')
-//     switch (to.query?.id) {
-//         case '6y5gt3':
-//             await push('/', { query: { id: '34tg34' } })
-//             break
+// afterEach(async to => {
+//     if (to.params?.id !== '1') {
+//         await setParams({ id: '1' })
+//             .then(r => console.log(r, 'jjjdddd'))
+//             .catch(err => console.log(err))
 //     }
 // })
 
 setRoutes(routes)
-
-// setTimeout(() => {
-//     push('/', {
-//         query: { id: '34tg34' }
-//     }).then(route => console.log(route))
-// }, 1000)
 
 const app = new App({ target: document.body })
 

@@ -51,7 +51,7 @@ export function chartState(route: FormattedRoute): void {
                 tempChart[child.depth] = child
                 tempDepth += 1
 
-                if (tempDepth !== route.depth && child.children) {
+                if (tempDepth <= route.depth && child.children) {
                     filterChildren(child)
                 }
             }

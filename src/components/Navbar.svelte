@@ -20,9 +20,8 @@
             on:navigation={e => {
                 console.log(e.detail, 'navigation')
                 console.log(routeProps)
-            }}>
-            Home
-        </SLink>
+            }}
+        >Home</SLink>
         <SLink name={'About'}>About</SLink>
         <SLink name={'Future'} {params} {props}>Blog</SLink>
         <SLink path={'/blog'} params={missingParams} {props}>Blog - Missing Params</SLink>
@@ -45,49 +44,42 @@
                     params: { id: 'hello', name: 'knsckjsndc' },
                     props: { whaddup: 'its ya boi' }
                 })
-            }}>
-            Replace
-        </div>
+            }}
+        >Replace</div>
         <div
             on:click={() => {
                 replace('/blog', { params: { id: 'hello' } })
-            }}>
-            Replace - Missing Params
-        </div>
+            }}
+        >Replace - Missing Params</div>
         <div
             on:click={() => {
                 replace('/blog', { params: { id: 'hello', name: 'john', test: 'sa' } })
-            }}>
-            Replace - Invalid Params
-        </div>
+            }}
+        >Replace - Invalid Params</div>
         <div
             on:click={() => {
                 replace('/blog', { params: { id: 'hello', test: 'heasasd' } })
-            }}>
-            Replace - Missing + Invalid Params
-        </div>
+            }}
+        >Replace - Missing + Invalid Params</div>
         <div
             on:click={async () => {
                 const route = await setQuery({ it: 'definitely works' }, false, false)
                 console.log(route)
-            }}>
-            Set Query
-        </div>
+            }}
+        >Set Query</div>
         <div on:click={() => setQuery({ definitely: 'works' }, true)}>Update Query</div>
         <div
             on:click={async () => {
                 const route = await setParams({ id: 'steve', name: 'iwjndkjwend' })
                 console.log(route)
-            }}>
-            Set Params
-        </div>
+            }}
+        >Set Params</div>
         <div
             on:click={async () => {
                 const route = await setParams({ id: 'steve' })
                 console.log(route)
-            }}>
-            Set Params - Missing params
-        </div>
+            }}
+        >Set Params - Missing params</div>
         <div
             on:click={async () => {
                 const route = await setParams({
@@ -96,8 +88,7 @@
                     test: 'asdasd'
                 })
                 console.log(route)
-            }}>
-            Set Params - Invalid params
-        </div>
+            }}
+        >Set Params - Invalid params</div>
     </nav>
 </header>

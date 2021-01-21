@@ -15,6 +15,7 @@ import { routeProps, setProps } from './router'
  * @returns `void` or logs an error if the route is unknown.
  */
 export async function loadState(): Promise<void> {
+    routerState.loading = true
     routerState.navigating = true
 
     let currentRoute: FormattedRoute
@@ -78,9 +79,12 @@ export async function loadState(): Promise<void> {
     if (beforeCallback) {
         const beforeResult = await beforeCallback(currentRoute, null, setProps)
 
-        if (beforeResult === false || routerState.redirecting) {
+        routerState.navigationStack.push(currentRoute)
+
+        const index = routerState.navigationStack.indexOf(currentRoute)
+
+        if (beforeResult === false || index > 0) {
             routerState.navigating = false
-            routerState.redirecting = false
             return
         }
     }
@@ -95,11 +99,11 @@ export async function loadState(): Promise<void> {
         title.innerHTML = currentRoute.title
     }
 
+    routerState.navigating = false
+
     if (afterCallback) {
         afterCallback(currentRoute, null, routeProps)
     }
-
-    routerState.navigating = false
 }
 
 window.addEventListener('popstate', loadState)

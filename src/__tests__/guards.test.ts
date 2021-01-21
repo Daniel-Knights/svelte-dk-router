@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, push, setRoutes, routeProps } from '../router'
+import { beforeEach, afterEach, push, setRoutes, routeProps, replace } from '../router'
 import { testRoutes } from './static/routes'
 import routes from '../routes'
 
@@ -34,6 +34,22 @@ describe('beforeEach()', () => {
             query: { id: 'cwdwdc' }
         })
     })
+
+    // test('Redirects with push and replace', async () => {
+    //     beforeEach(async to => {
+    //         if (to.path === '/') {
+    //             await push('About')
+    //         } else if (to.name === 'About') {
+    //             await replace('/blog', { params: { id: '1', name: 'dan' } })
+    //         }
+    //     })
+
+    //     const pushResult = await push('/')
+    //     expect(pushResult).toMatchObject(testRoutes[1])
+
+    //     const replaceResult = await replace('/about')
+    //     expect(replaceResult).toMatchObject(testRoutes[2].children[0])
+    // })
 })
 
 describe('afterEach()', () => {
@@ -68,17 +84,33 @@ describe('afterEach()', () => {
             query: { id: 'lkwqdm' }
         })
     })
+
+    // test('Redirects with push and replace', async () => {
+    //     afterEach(async to => {
+    //         if (to.name === 'Blog') {
+    //             await replace('/')
+    //         } else if (to.name !== 'About') {
+    //             await push('About')
+    //         }
+    //     })
+
+    //     const replaceResult = await replace('Blog', { params: { id: '1', name: 'dan' } })
+    //     expect(replaceResult).toMatchObject(testRoutes[0])
+
+    //     const pushResult = await push('/')
+    //     expect(pushResult).toMatchObject(testRoutes[1])
+    // })
 })
 
 describe('beforeEach() + afterEach()', () => {
     test('Correct props handling', async () => {
         beforeEach((to, from, setProps) => {
-            if (to.query.id === 'eifunw') setProps({ test: 'test' })
-            if (to.query.id === 'ejwknrf') setProps('test')
+            if (to.query?.id === 'eifunw') setProps({ test: 'test' })
+            if (to.query?.id === 'ejwknrf') setProps('test')
         })
 
         afterEach(async (to, from, props) => {
-            switch (to.query.id) {
+            switch (to.query?.id) {
                 case 'eifunw':
                     expect(props).toMatchObject({ test: 'test' })
                     expect(routeProps).toMatchObject({ test: 'test' })

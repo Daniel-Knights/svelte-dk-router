@@ -65,8 +65,8 @@
 
 <a
     href={path}
-    on:click|preventDefault={async () => {
-        await changeRoute(routeData, replace, identifier)
+    on:click|preventDefault={() => {
+        changeRoute(routeData, replace, identifier)
             .then(result => {
                 if (!result) return
 
