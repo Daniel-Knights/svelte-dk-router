@@ -1,7 +1,7 @@
 import type { BeforeEach, AfterEach } from '../static'
 
-let beforeCallback: BeforeEach
-let afterCallback: AfterEach
+export let beforeCallback: BeforeEach
+export let afterCallback: AfterEach
 
 /**
  * Navigation guard which runs *before* each route-change.
@@ -12,7 +12,7 @@ let afterCallback: AfterEach
  * @property `redirect` - Redirects initial navigation to another route
  * @property `setProps` - Sets route-props, accessible through the `routeProps` import and `props` parameter in the `afterEach` callback
  */
-function beforeEach(cb: BeforeEach): void {
+export function beforeEach(cb: BeforeEach): void {
     beforeCallback = cb
 }
 
@@ -30,8 +30,6 @@ function beforeEach(cb: BeforeEach): void {
  * - `replace`
  * - `beforeEach`.
  */
-function afterEach(cb: AfterEach): void {
+export function afterEach(cb: AfterEach): void {
     afterCallback = cb
 }
-
-export { beforeCallback, afterCallback, beforeEach, afterEach }

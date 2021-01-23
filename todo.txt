@@ -1,8 +1,11 @@
-Update slink/guards readme
 anchor links/scroll-behaviour
 named-params at start of path
 
 tests
-    duplicate navigation
-    guards redirect
-    page load
+    duplicate navigation/rate-limit
+    page-load
+
+docs
+    slink custom event
+    guards redirect logic
+    setRateLimit

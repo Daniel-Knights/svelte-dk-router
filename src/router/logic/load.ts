@@ -15,7 +15,6 @@ import { routeProps, setProps } from './router'
  * @returns `void` or logs an error if the route is unknown.
  */
 export async function loadState(): Promise<void> {
-    routerState.loading = true
     routerState.navigating = true
 
     let currentRoute: FormattedRoute
@@ -76,14 +75,17 @@ export async function loadState(): Promise<void> {
         handleNestedBasePath()
     }
 
+    // Ensure latest navigation is at the zeroth index
+    routerState.navigationStack.unshift(currentRoute)
+
     if (beforeCallback) {
         const beforeResult = await beforeCallback(currentRoute, null, setProps)
-
-        routerState.navigationStack.push(currentRoute)
-
         const index = routerState.navigationStack.indexOf(currentRoute)
 
-        if (beforeResult === false || index > 0) {
+        if (
+            beforeResult === false ||
+            (!routerState.afterCallbackRunning && index !== 0)
+        ) {
             routerState.navigating = false
             return
         }
@@ -102,7 +104,9 @@ export async function loadState(): Promise<void> {
     routerState.navigating = false
 
     if (afterCallback) {
-        afterCallback(currentRoute, null, routeProps)
+        routerState.afterCallbackRunning = true
+        await afterCallback(currentRoute, null, routeProps)
+        routerState.afterCallbackRunning = false
     }
 }
 

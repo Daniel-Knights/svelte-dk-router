@@ -21,7 +21,8 @@
                 console.log(e.detail, 'navigation')
                 console.log(routeProps)
             }}
-        >Home</SLink>
+        >Home</SLink
+        >
         <SLink name={'About'}>About</SLink>
         <SLink name={'Future'} {params} {props}>Blog</SLink>
         <SLink path={'/blog'} params={missingParams} {props}>Blog - Missing Params</SLink>
@@ -43,7 +44,7 @@
                 replace('/blog/hello/dan', {
                     params: { id: 'hello', name: 'knsckjsndc' },
                     props: { whaddup: 'its ya boi' }
-                })
+                }).then(t => console.log(t, 'ijnkjn'))
             }}
         >Replace</div>
         <div

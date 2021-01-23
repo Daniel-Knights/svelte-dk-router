@@ -3,20 +3,26 @@ import type { FormattedRoute } from '../static'
 
 /**
  * Current state.
- * @property `hashHistory` - boolean
- * @property `routes` - FormattedRoute[]
- * @property `loading` - boolean
- * @property `navigating` - boolean
- * @property `redirecting` - boolean
- * @property `navigationStack` - FormattedRoute[]
+ * @property `hashHistory` - Whether hash-mode has been set.
+ * @property `routes` - Formatted routes.
+ * @property `navigating` - Used to determine if a redirect has been called.
+ * @property `navigationStack` - Stack of pending navigations, `0` being the priority. Any navigation after this is cancelled.
+ * @property `redirecting` - To prevent `sameRoute` check conflicting with redirects.
+ * @property `afterCallbackRunning` - To prevent route cancellation when redirects are stacked through `beforeEach`.
+ * @property `rateLimit` - Number of navigations allowed within 10ms of an initial navigation.
+ * @property `callCount` - Number of times `changeRoute` has been called. Used to prevent infinite loops.
+ * @property `initiationTime` - Time in ms since the first navigation was called. Used to prevent infinite loops.
  */
 export const routerState = {
     hashHistory: false,
     routes: [],
-    loading: false,
     navigating: false,
+    navigationStack: [],
     redirecting: false,
-    navigationStack: []
+    afterCallbackRunning: false,
+    rateLimit: 10,
+    callCount: 0,
+    initiationTime: null
 }
 
 /**

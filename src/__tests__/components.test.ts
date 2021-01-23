@@ -91,7 +91,7 @@ describe('<SLink>', () => {
         expect(routeProps).toMatchObject({ test: 'test' })
     })
 
-    it('Changes route using window.history.replaceState', async () => {
+    it('Changes route using window.history.replaceState', async done => {
         const { getByTestId } = render(SLink, {
             props: {
                 path: '/',
@@ -108,8 +108,10 @@ describe('<SLink>', () => {
         const aboutLink = getByTestId('enrfjk')
 
         afterEach((to, from) => {
-            if (routeProps && (routeProps as Record<string, string>).replaceTest) {
+            if ((routeProps as Record<string, string>)?.replaceTest) {
                 expect(from).not.toMatchObject(testRoutes[1])
+
+                done()
             }
         })
 

@@ -6,7 +6,9 @@ import {
     setQuery,
     setParams,
     setRoutes,
-    beforeEach
+    beforeEach,
+    routeProps,
+    setRateLimit
 } from '../router'
 import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
@@ -18,6 +20,7 @@ beforeAll(() => {
     console.error = jest.fn()
     console.warn = jest.fn()
     Error = jest.fn()
+    setRateLimit(100)
 })
 
 afterAll(() => (Error = store))
@@ -243,7 +246,7 @@ describe('setParams()', () => {
     })
 
     it('Logs/throws error on missing named-params', async () => {
-        await push('/blog', { params: { id: '1', name: 'Dan' } })
+        await push('/blog', { params: { id: '1', name: 'dan' } })
 
         await setParams({ id: '2' }).catch(() => '')
 
@@ -252,7 +255,7 @@ describe('setParams()', () => {
     })
 
     it('Logs warning when invalid named-param is passed', async () => {
-        await push('/blog', { params: { id: '2', name: 'Steve' } })
+        await push('/blog', { params: { id: '2', name: 'steve' } })
 
         await setParams({ id: '3', name: 'John', invalid: 'invalid' })
 
@@ -260,7 +263,7 @@ describe('setParams()', () => {
     })
 
     it('Logs/throws error and warning on missing/invalid named-params', async () => {
-        await push('/blog', { params: { id: '1', name: 'Dan' } })
+        await push('/blog', { params: { id: '1', name: 'dan' } })
 
         await setParams({ id: '2', invalid: 'invalid' }).catch(() => '')
 
@@ -374,23 +377,26 @@ describe('<SLink>', () => {
 })
 
 describe('beforeEach()', () => {
-    it('Logs error when attempting to set props more than once per navigation', async () => {
+    it('Logs error when attempting to set props more than once per navigation', async done => {
         beforeEach((to, from, setProps) => {
             setProps({ some: 'props' })
             setProps('Some other props')
         })
 
-        await push('/')
+        await push('/').then(() => {
+            expect(routeProps).toMatchObject({ some: 'props' })
+            expect(console.error).toHaveBeenCalledTimes(1)
 
-        expect(console.error).toHaveBeenCalledTimes(1)
+            done()
+        })
     })
 })
 
 describe('Promise rejections', () => {
     it('Throws correct error messages', async () => {
-        await push('/unknown').catch(err =>
+        await push('/unknown').catch(err => {
             expect(err.message).toBe('Unknown route: "/unknown"')
-        )
+        })
         await push('/blog').catch(err =>
             expect(err.message).toBe('Missing required param(s): "id" "name"')
         )
@@ -414,7 +420,7 @@ describe('Promise rejections', () => {
             expect(err.message).toBe('Cannot set query of unknown route')
         )
 
-        await replace('/blog', { params: { id: '1', name: 'dan' } })
+        await replace('/blog', { params: { id: '1', name: 'dan' }, query: { t: 't' } })
 
         await setParams({ id: '2' }).catch(err =>
             expect(err.message).toBe('Missing required param(s): "name"')

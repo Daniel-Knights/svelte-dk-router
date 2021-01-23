@@ -11,15 +11,18 @@ import {
     search,
     routeProps
 } from '../router'
-import { routerState } from '../router/logic'
+import { routerState, setRateLimit } from '../router/logic'
 import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
 
 const testObjOne = { test: 'test' }
 const testObjTwo = { id: '1', name: 'dan' }
 
-// @ts-ignore
-beforeAll(() => setRoutes(userRoutes, process.env.HASH_MODE))
+beforeAll(() => {
+    // @ts-ignore
+    setRoutes(userRoutes, process.env.HASH_MODE)
+    setRateLimit(100)
+})
 
 describe('setRoutes()', () => {
     it('Sets correct routes', () => expect(routerState.routes).toEqual(userRoutes))
@@ -95,7 +98,7 @@ describe('push()', () => {
 describe('replace()', () => {
     it('Uses window.history.replaceState to change route', async () => {
         beforeEach((to, from) => {
-            if (routeProps && (routeProps as Record<string, string>).replaceTest) {
+            if ((routeProps as Record<string, string>)?.replaceTest) {
                 expect(from).not.toMatchObject(testRoutes[0])
             }
         })
@@ -207,25 +210,21 @@ describe('setQuery()', () => {
         })
     })
 
-    it('Uses push instead of replace if third argument is `false`', async () => {
-        let fired
-
+    it('Uses push instead of replace if third argument is `false`', async done => {
         expect(route).not.toMatchObject(testRoutes[0])
 
         await push('/')
 
         beforeEach((to, from) => {
-            if (to.query && to.query.test === 'test') {
+            if (to.query?.test === 'test') {
                 expect(from).toMatchObject(testRoutes[0])
-
-                fired = true
+            } else if (to.query?.test === 'test 2') {
+                done()
             }
         })
 
         await setQuery({ test: 'test' }, false, false)
         await setQuery({ test: 'test 2' })
-
-        expect(fired).toBeTruthy()
     })
 })
 
@@ -263,9 +262,7 @@ describe('setParams()', () => {
         })
     })
 
-    it('Uses replace instead of push if third argument is `false`', async () => {
-        let fired
-
+    it('Uses replace instead of push if third argument is `false`', async done => {
         await push('/')
 
         expect(route).not.toMatchObject(testRoutes[2].children[0])
@@ -273,16 +270,14 @@ describe('setParams()', () => {
         await push('/blog', { params: { id: '1', name: 'dan' } })
 
         beforeEach((to, from) => {
-            if (to.params && to.params.name === 'test') {
+            if (to.params?.name === 'test') {
                 expect(from).toMatchObject(testRoutes[2].children[0])
-
-                fired = true
+            } else if (to.params?.name === 'test-2') {
+                done()
             }
         })
 
         await setParams({ id: '1', name: 'test' }, false)
         await setParams({ id: '1', name: 'test-2' })
-
-        expect(fired).toBeTruthy()
     })
 })

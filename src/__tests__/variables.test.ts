@@ -17,7 +17,8 @@ import {
     routeChart,
     routeStore,
     routeChartStore,
-    routeProps
+    routeProps,
+    setRateLimit
 } from '../router'
 import { testRoutes } from './static/routes'
 import routes from '../routes'
@@ -37,8 +38,11 @@ const formattedProperties = [
 const testObjOne = { test: 'test' }
 const testObjTwo = { id: '1', name: 'Dan' }
 
-// @ts-ignore
-beforeAll(() => setRoutes(routes, process.env.HASH_MODE))
+beforeAll(() => {
+    // @ts-ignore
+    setRoutes(routes, process.env.HASH_MODE)
+    setRateLimit(100)
+})
 
 describe('route', () => {
     it('Contains correct data', async () => {

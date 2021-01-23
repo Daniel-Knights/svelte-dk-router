@@ -11,7 +11,8 @@ export {
     afterEach,
     setQuery,
     setParams,
-    setRoutes
+    setRoutes,
+    setRateLimit
 } from './logic'
 export {
     hash,

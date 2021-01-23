@@ -33,7 +33,7 @@ export function setProps(props: unknown): void {
 }
 
 /** Previous route data */
-const fromRoute = { route: null, identifier: null }
+export const fromRoute = { route: null, identifier: null }
 
 /**
  * Central function responsible for all navigations.
@@ -49,10 +49,13 @@ export async function changeRoute(
 ): Promise<void | FormattedRoute> {
     routerState.navigating = true
 
+    rateLimit(passedRoute)
+
     const matchedRoute = compareRoutes(routerState.routes, passedRoute)
 
     if (!matchedRoute) {
         routerState.navigating = false
+        routerState.redirecting = false
         error(`Unknown route: "${identifier}"`)
         throw new Error(`Unknown route: "${identifier}"`)
     }
@@ -66,6 +69,7 @@ export async function changeRoute(
 
     if (!paramsResult.valid) {
         routerState.navigating = false
+        routerState.redirecting = false
         throw new Error('Missing required param(s):' + paramsResult.errorString)
     }
 
@@ -89,13 +93,11 @@ export async function changeRoute(
             identifier,
             fromRoute.identifier
         ) &&
-        !routerState.loading
+        !routerState.redirecting
     ) {
         routerState.navigating = false
         return
     } else fromRoute.identifier = identifier
-
-    if (routerState.loading) routerState.loading = false
 
     // Set fromRoute before route is updated
     if (!replace) {
@@ -108,23 +110,28 @@ export async function changeRoute(
 
     // Before route change navigation guard
     if (beforeCallback) {
+        // Ensure latest navigation is at the zeroth index
+        routerState.navigationStack.unshift(passedRoute)
+
         const beforeResult = await beforeCallback(
             newRoute.route,
             fromRoute.route,
             setProps
         )
 
-        routerState.navigationStack.push(passedRoute)
-
         const index = routerState.navigationStack.indexOf(passedRoute)
 
-        if (beforeResult === false || (routerState.redirecting && index > 0)) {
+        if (
+            beforeResult === false ||
+            (!routerState.afterCallbackRunning && index !== 0)
+        ) {
             routerState.navigating = false
-            return route
-        }
-
-        if (routerState.redirecting) {
             routerState.redirecting = false
+            routerState.navigationStack = []
+
+            return route
+        } else if (routerState.afterCallbackRunning) {
+            routerState.navigationStack = []
         }
     }
 
@@ -152,10 +159,42 @@ export async function changeRoute(
 
     // After route change navigation guard
     if (afterCallback) {
-        afterCallback(route, fromRoute.route, routeProps)
+        routerState.afterCallbackRunning = true
+        await afterCallback(route, fromRoute.route, routeProps)
+        routerState.afterCallbackRunning = false
     }
 
+    routerState.redirecting = false
+
     return route
+}
+
+/** Prevents infinite loops by throwing an error */
+function rateLimit(passedRoute) {
+    routerState.callCount += 1
+
+    const date = new Date()
+
+    if (!routerState.initiationTime) {
+        routerState.initiationTime = date.getTime()
+    }
+
+    const timeout = date.getTime() > routerState.initiationTime + 10
+
+    if (routerState.callCount > routerState.rateLimit && timeout) {
+        routerState.callCount = 0
+        routerState.initiationTime = null
+
+        const errorMessage = `Rate-limit exceeded: "${
+            passedRoute.name || passedRoute.path
+        }". To increase the limit, pass a number to \`setRateLimit()\``
+
+        error(errorMessage)
+        throw new Error(errorMessage)
+    } else if (routerState.callCount <= routerState.rateLimit && timeout) {
+        routerState.callCount = 0
+        routerState.initiationTime = null
+    }
 }
 
 /** Formats and sets new route-data */
