@@ -57,7 +57,8 @@ describe('route', () => {
 
         expect(route).toMatchObject(testRoutes[1])
 
-        setQuery(testObjOne)
+        await setQuery(testObjOne)
+
         expect(route.query).toMatchObject(testObjOne)
 
         await push('/blog', { params: testObjTwo })
@@ -82,7 +83,7 @@ describe('routeChart', () => {
 
         expect(routeChart[1]).toMatchObject(testRoutes[1])
 
-        setQuery(testObjOne)
+        await setQuery(testObjOne)
 
         values(routeChart).forEach((route: FormattedRoute) => {
             expect(route.query).toMatchObject(testObjOne)

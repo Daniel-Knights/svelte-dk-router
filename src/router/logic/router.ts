@@ -13,6 +13,83 @@ import { afterCallback, beforeCallback } from './guard'
 import { chartState } from './nested'
 import { route, routerState, writableRoute } from './state'
 
+/** Prevents infinite loops by throwing an error */
+function rateLimit(passedRoute) {
+    routerState.callCount += 1
+
+    const date = new Date()
+
+    if (!routerState.initiationTime) {
+        routerState.initiationTime = date.getTime()
+    }
+
+    const timeout = date.getTime() > routerState.initiationTime + 10
+
+    if (routerState.callCount > routerState.rateLimit && timeout) {
+        routerState.callCount = 0
+        routerState.initiationTime = null
+
+        const errorMessage = `Rate-limit exceeded: "${
+            passedRoute.name || passedRoute.path
+        }". To increase the limit, pass a number to \`setRateLimit()\``
+
+        error(errorMessage)
+        throw new Error(errorMessage)
+    } else if (routerState.callCount <= routerState.rateLimit && timeout) {
+        routerState.callCount = 0
+        routerState.initiationTime = null
+    }
+}
+
+/** Formats and sets new route-data */
+function setNewRouteData(routeData: FormattedRoute): NewRoute {
+    const hasDefaultChild = routeData.children && !routeData.children[0].path
+    const newRoute = { path: '', title: '', route: null }
+
+    if (routeData.title) newRoute.title = routeData.title
+
+    // Cleanup
+    if (routeData.query) {
+        delete routeData.query
+
+        if (hasDefaultChild) {
+            delete routeData.children[0].query
+        }
+    }
+    if (routeData.params) {
+        delete routeData.params
+
+        if (hasDefaultChild) {
+            delete routeData.children[0].params
+        }
+    }
+
+    newRoute.path = routeData.fullPath
+    newRoute.route = { ...routeData }
+
+    // Check for default child
+    if (newRoute.route.children) {
+        newRoute.route.children.forEach(child => {
+            if (child.path !== '') return
+
+            newRoute.route = child
+        })
+    }
+
+    return newRoute
+}
+
+/** Handle `afterCallback` asynchronously */
+async function afterCallbackHandler() {
+    if (afterCallback) {
+        routerState.afterCallbackRunning = true
+        await afterCallback(route, fromRoute.route, routeProps)
+        routerState.afterCallbackRunning = false
+    }
+
+    routerState.redirecting = false
+}
+
 /**
  * Contains any props set on navigation through:
  *
@@ -159,80 +236,8 @@ export async function changeRoute(
         throw new Error(`Unknown route: "${identifier}"`)
     }
 
-    // After route change navigation guard
-    if (afterCallback) {
-        routerState.afterCallbackRunning = true
-        await afterCallback(route, fromRoute.route, routeProps)
-        routerState.afterCallbackRunning = false
-    }
-
-    routerState.redirecting = false
+    // After route-change navigation guard
+    afterCallbackHandler()
 
     return route
-}
-
-/** Prevents infinite loops by throwing an error */
-function rateLimit(passedRoute) {
-    routerState.callCount += 1
-
-    const date = new Date()
-
-    if (!routerState.initiationTime) {
-        routerState.initiationTime = date.getTime()
-    }
-
-    const timeout = date.getTime() > routerState.initiationTime + 10
-
-    if (routerState.callCount > routerState.rateLimit && timeout) {
-        routerState.callCount = 0
-        routerState.initiationTime = null
-
-        const errorMessage = `Rate-limit exceeded: "${
-            passedRoute.name || passedRoute.path
-        }". To increase the limit, pass a number to \`setRateLimit()\``
-
-        error(errorMessage)
-        throw new Error(errorMessage)
-    } else if (routerState.callCount <= routerState.rateLimit && timeout) {
-        routerState.callCount = 0
-        routerState.initiationTime = null
-    }
-}
-
-/** Formats and sets new route-data */
-function setNewRouteData(routeData: FormattedRoute): NewRoute {
-    const hasDefaultChild = routeData.children && !routeData.children[0].path
-    const newRoute = { path: '', title: '', route: null }
-
-    if (routeData.title) newRoute.title = routeData.title
-
-    // Cleanup
-    if (routeData.query) {
-        delete routeData.query
-
-        if (hasDefaultChild) {
-            delete routeData.children[0].query
-        }
-    }
-    if (routeData.params) {
-        delete routeData.params
-
-        if (hasDefaultChild) {
-            delete routeData.children[0].params
-        }
-    }
-
-    newRoute.path = routeData.fullPath
-    newRoute.route = { ...routeData }
-
-    // Check for default child
-    if (newRoute.route.children) {
-        newRoute.route.children.forEach(child => {
-            if (child.path !== '') return
-
-            newRoute.route = child
-        })
-    }
-
-    return newRoute
 }

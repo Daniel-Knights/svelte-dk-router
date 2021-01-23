@@ -98,11 +98,11 @@ describe('afterEach()', () => {
         })
 
         const replaceResult = await replace('Blog', { params: { id: '1', name: 'dan' } })
-        expect(replaceResult).toMatchObject(testRoutes[1])
+        expect(replaceResult).toMatchObject(testRoutes[2].children[0])
         expect(route).toMatchObject(testRoutes[1])
 
         const pushResult = await push('/')
-        expect(pushResult).toMatchObject(testRoutes[1])
+        expect(pushResult).toMatchObject(testRoutes[0])
         expect(route).toMatchObject(testRoutes[1])
     })
 })
