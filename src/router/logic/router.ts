@@ -123,14 +123,16 @@ export async function changeRoute(
 
         if (
             beforeResult === false ||
-            (!routerState.afterCallbackRunning && index !== 0)
+            // If current navigation isn't highest priority and wasn't called in `afterEach`
+            (index !== 0 && !routerState.afterCallbackRunning)
         ) {
             routerState.navigating = false
             routerState.redirecting = false
             routerState.navigationStack = []
 
             return route
-        } else if (routerState.afterCallbackRunning) {
+        } else if (routerState.afterCallbackRunning || !routerState.redirecting) {
+            // Prevent memory-leak
             routerState.navigationStack = []
         }
     }
