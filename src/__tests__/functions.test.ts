@@ -281,3 +281,11 @@ describe('setParams()', () => {
         await setParams({ id: '1', name: 'test-2' })
     })
 })
+
+describe('setRateLimit()', () => {
+    it('Updates the rate-limit', () => {
+        setRateLimit(1)
+
+        expect(routerState.rateLimit).toBe(1)
+    })
+})

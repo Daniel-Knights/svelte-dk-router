@@ -2,7 +2,6 @@ anchor links/scroll-behaviour
 named-params at start of path
 
 tests
-    duplicate navigation/rate-limit
     page-load
 
 docs

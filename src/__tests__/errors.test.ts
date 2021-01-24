@@ -14,6 +14,7 @@ import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
 import SLink from './static/SLink.svelte'
 
+// Reset in last SLink test
 const store = Error
 
 beforeAll(() => {
@@ -23,9 +24,34 @@ beforeAll(() => {
     setRateLimit(100)
 })
 
-afterAll(() => (Error = store))
-
 afterEach(() => jest.resetAllMocks())
+
+it('Prevents duplicate navigation', async () => {
+    setRoutes(userRoutes)
+
+    const firstResult = await push('/about')
+
+    expect(firstResult).toMatchObject(testRoutes[1])
+
+    const secondResult = await push('/about')
+
+    expect(secondResult).toBeUndefined()
+
+    const { getByTestId, component } = render(SLink, {
+        props: { path: '/about', id: 'yviujnt' }
+    })
+    const link = getByTestId('yviujnt')
+
+    let eventTriggered
+
+    component.$on('navigation', () => {
+        eventTriggered = true
+    })
+
+    await fireEvent.click(link)
+
+    expect(eventTriggered).toBeUndefined()
+})
 
 describe('setRoutes()', () => {
     it('Logs warning when passed invalid properties', () => {
@@ -273,6 +299,39 @@ describe('setParams()', () => {
     })
 })
 
+describe('beforeEach()', () => {
+    it('Logs/throws error when an infinite loop occurs', async () => {
+        setRateLimit(10)
+
+        beforeEach(async () => {
+            await push('/')
+        })
+
+        await push('/').catch(() => '')
+
+        expect(console.error).toHaveBeenCalledTimes(1)
+        expect(Error).toHaveBeenCalledTimes(1)
+
+        // Reset
+        setRateLimit(100)
+    })
+
+    it('Logs error when attempting to set props more than once per navigation', async () => {
+        beforeEach((to, from, setProps) => {
+            setProps({ some: 'props' })
+            setProps('Some other props')
+        })
+
+        await push('/')
+
+        expect(routeProps).toMatchObject({ some: 'props' })
+        expect(console.error).toHaveBeenCalledTimes(1)
+
+        // Reset
+        beforeEach(() => null)
+    })
+})
+
 describe('Fallback', () => {
     it('Navigates to fallback when no other routes match', async () => {
         const { getByTestId } = render(SLink, {
@@ -348,7 +407,7 @@ describe('<SLink>', () => {
         expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
-    it('Emits correct "navigation" error', async () => {
+    it('Emits correct "navigation" error', async done => {
         Error = store
 
         const { getByTestId, component } = render(SLink, {
@@ -357,85 +416,124 @@ describe('<SLink>', () => {
 
         const link = getByTestId('khvvkhjv')
 
-        let fired
-
         component.$on('navigation', e => {
             if (e.detail) {
-                expect(e.detail.success).toBeFalsy()
+                expect(e.detail.success).toBe(false)
                 expect(e.detail.err.message).toBe(`Unknown route: "/unknown"`)
                 expect(console.error).toHaveBeenCalledTimes(2)
 
-                fired = true
+                done()
             }
         })
 
         await push('/') // Prevent duplicate navigation error
         await fireEvent.click(link)
-
-        expect(fired).toBeTruthy()
     })
 })
 
-describe('beforeEach()', () => {
-    it('Logs error when attempting to set props more than once per navigation', async done => {
-        beforeEach((to, from, setProps) => {
-            setProps({ some: 'props' })
-            setProps('Some other props')
-        })
+describe('Promise rejection messages', () => {
+    it('push() - Unknown route', done => {
+        setRoutes(userRoutes)
 
-        await push('/').then(() => {
-            expect(routeProps).toMatchObject({ some: 'props' })
-            expect(console.error).toHaveBeenCalledTimes(1)
+        push('/unknown').catch(err => {
+            expect(err.message).toBe('Unknown route: "/unknown"')
 
             done()
         })
     })
-})
+    it('push() - Missing params', done => {
+        push('/blog').catch(err => {
+            expect(err.message).toBe('Missing required param(s): "id" "name"')
 
-describe('Promise rejections', () => {
-    it('Throws correct error messages', async () => {
-        await push('/unknown').catch(err => {
-            expect(err.message).toBe('Unknown route: "/unknown"')
+            done()
         })
-        await push('/blog').catch(err =>
-            expect(err.message).toBe('Missing required param(s): "id" "name"')
-        )
+    })
+    it('push() - No arguments', done => {
         // @ts-ignore
-        await push().catch(err =>
+        push().catch(err => {
             expect(err.message).toBe('"path" or "name" argument required')
-        )
 
-        await replace('/unknown').catch(err =>
+            done()
+        })
+    })
+
+    it('replace() - Unknown route', done => {
+        setRoutes(userRoutes)
+
+        replace('/unknown').catch(err => {
             expect(err.message).toBe('Unknown route: "/unknown"')
-        )
-        await replace('/blog').catch(err =>
+
+            done()
+        })
+    })
+    it('replace() - Missing params', done => {
+        replace('/blog').catch(err => {
             expect(err.message).toBe('Missing required param(s): "id" "name"')
-        )
+
+            done()
+        })
+    })
+    it('replace() - No arguments', done => {
         // @ts-ignore
-        await replace().catch(err =>
+        replace().catch(err => {
             expect(err.message).toBe('"path" or "name" argument required')
-        )
 
-        await setQuery({ test: 'test' }).catch(err =>
+            done()
+        })
+    })
+
+    it('setQuery() - Unknown route', done => {
+        setQuery({ test: 'test' }).catch(err => {
             expect(err.message).toBe('Cannot set query of unknown route')
-        )
 
+            done()
+        })
+    })
+
+    it('setParams() - Unknown route', async done => {
         await replace('/blog', { params: { id: '1', name: 'dan' }, query: { t: 't' } })
 
-        await setParams({ id: '2' }).catch(err =>
+        setParams({ id: '2' }).catch(err => {
             expect(err.message).toBe('Missing required param(s): "name"')
-        )
 
+            done()
+        })
+    })
+    it('setParams() - Unknown route', async done => {
         await push('/unknown').catch(() => '')
 
-        await setParams({ test: 'test' }).catch(err =>
+        setParams({ test: 'test' }).catch(err => {
             expect(err.message).toBe('Cannot set params of unknown route')
-        )
 
+            done()
+        })
+    })
+    it('setParams() - No defined params', async done => {
         await push('/about')
 
-        setParams({ test: 'test' }).catch(err =>
+        setParams({ test: 'test' }).catch(err => {
             expect(err.message).toBe('Current route has no defined params')
-        )
+
+            done()
+        })
+    })
+
+    it('Rate-limit exceeded', async done => {
+        setRateLimit(10)
+
+        beforeEach(async () => {
+            await push('/')
+        })
+
+        push('/').catch(err => {
+            expect(err.message).toBe(
+                'Rate-limit exceeded: "/". To increase the limit, pass a number to `setRateLimit()`'
+            )
+
+            done()
+        })
+
+        // Reset
+        beforeEach(() => null)
     })
 })

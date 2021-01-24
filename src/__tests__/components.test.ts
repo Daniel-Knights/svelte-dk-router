@@ -121,27 +121,23 @@ describe('<SLink>', () => {
         expect(route).toMatchObject(testRoutes[0])
     })
 
-    it('Emits correct "navigation" event', async () => {
+    it('Emits correct "navigation" event', async done => {
         const { getByTestId, component } = render(SLink, {
             props: { name: 'About', id: 'oinkjn' }
         })
 
         const link = getByTestId('oinkjn')
 
-        let fired
-
         component.$on('navigation', e => {
             if (e.detail) {
-                expect(e.detail.success).toBeTruthy()
+                expect(e.detail.success).toBe(true)
                 expect(e.detail.route).toMatchObject(testRoutes[1])
 
-                fired = true
+                done()
             }
         })
 
         await fireEvent.click(link)
-
-        expect(fired).toBeTruthy()
     })
 
     it('Applies router-active class and aria-current attribute', async () => {
