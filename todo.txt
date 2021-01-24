@@ -1,10 +1,4 @@
 anchor links/scroll-behaviour
-named-params at start of path
 
 tests
     page-load
-
-docs
-    slink custom event
-    guards redirect logic
-    setRateLimit

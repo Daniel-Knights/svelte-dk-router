@@ -23,7 +23,7 @@
 
     let routerActive
 
-    // Match identifier to set routes
+    // Match identifier to set-routes
     const route = compareRoutes(routerState.routes, { name, path, params })
 
     if (route) {

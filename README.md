@@ -22,6 +22,7 @@
     -   [afterEach](#aftereach)
     -   [setQuery](#setquery)
     -   [setParams](#setparams)
+    -   [setRateLimit](#setratelimit)
     -   [location properties](#location-properties)
     -   [router-active](#router-active)
 
@@ -130,9 +131,9 @@ Links to navigate:
 <script>
     import { SLink } from 'svelte-dk-router';
 
-    let params = { id: '1', name: 'dan' },
-        query = { id: '1', name: 'dan' },
-        props = { some: 'extra information' };
+    let params = { id: '1', name: 'dan' };
+    let query = { id: '1', name: 'dan' };
+    let props = { some: 'extra information' };
 </script>
 
 <SLink name={'Home'}>Home</SLink>
@@ -174,7 +175,7 @@ You can nest any number of views within your set components.
 
 Link to each route. `name` _or_ `path` are required, optional `query`, `params` (if defined), `props` and `replace`.
 
-Dispatches a `navigation` event which returns the route being navigated to.
+Dispatches a `navigation` event which returns an object with the success status and, if successful, the route being navigated to, else the error which was thrown.
 
 `replace` defaults to `false`, meaning `pushState` is used instead of `replaceState`.
 
@@ -186,9 +187,9 @@ Dispatches a `navigation` event which returns the route being navigated to.
     path={string}
     query={object}
     params={object}
-    props={object}
+    props={any}
     replace={boolean}
-    on:navigation={newRoute => /* ... */}
+    on:navigation={e => console.log(e.detail)} // e.detail = new-route
 >
     Slot for any link content
 </SLink>
@@ -241,7 +242,7 @@ A readable Svelte store which, through the `.subscribe` method, returns the curr
 
 #### `routeProps`
 
-A variable containing any data passed as props through `<SLink />`, `push()` or `replace()`.
+A variable containing any data passed as props through [`<SLink />`](#slink), [`push()`](#push) or [`replace()`](#replace).
 
 Resets to `null` on route change.
 
@@ -273,31 +274,39 @@ await push('Blog', {
 
 The same as `push()`, except, uses `window.history.replaceState()` instead.
 
-#### <a id="beforeeach"></a>`beforeEach((to, from) => {})`
+#### <a id="beforeeach"></a>`beforeEach((to, from, setProps) => {})`
 
-Navigation guard to run _before_ each route.
+Navigation guard to run _before_ each route-change.
 
 `to` contains all data for the route navigating to, `from` all data of the current route.
 
+`setProps` allows you to set the value of [`routeProps`](#routeprops) (`props` in `afterEach`).
+
+**Note:** Props can only be set **once per navigation**.
+
 If `async`/`await` is used, **the callback will be `await`ed before navigating**.
 
-**Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
+If a redirect is initiated, the original navigation is cancelled and replaced with the redirect.
 
-**Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
+To cancel any navigation, return `false`.
 
-#### <a id="aftereach"></a>`afterEach((to, from) => {})`
+**Note:** Set your navigation-guards _before_ you call [`setRoutes`](#setroutes), else, they won't run on page-load.
 
-Navigation guard to run _after_ each route.
+#### <a id="aftereach"></a>`afterEach((to, from, props) => {})`
+
+Navigation guard to run _after_ each route-change.
 
 `to` contains all data for the route navigated to, `from` all data of the previous route.
 
-**Note:** Duplicate route navigation **does not throw an error**, it's up to you to prevent infinite loops.
+`props` is essentially an alias for the [`routeProps`](#routeprops) import.
 
-**Note:** Set your navigation-guards _before_ you call `setRoutes`, else, they won't run on page-load.
+**Note:** Set your navigation-guards _before_ you call [`setRoutes`](#setroutes), else, they won't run on page-load.
 
 #### <a id="setquery"></a>`setQuery(query: object, update?: boolean, replace?: boolean): current route`
 
-Programmatically set query params. If `update` is set to `true`, replaces/adds to existing query.
+Programmatically set query params.
+
+If `update` is set to `true`, replaces/adds to existing query.
 
 Defaults to `window.history.replaceState`, if `replace` is set to false, uses `window.history.pushState` instead.
 
@@ -319,13 +328,15 @@ Defaults to `window.history.replaceState`, if `replace` is set to false, uses `w
 
 Returns a promise which resolves with the updated route data.
 
-**Example:**
+#### <a id="setratelimit"></a>`setRateLimit(limit: number)`
 
-```js
-await setParams({ id: '2' })
-    .then(updatedRoute => /* Resolved */)
-    .catch(err => /* Rejected */);
-```
+To prevent infinite loops from crashing a users browser, a default rate-limit is set with a maximum of 10 navigations per 10ms. If this limit is exceeded, an error will be thrown.
+
+To increase the limit, use this function.
+
+The limit caps-out at around `850` (before the built-in `RangeError` kicks in) so, to essentially disable it, pass any number higher than this.
+
+**Note:** Set the rate-limit _before_ calling [`setRoutes`](#setroutes), else the limit won't be applied on page-load.
 
 #### `location` properties
 
