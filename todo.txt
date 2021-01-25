@@ -1,4 +1,2 @@
-anchor links/scroll-behaviour
-
 tests
     page-load
