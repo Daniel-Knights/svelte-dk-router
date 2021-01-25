@@ -22,7 +22,6 @@
     -   [afterEach](#aftereach)
     -   [setQuery](#setquery)
     -   [setParams](#setparams)
-    -   [setRateLimit](#setratelimit)
     -   [location properties](#location-properties)
     -   [router-active](#router-active)
 
