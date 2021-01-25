@@ -188,7 +188,7 @@ Dispatches a `navigation` event which returns an object with the success status 
     params={object}
     props={any}
     replace={boolean}
-    on:navigation={e => console.log(e.detail)} // e.detail = new-route
+    on:navigation={e => console.log(e.detail)} // e.detail = result
 >
     Slot for any link content
 </SLink>
