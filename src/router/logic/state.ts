@@ -19,10 +19,7 @@ export const routerState = {
     navigating: false,
     navigationStack: [],
     redirecting: false,
-    afterCallbackRunning: false,
-    rateLimit: 10,
-    callCount: 0,
-    initiationTime: null
+    afterCallbackRunning: false
 }
 
 /**

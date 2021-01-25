@@ -209,11 +209,3 @@ export async function setParams(
 
     return changeRoute({ ...route, params }, replace)
 }
-
-/**
- * Set the rate-limit used for preventing infinite loops. Defaults to 10 navigations within 10ms.
- * @param limit
- */
-export function setRateLimit(limit: number): void {
-    routerState.rateLimit = limit
-}

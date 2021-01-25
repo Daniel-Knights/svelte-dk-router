@@ -11,7 +11,7 @@ import {
     search,
     routeProps
 } from '../router'
-import { routerState, setRateLimit } from '../router/logic'
+import { routerState } from '../router/logic'
 import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
 
@@ -21,7 +21,6 @@ const testObjTwo = { id: '1', name: 'dan' }
 beforeAll(() => {
     // @ts-ignore
     setRoutes(userRoutes, process.env.HASH_MODE)
-    setRateLimit(100)
 })
 
 describe('setRoutes()', () => {
@@ -279,13 +278,5 @@ describe('setParams()', () => {
 
         await setParams({ id: '1', name: 'test' }, false)
         await setParams({ id: '1', name: 'test-2' })
-    })
-})
-
-describe('setRateLimit()', () => {
-    it('Updates the rate-limit', () => {
-        setRateLimit(1)
-
-        expect(routerState.rateLimit).toBe(1)
     })
 })

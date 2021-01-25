@@ -328,16 +328,6 @@ Defaults to `window.history.replaceState`, if `replace` is set to false, uses `w
 
 Returns a promise which resolves with the updated route data.
 
-#### <a id="setratelimit"></a>`setRateLimit(limit: number)`
-
-To prevent infinite loops from crashing a users browser, a default rate-limit is set with a maximum of 10 navigations per 10ms. If this limit is exceeded, an error will be thrown.
-
-To increase the limit, use this function.
-
-The limit caps-out at around `850` (before the built-in `RangeError` kicks in) so, to essentially disable it, pass any number higher than this.
-
-**Note:** Set the rate-limit _before_ calling [`setRoutes`](#setroutes), else the limit won't be applied on page-load.
-
 #### `location` properties
 
 You can also import variables for each property of `window.location`:

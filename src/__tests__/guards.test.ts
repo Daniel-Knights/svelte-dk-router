@@ -6,7 +6,6 @@ import {
     routeProps,
     replace,
     route,
-    setRateLimit,
     setQuery
 } from '../router'
 import { testRoutes } from './static/routes'
@@ -15,7 +14,6 @@ import routes from '../routes'
 beforeAll(() => {
     // @ts-ignore
     setRoutes(routes, process.env.HASH_MODE)
-    setRateLimit(100)
 })
 
 // Reset callbacks to avoid conflict

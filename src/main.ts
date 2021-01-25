@@ -9,8 +9,7 @@ import {
     push,
     replace,
     setParams,
-    setQuery,
-    setRateLimit
+    setQuery
 } from './router'
 
 // beforeEach(async to => {})

@@ -17,8 +17,7 @@ import {
     routeChart,
     routeStore,
     routeChartStore,
-    routeProps,
-    setRateLimit
+    routeProps
 } from '../router'
 import { testRoutes } from './static/routes'
 import routes from '../routes'
@@ -41,7 +40,6 @@ const testObjTwo = { id: '1', name: 'Dan' }
 beforeAll(() => {
     // @ts-ignore
     setRoutes(routes, process.env.HASH_MODE)
-    setRateLimit(100)
 })
 
 describe('route', () => {

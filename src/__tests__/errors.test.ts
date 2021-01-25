@@ -7,8 +7,7 @@ import {
     setParams,
     setRoutes,
     beforeEach,
-    routeProps,
-    setRateLimit
+    routeProps
 } from '../router'
 import { testRoutes } from './static/routes'
 import userRoutes from '../routes'
@@ -21,7 +20,6 @@ beforeAll(() => {
     console.error = jest.fn()
     console.warn = jest.fn()
     Error = jest.fn()
-    setRateLimit(100)
 })
 
 afterEach(() => jest.resetAllMocks())
@@ -300,22 +298,6 @@ describe('setParams()', () => {
 })
 
 describe('beforeEach()', () => {
-    it('Logs/throws error when an infinite loop occurs', async () => {
-        setRateLimit(10)
-
-        beforeEach(async () => {
-            await push('/')
-        })
-
-        await push('/').catch(() => '')
-
-        expect(console.error).toHaveBeenCalledTimes(1)
-        expect(Error).toHaveBeenCalledTimes(1)
-
-        // Reset
-        setRateLimit(100)
-    })
-
     it('Logs error when attempting to set props more than once per navigation', async () => {
         beforeEach((to, from, setProps) => {
             setProps({ some: 'props' })
@@ -516,24 +498,5 @@ describe('Promise rejection messages', () => {
 
             done()
         })
-    })
-
-    it('Rate-limit exceeded', async done => {
-        setRateLimit(10)
-
-        beforeEach(async () => {
-            await push('/')
-        })
-
-        push('/').catch(err => {
-            expect(err.message).toBe(
-                'Rate-limit exceeded: "/". To increase the limit, pass a number to `setRateLimit()`'
-            )
-
-            done()
-        })
-
-        // Reset
-        beforeEach(() => null)
     })
 })

@@ -13,34 +13,6 @@ import { afterCallback, beforeCallback } from './guard'
 import { chartState } from './nested'
 import { route, routerState, writableRoute } from './state'
 
-/** Prevents infinite loops by throwing an error */
-function rateLimit(passedRoute) {
-    routerState.callCount += 1
-
-    const date = new Date()
-
-    if (!routerState.initiationTime) {
-        routerState.initiationTime = date.getTime()
-    }
-
-    const timeout = date.getTime() > routerState.initiationTime + 10
-
-    if (routerState.callCount > routerState.rateLimit && timeout) {
-        routerState.callCount = 0
-        routerState.initiationTime = null
-
-        const errorMessage = `Rate-limit exceeded: "${
-            passedRoute.name || passedRoute.path
-        }". To increase the limit, pass a number to \`setRateLimit()\``
-
-        error(errorMessage)
-        throw new Error(errorMessage)
-    } else if (routerState.callCount <= routerState.rateLimit && timeout) {
-        routerState.callCount = 0
-        routerState.initiationTime = null
-    }
-}
-
 /** Formats and sets new route-data */
 function setNewRouteData(routeData: FormattedRoute): NewRoute {
     const hasDefaultChild = routeData.children && !routeData.children[0].path
@@ -125,8 +97,6 @@ export async function changeRoute(
     identifier?: string
 ): Promise<void | FormattedRoute> {
     routerState.navigating = true
-
-    rateLimit(passedRoute)
 
     const matchedRoute = compareRoutes(routerState.routes, passedRoute)
 
