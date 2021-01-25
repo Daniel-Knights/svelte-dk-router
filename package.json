@@ -1,6 +1,6 @@
 {
     "name": "svelte-dk-router",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "main": "dist/index.js",
     "svelte": "dist/index.js",
     "description": "An efficient, easy-to-use router for Svelte.",
