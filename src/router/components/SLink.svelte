@@ -77,6 +77,8 @@
             })
     }}
     class={routerActive ? 'router-active' : ''}
-    aria-current={routerActive ? 'page' : null}>
+    aria-current={routerActive ? 'page' : null}
+    {...$$restProps}
+>
     <slot />
 </a>

@@ -79,6 +79,8 @@
     }}
     class={routerActive ? 'router-active' : ''}
     aria-current={routerActive ? 'page' : null}
-    data-testid={id}>
+    {...$$restProps}
+    data-testid={id}
+>
     <slot />
 </a>
