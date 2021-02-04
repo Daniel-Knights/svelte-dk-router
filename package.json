@@ -24,7 +24,7 @@
         "test": "npm run test-normal && npm run test-hash",
         "lint": "npx eslint src/router",
         "copy-components": "cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
-        "copy-types": "rm -r dist/static/types && mkdir dist/static/types && cp src/router/static/types/index.d.ts dist/static/types/index.d.ts && cp src/router/static/types/internal.ts dist/static/types/internal.ts"
+        "copy-types": "rm -r dist/static/types && mkdir dist/static/types && cp src/router/static/types/index.d.ts dist/static/types/index.d.ts && cp src/router/static/types/internal.ts dist/static/types/internal.ts && cp src/router/static/types/index.ts dist/static/types/index.ts"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^17.0.0",
