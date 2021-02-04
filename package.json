@@ -1,6 +1,6 @@
 {
     "name": "svelte-dk-router",
-    "version": "4.0.10",
+    "version": "4.0.9",
     "main": "dist/index.js",
     "svelte": "dist/index.js",
     "description": "An efficient, easy-to-use router for Svelte.",
@@ -24,7 +24,7 @@
         "test": "npm run test-normal && npm run test-hash",
         "lint": "npx eslint src/router",
         "copy-components": "cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
-        "copy-types": "cp src/router/static/types/index.d.ts dist/static/types/index.d.ts"
+        "copy-types": "mkdir dist/static/types && cp src/router/static/types/index.d.ts dist/static/types/index.d.ts && cp src/router/static/types/external.d.ts dist/static/types/external.d.ts && cp src/router/static/types/internal.d.ts dist/static/types/internal.d.ts"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^17.0.0",
