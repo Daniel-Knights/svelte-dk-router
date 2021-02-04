@@ -9,7 +9,7 @@
  * @property `meta?` - `string`
  * @property `children?` - `string`
  */
-interface Route {
+export interface Route {
     name?: string
     title?: string
     path: string
@@ -32,7 +32,7 @@ interface Route {
  * @property `parent?` - `FormattedRoute`
  * @property `rootParent?` - `FormattedRoute`
  */
-interface FormattedRoute extends Route {
+export interface FormattedRoute extends Route {
     fullPath: string
     rootPath: string
     regex: RegExp
@@ -52,7 +52,7 @@ interface FormattedRoute extends Route {
  * @property `params?` - `Record<string, string>`
  * @property `props?` - `unknown`
  */
-interface PassedRoute {
+export interface PassedRoute {
     identifier?: string
     name?: string
     path?: string
@@ -62,11 +62,22 @@ interface PassedRoute {
 }
 
 /**
+ * @property `path` - string
+ * @property `title` - string
+ * @property `route` - FormattedRoute
+ */
+export interface NewRoute {
+    path: string
+    title: string
+    route: FormattedRoute
+}
+
+/**
  * `beforeEach` navigation-guard callback.
  * @property `(to?, from?, setProps?)`
  * @returns `void | boolean | Promise<void | boolean>`
  */
-interface BeforeEach {
+export type BeforeEach = {
     (
         to?: FormattedRoute,
         from?: FormattedRoute | null,
@@ -79,19 +90,6 @@ interface BeforeEach {
  * @property `(to?, from?, props?)`
  * @returns `void | Promise<void>`
  */
-interface AfterEach {
+export type AfterEach = {
     (to?: FormattedRoute, from?: FormattedRoute, props?: unknown): void | Promise<void>
 }
-
-/**
- * @property `path` - string
- * @property `title` - string
- * @property `route` - FormattedRoute
- */
-interface NewRoute {
-    path: string
-    title: string
-    route: FormattedRoute
-}
-
-export type { Route, FormattedRoute, PassedRoute, BeforeEach, AfterEach, NewRoute }

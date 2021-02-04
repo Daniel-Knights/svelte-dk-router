@@ -5,7 +5,7 @@ import type { FormattedRoute } from '../static'
 export const writableDepthChart = writable({})
 
 /**
- * Object containing all routes within the current route heirarchy,
+ * Object containing all routes within the current route-hierarchy,
  * listed by depth (`1` = root, `2` = child, etc.).
  * @example
  * {
@@ -18,7 +18,7 @@ export let routeChart: Record<string, FormattedRoute>
 writableDepthChart.subscribe(newChart => (routeChart = newChart))
 
 /**
- * Readable Svelte store which triggers on each navigation and returns the current route-heirarchy,
+ * Readable Svelte store which triggers on each navigation and returns the current route-hierarchy,
  * listed by depth (`1` = root, `2` = child, etc.).
  * @example
  * routeChartStore.subscribe(newChart => {

@@ -12,7 +12,7 @@
     },
     "scripts": {
         "build": "rollup -c",
-        "lib": "rm -r dist && tsc -b src/router && grunt && cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
+        "lib": "rm -r dist && tsc -b src/router && grunt && cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte && rm -r dist/static/types && mkdir dist/static/types && cp src/router/static/types/index.d.ts dist/static/types/index.d.ts && cp src/router/static/types/internal.ts dist/static/types/internal.ts",
         "pub": "npm run lib && npm version patch && npm publish",
         "pub-minor": "npm run lib && npm version minor && npm publish",
         "pub-major": "npm run lib && npm version major && npm publish",
@@ -60,6 +60,7 @@
     "files": [
         "dist"
     ],
+    "types": "dist/static/types/index.d.ts",
     "keywords": [
         "svelte",
         "router",

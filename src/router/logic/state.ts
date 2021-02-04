@@ -31,8 +31,8 @@ export const routerState = {
  * @property `children` - Nested-routes
  * @property `parent` - Parent-route
  * @property `rootParent` - Ancestor-route
- * @property `crumbs` - Array of route-names within the route-heirarchy
- * @property `depth` - Routes' depth within its route-heirarchy
+ * @property `crumbs` - Array of route-names within the route-hierarchy
+ * @property `depth` - Routes' depth within its route-hierarchy
  * @property `fullPath` - Path joined with any matching ancestor paths
  * @property `rootPath` - Ancestor-routes' path
  * @property `regex` - Generated regex for the routes' path
