@@ -10,9 +10,13 @@
         "type": "git",
         "url": "https://github.com/Daniel-Knights/svelte-dk-router"
     },
+    "files": [
+        "dist"
+    ],
+    "types": "dist/static/types/index.d.ts",
     "scripts": {
         "build": "rollup -c",
-        "lib": "rm -r dist && tsc -b src/router && grunt && npm run copy-components && npm run copy-types",
+        "lib": "rm -r dist && tsc -b src/router && grunt && npm run copy-components",
         "pub": "npm version patch && npm publish",
         "pub-minor": "npm version minor && npm publish",
         "pub-major": "npm version major && npm publish",
@@ -23,8 +27,7 @@
         "test-hash": "HASH_MODE=true jest",
         "test": "npm run test-normal && npm run test-hash",
         "lint": "npx eslint src/router",
-        "copy-components": "cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte",
-        "copy-types": "mkdir dist/static/types && touch dist/static/types/index.js && cp src/router/static/types/index.d.ts dist/static/types/index.d.ts && cp src/router/static/types/external.d.ts dist/static/types/external.d.ts && cp src/router/static/types/internal.d.ts dist/static/types/internal.d.ts"
+        "copy-components": "cp src/router/components/SLink.svelte dist/components/SLink.svelte && cp src/router/components/SView.svelte dist/components/SView.svelte"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^17.0.0",
@@ -59,10 +62,6 @@
     "peerDependencies": {
         "svelte": "^3.31.2"
     },
-    "files": [
-        "dist"
-    ],
-    "types": "dist/static/types/index.d.ts",
     "keywords": [
         "svelte",
         "router",
