@@ -6,44 +6,8 @@ import type {
     PassedRoute,
     Route
 } from './internal'
-
-/**
- * @property `identifier` - string
- * @property `routeData?` - PassedRoute
- */
-type PushReplace = (
-    identifier: string,
-    routeData?: PassedRoute
-) => Promise<void | FormattedRoute>
-
-/**
- * @property `query` - Record<string, string>
- * @property `update?` - boolean
- * @property `replace?` - boolean
- * @returns `Promise<void | FormattedRoute>`
- */
-type SetQuery = (
-    query: Record<string, string>,
-    update?: boolean,
-    replace?: boolean
-) => Promise<void | FormattedRoute>
-
-/**
- * @property `params` - Record<string, string>
- * @property `replace?` - boolean
- * @returns `Promise<void | FormattedRoute>`
- */
-type SetParams = (
-    params: Record<string, string>,
-    replace?: boolean
-) => Promise<void | FormattedRoute>
-
-/**
- * @property `userRoutes` - Route[]
- * @property `hashMode?` - boolean
- * @returns `void`
- */
-type SetRoutes = (userRoutes: Route[], hashMode?: boolean) => void
+import SLink from '../../components/SLink.svelte'
+import SView from '../../components/SLink.svelte'
 
 declare module 'svelte-dk-router' {
     /**
@@ -112,7 +76,10 @@ declare module 'svelte-dk-router' {
      *   .then(route => ...)
      *   .catch(err => ...)
      */
-    function push(): PushReplace
+    function push(
+        identifier: string,
+        routeData?: PassedRoute
+    ): Promise<void | FormattedRoute>
     /**
      * Uses window.history.replaceState to update the current history entry. Returns a promise.
      * @param identifier - Name or path.
@@ -123,7 +90,10 @@ declare module 'svelte-dk-router' {
      *   .then(route => ...)
      *   .catch(err => ...)
      */
-    function replace(): PushReplace
+    function replace(
+        identifier: string,
+        routeData?: PassedRoute
+    ): Promise<void | FormattedRoute>
     /**
      * Navigation guard which runs *before* each route-change.
      * @param cb - **Arguments:**
@@ -160,7 +130,11 @@ declare module 'svelte-dk-router' {
      *   .then(route => ...)
      *   .catch(err => ...)
      */
-    function setQuery(): SetQuery
+    function setQuery(
+        query: Record<string, string>,
+        update?: boolean,
+        replace?: boolean
+    ): Promise<void | FormattedRoute>
     /**
      * Set named-params. Returns a promise.
      * @param params - Any predefined key/value pairs.
@@ -171,13 +145,16 @@ declare module 'svelte-dk-router' {
      *   .then(route => ...)
      *   .catch(err => ...)
      */
-    function setParams(): SetParams
+    function setParams(
+        params: Record<string, string>,
+        replace?: boolean
+    ): Promise<void | FormattedRoute>
     /**
      * Sets a provided array of routes.
      * @param userRoutes
      * @param hashMode - (Optional, defaults to `false` (history-mode)).
      */
-    function setRoutes(): SetRoutes
+    function setRoutes(userRoutes: Route[], hashMode?: boolean): void
 
     /** Alias for `window.location.hash`, updates on navigation */
     const hash: string
@@ -199,6 +176,8 @@ declare module 'svelte-dk-router' {
     const search: string
 
     export {
+        SLink,
+        SView,
         route,
         routeChart,
         routeProps,
