@@ -1,7 +1,6 @@
 {
     "extends": "@tsconfig/svelte/tsconfig.json",
     "include": ["./**/*"],
-    "exclude": ["static/types"],
     "compilerOptions": {
         "target": "es3",
         "lib": ["es2017", "DOM"],
