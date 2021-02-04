@@ -103,7 +103,7 @@ declare module 'svelte-dk-router' {
      * @property `redirect` - Redirects initial navigation to another route
      * @property `setProps` - Sets route-props, accessible through the `routeProps` import and `props` parameter in the `afterEach` callback
      */
-    function beforeEach(): BeforeEach
+    function beforeEach(cb: BeforeEach)
     /**
      * Navigation guard which runs *after* each route-change.
      * @param cb - **Arguments:**
@@ -118,7 +118,7 @@ declare module 'svelte-dk-router' {
      * - `replace`
      * - `beforeEach`.
      */
-    function afterEach(): AfterEach
+    function afterEach(cb: AfterEach)
     /**
      * Set or update query-params. Returns a promise.
      * @param query - Object of any valid key/value pairs.
