@@ -31,7 +31,7 @@
 npm i svelte-dk-router
 ```
 
-_Or..._
+_or..._
 
 ```
 yarn add svelte-dk-router
