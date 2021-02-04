@@ -5,6 +5,7 @@
         "target": "es3",
         "lib": ["es2017", "DOM"],
         "outDir": "../../dist",
-        "removeComments": true
+        "removeComments": true,
+        "sourceMap": false
     }
 }
