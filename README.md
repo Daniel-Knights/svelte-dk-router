@@ -31,6 +31,12 @@
 npm i svelte-dk-router
 ```
 
+_Or..._
+
+```
+yarn add svelte-dk-router
+```
+
 ## Quick Start
 
 First set your routes:
